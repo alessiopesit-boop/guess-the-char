@@ -22,8 +22,16 @@ export const routes: Routes = [
     canActivate: [onboardedGuard],
     loadComponent: () => import('./features/selection/selection').then((m) => m.Selection),
   },
-  { path: 'game',              canActivate: [onboardedGuard], loadComponent: comingSoon },
-  { path: 'daily',             canActivate: [onboardedGuard], loadComponent: comingSoon },
+  {
+    path: 'game',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/game/game').then((m) => m.Game),
+  },
+  {
+    path: 'daily',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/game/game').then((m) => m.Game),
+  },
   { path: 'daily-result',      canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'session-result',    canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'settings',          canActivate: [onboardedGuard], loadComponent: comingSoon },

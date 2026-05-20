@@ -1,0 +1,125 @@
+.gamebar { align-items: center; }
+
+.progress-wrap {
+  flex: 1;
+  padding: 0 14px;
+}
+
+.gamebar-r {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: calc(100dvh - 80px);
+}
+
+.game-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-score {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.meta-combo {
+  color: var(--warm);
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+.hint-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--hover-dur) ease;
+}
+.hint-btn:hover:not(:disabled) {
+  background: var(--surface-3);
+}
+.hint-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.hint-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.hint-count {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.feedback-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: pop 220ms var(--tx-ease);
+}
+.feedback-bar.is-correct {
+  border-color: rgba(52, 211, 153, 0.4);
+  background: linear-gradient(180deg, rgba(52, 211, 153, 0.05), var(--surface));
+}
+.feedback-bar.is-wrong {
+  border-color: rgba(251, 113, 133, 0.4);
+  background: linear-gradient(180deg, rgba(251, 113, 133, 0.05), var(--surface));
+}
+
+.fb-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.fb-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+.feedback-bar.is-correct .fb-label { color: var(--success); }
+.feedback-bar.is-wrong .fb-label { color: var(--danger); }
+
+.fb-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.fb-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  color: var(--text-mute);
+}
+
+.fb-next {
+  align-self: stretch;
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

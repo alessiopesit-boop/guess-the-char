@@ -1,0 +1,126 @@
+<div class="app-shell">
+  @if (flash(); as f) {
+    <div [class]="'flash ' + f"></div>
+  }
+
+  <div class="appbar gamebar">
+    <button class="btn-icon" type="button" (click)="exit()" aria-label="Exit">
+      <app-icon name="close" />
+    </button>
+    <div class="progress-wrap">
+      <div class="progress">
+        <i [style.width.%]="totalProgress() * 100"></i>
+      </div>
+    </div>
+    <div class="gamebar-r">
+      @if (isTimed()) {
+        <app-timer-ring [seconds]="secondsLeft()" [max]="60" />
+      } @else if (isSurvival()) {
+        <app-lives [count]="lives()" />
+      } @else {
+        <app-streak-pill [value]="streakLocal()" />
+      }
+    </div>
+  </div>
+
+  <div class="page game-page">
+    <div class="game-meta">
+      <span class="eyebrow">
+        @switch (mode()) {
+          @case ('daily') {
+            <span>{{ i18n.lang() === 'it' ? 'Sfida' : 'Daily' }} · {{ idx() + 1 }}/{{ totalDaily }}</span>
+          }
+          @case ('timed') {
+            <span>{{ i18n.t('timed') }} · </span>
+            <span class="meta-score">{{ score() }}</span>
+            @if (combo() > 1) {
+              <span class="meta-combo"> ×{{ combo() }}</span>
+            }
+          }
+          @case ('survival') {
+            <span>Survival · {{ correctCount() }}</span>
+          }
+          @default {
+            @if (weakOnly()) {
+              <span>{{ i18n.t('weak') }} · {{ correctCount() }}/{{ history().length }}</span>
+            } @else {
+              <span>{{ i18n.t('training') }} · {{ correctCount() }}/{{ history().length }}</span>
+            }
+          }
+        }
+      </span>
+      <button
+        class="hint-btn"
+        type="button"
+        [disabled]="chosen() !== null || hintsLeft() <= 0"
+        (click)="useHint()"
+        aria-label="Use hint"
+      >
+        <span class="hint-icon">💡</span>
+        <span class="mono tabnum hint-count">{{ hintsLeft() }}</span>
+      </button>
+    </div>
+
+    @if (question(); as q) {
+      <div
+        class="glyph-stage"
+        [class.is-wrong]="glyphFx() === 'wrong'"
+        [class.is-correct]="glyphFx() === 'correct'"
+      >
+        <div
+          class="glyph"
+          [class.is-wrong]="glyphFx() === 'wrong'"
+          [class.is-correct-fast]="glyphFx() === 'correct'"
+          [attr.data-idx]="idx()"
+        >
+          {{ q.glyph }}
+        </div>
+        @if (showCp()) {
+          <span class="glyph-codepoint mono">U+{{ q.cp }}</span>
+        }
+      </div>
+
+      <div class="options">
+        @for (opt of q.options; track opt.id; let i = $index) {
+          <button
+            class="option"
+            type="button"
+            [class.is-correct]="chosen() !== null && opt.id === q.correct.id"
+            [class.is-wrong]="chosen()?.id === opt.id && chosen() !== null && !chosen()!.correct"
+            [class.is-eliminated]="eliminated().includes(opt.id)"
+            [disabled]="chosen() !== null || eliminated().includes(opt.id)"
+            (click)="pick(opt)"
+          >
+            <span class="opt-n">{{ i + 1 }}</span>
+            <span class="opt-name">{{ nameOf(opt) }}</span>
+          </button>
+        }
+      </div>
+
+      @if (chosen(); as c) {
+        @if (!isTimed()) {
+          <div
+            class="feedback-bar"
+            [class.is-correct]="c.correct"
+            [class.is-wrong]="!c.correct"
+          >
+            <div class="fb-row">
+              <div class="fb-label">
+                {{ c.correct ? i18n.t('correct') : i18n.t('wrong') }}
+              </div>
+              <div class="fb-name">{{ nameOf(q.correct) }}</div>
+            </div>
+            <div class="fb-info">
+              <div class="fb-region">{{ q.correct.region }} · {{ q.correct.lang }}</div>
+              <div class="fb-cp mono">U+{{ q.cp }}</div>
+            </div>
+            <button class="btn btn-primary fb-next" type="button" (click)="advance()">
+              <span>{{ i18n.t('next') }}</span>
+              <app-icon name="arrow-right" />
+            </button>
+          </div>
+        }
+      }
+    }
+  </div>
+</div>
