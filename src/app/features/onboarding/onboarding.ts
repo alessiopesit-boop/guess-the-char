@@ -51,6 +51,8 @@ export class Onboarding {
 
   protected readonly current = computed(() => STEPS[this.step()]);
   protected readonly isLast = computed(() => this.step() === STEPS.length - 1);
+  /** Chiave usata da @for per forzare il remount del DOM e far ripartire l'animazione di slide ad ogni cambio di step/direzione. */
+  protected readonly slideKey = computed(() => `${this.step()}:${this.dir()}`);
   protected readonly currentTitle = computed(() => {
     const s = this.current();
     return this.i18n.lang() === 'en' ? s.titleEn : s.titleIt;

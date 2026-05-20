@@ -16,18 +16,20 @@
   </div>
 
   <div class="page onb-page">
-    <div [class]="'onb-slide ' + dir()" [attr.data-step]="step()">
-      <div class="onb-grid">
-        @for (g of current().glyphs; track $index) {
-          <div class="g">{{ g }}</div>
-        }
+    @for (k of [slideKey()]; track k) {
+      <div [class]="'onb-slide ' + dir()" [attr.data-step]="step()">
+        <div class="onb-grid">
+          @for (g of current().glyphs; track $index) {
+            <div class="g">{{ g }}</div>
+          }
+        </div>
+        <div class="onb-copy">
+          <div class="eyebrow">{{ current().eyebrow }}</div>
+          <h1 class="h1">{{ currentTitle() }}</h1>
+          <p class="muted onb-body">{{ currentBody() }}</p>
+        </div>
       </div>
-      <div class="onb-copy">
-        <div class="eyebrow">{{ current().eyebrow }}</div>
-        <h1 class="h1">{{ currentTitle() }}</h1>
-        <p class="muted onb-body">{{ currentBody() }}</p>
-      </div>
-    </div>
+    }
 
     <div class="onb-foot">
       <div class="onb-dots">
