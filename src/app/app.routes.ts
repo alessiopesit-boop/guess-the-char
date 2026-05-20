@@ -17,7 +17,11 @@ export const routes: Routes = [
   },
 
   // Stub navigabili: verranno sostituiti progressivamente con i veri componenti.
-  { path: 'selection',         canActivate: [onboardedGuard], loadComponent: comingSoon },
+  {
+    path: 'selection',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/selection/selection').then((m) => m.Selection),
+  },
   { path: 'game',              canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'daily',             canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'daily-result',      canActivate: [onboardedGuard], loadComponent: comingSoon },
