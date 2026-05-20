@@ -32,7 +32,11 @@ export const routes: Routes = [
     canActivate: [onboardedGuard],
     loadComponent: () => import('./features/game/game').then((m) => m.Game),
   },
-  { path: 'daily-result',      canActivate: [onboardedGuard], loadComponent: comingSoon },
+  {
+    path: 'daily-result',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/daily-result/daily-result').then((m) => m.DailyResult),
+  },
   { path: 'session-result',    canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'settings',          canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'badges',            canActivate: [onboardedGuard], loadComponent: comingSoon },
