@@ -55,9 +55,9 @@ export class Badges {
     this.router.navigate(['/home']);
   }
 
-  @HostListener('window:keydown.escape', ['$event'])
-  protected onEsc(e: KeyboardEvent): void {
-    if (this.detail()) {
+  @HostListener('window:keydown', ['$event'])
+  protected onKey(e: KeyboardEvent): void {
+    if (e.key === 'Escape' && this.detail()) {
       e.preventDefault();
       this.closeDetail();
     }

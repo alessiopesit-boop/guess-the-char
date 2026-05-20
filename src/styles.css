@@ -791,7 +791,10 @@ button {
   from { transform: scale(.7); opacity: 0; filter: blur(8px); }
   to { transform: scale(1); opacity: 1; filter: blur(0); }
 }
-[data-motion="rich"] @keyframes glyph-in {
+[data-motion="rich"] .glyph {
+  animation-name: glyph-in-rich;
+}
+@keyframes glyph-in-rich {
   from { transform: scale(.5); opacity: 0; filter: blur(12px); }
   60% { transform: scale(1.08); opacity: 1; filter: blur(0); }
   to { transform: scale(1); }
