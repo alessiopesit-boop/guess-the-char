@@ -20,14 +20,14 @@
         <button
           type="button"
           class="badge-card"
-          [class.unlocked]="b.unlocked"
+          [attr.data-unlocked]="b.unlocked ? '1' : '0'"
           [attr.data-tier]="b.tier"
           (click)="open(b)"
         >
-          <span class="badge-glyph">{{ b.icon }}</span>
-          <span class="badge-name">{{ titleOf(b) }}</span>
+          <span class="badge-icon">{{ b.icon }}</span>
+          <span class="badge-title">{{ titleOf(b) }}</span>
           @if (!b.unlocked) {
-            <span class="badge-progress-bar"><i [style.width.%]="progressPct(b)"></i></span>
+            <span class="badge-prog"><div [style.width.%]="progressPct(b)"></div></span>
           }
         </button>
       }
@@ -41,9 +41,15 @@
           <app-icon name="close" />
         </button>
 
-        <div class="badge-sheet-icon" [class.unlocked]="d.unlocked" [attr.data-tier]="d.tier">
+        <div class="badge-icon-lg" [attr.data-unlocked]="d.unlocked ? '1' : '0'" [attr.data-tier]="d.tier">
           {{ d.icon }}
         </div>
+        <span class="eyebrow badge-sheet-status" [class.unlocked]="d.unlocked">
+          {{ d.unlocked
+            ? (i18n.lang() === 'it' ? 'SBLOCCATO' : 'UNLOCKED')
+            : (i18n.lang() === 'it' ? 'DA SBLOCCARE' : 'TO UNLOCK') }}
+          · {{ d.tier.toUpperCase() }}
+        </span>
         <h2 class="h2 badge-sheet-title">{{ titleOf(d) }}</h2>
         <p class="muted badge-sheet-desc">{{ descOf(d) }}</p>
 

@@ -1,12 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   HostListener,
   OnDestroy,
   computed,
   effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -14,6 +16,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
 import { ALL_SCRIPT_IDS, ScriptInfo } from '../../core/data/scripts';
 import { Question, buildQuestion, mulberry32, seedFromDate } from '../../core/data/quiz';
+import { scriptHint } from '../../core/data/script-hints';
 import { SoundService } from '../../core/audio/sound.service';
 import { HapticsService } from '../../core/audio/haptics.service';
 import { Icon } from '../../shared/icon';
@@ -87,6 +90,12 @@ export class Game implements OnDestroy {
   protected readonly chosen = signal<{ id: string; correct: boolean } | null>(null);
   /** Overlay informativo aperto sopra la partita; non interrompe il gioco. */
   protected readonly infoOverlay = signal<'glyph' | 'script' | null>(null);
+
+  /** Tutorial "first wrong" mostrato una sola volta nella storia dell'utente, solo in modalita' Allenamento. */
+  protected readonly tutorial = signal<{ scriptId: string; text: string } | null>(null);
+
+  /** Bottone "Prossimo carattere" per spostarci il focus dopo una scelta. */
+  private readonly nextBtn = viewChild<ElementRef<HTMLButtonElement>>('nextBtn');
   protected readonly lives = signal(SURVIVAL_LIVES);
   protected readonly secondsLeft = signal(TIMED_DURATION);
   protected readonly streakLocal = signal(0);
@@ -141,6 +150,13 @@ export class Game implements OnDestroy {
         setTimeout(() => this.finishSession(), 700);
       }
     });
+
+    // Sposta il focus sul pulsante "Prossimo carattere" appena compare la scheda.
+    effect(() => {
+      const c = this.chosen();
+      if (!c || this.isTimed()) return;
+      queueMicrotask(() => this.nextBtn()?.nativeElement?.focus());
+    });
   }
 
   ngOnDestroy(): void {
@@ -156,6 +172,7 @@ export class Game implements OnDestroy {
     this.chosen.set(null);
     this.glyphFx.set(null);
     this.eliminated.set([]);
+    this.tutorial.set(null);
   }
 
   protected useHint(): void {
@@ -197,6 +214,20 @@ export class Game implements OnDestroy {
       { correct, scriptId: q.correct.id, glyph: q.glyph },
     ]);
     this.streakLocal.update((s) => (correct ? s + 1 : 0));
+
+    // Tutorial alla prima sbagliata di sempre, solo in modalita' allenamento.
+    if (
+      !correct &&
+      this.isTraining() &&
+      !this.tutorial() &&
+      !this.appState.state().shownFirstWrong
+    ) {
+      this.tutorial.set({
+        scriptId: q.correct.id,
+        text: scriptHint(q.correct, this.i18n.lang()),
+      });
+      this.appState.update({ shownFirstWrong: true });
+    }
 
     this.appState.patch((prev) => {
       const perScript = { ...prev.perScript };
@@ -313,15 +344,19 @@ export class Game implements OnDestroy {
     return this.i18n.lang() === 'en' ? opt.nameEn : opt.nameIt;
   }
 
-  /** Stato visuale dell'opzione (`data-state`): '' | 'dim' | 'reveal' | 'correct' | 'wrong'. */
+  /**
+   * Stato visuale dell'opzione (`data-state`): '' | 'dim' | 'reveal' | 'correct' | 'wrong'.
+   * Ordine: prima la scelta dell'utente (cosi' l'opzione giusta scelta scatta
+   * in "correct-pop"), poi la corretta non-scelta come "reveal", poi "dim".
+   */
   protected optState(opt: ScriptInfo): string {
     if (this.eliminated().includes(opt.id)) return 'dim';
     const c = this.chosen();
     if (!c) return '';
     const q = this.question();
     if (!q) return '';
-    if (opt.id === q.correct.id) return 'reveal';
     if (opt.id === c.id) return c.correct ? 'correct' : 'wrong';
+    if (opt.id === q.correct.id) return 'reveal';
     return 'dim';
   }
 

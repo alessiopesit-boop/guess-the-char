@@ -16,7 +16,7 @@
 .game-page {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   min-height: calc(100dvh - 80px);
 }
 
@@ -56,7 +56,6 @@
   font-family: inherit;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   cursor: pointer;
   transition:
     background var(--hover-dur) ease,
@@ -70,13 +69,35 @@
   opacity: 0.35;
   cursor: not-allowed;
 }
-.hint-icon {
-  font-size: 14px;
-  line-height: 1;
-}
 .hint-count {
   color: var(--warm);
   font-size: 12px;
+  margin-left: 4px;
+}
+
+/* Banner "promemoria" alla prima risposta sbagliata in Allenamento */
+.fb-tutorial {
+  padding: 12px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  animation: pop 0.25s ease;
+}
+.fb-tutorial-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+.fb-tutorial-body {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+}
+.fb-tutorial-eyebrow {
+  color: var(--warm);
+  margin-bottom: 4px;
 }
 
 /* Bottone "Prossimo carattere" sotto la feedback bar */

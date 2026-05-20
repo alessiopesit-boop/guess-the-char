@@ -63,64 +63,9 @@
   gap: 8px;
 }
 
-.badge-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 14px 8px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  cursor: pointer;
-  transition:
-    transform var(--hover-dur) ease,
-    background var(--hover-dur) ease;
-}
-.badge-card:hover {
-  background: var(--surface-2);
-}
-.badge-card:active {
-  transform: translateY(1px);
-}
-
-.badge-glyph {
-  font-size: 32px;
-  filter: grayscale(1);
-  opacity: 0.45;
-  transition:
-    filter var(--hover-dur) ease,
-    opacity var(--hover-dur) ease;
-}
-.badge-card.unlocked .badge-glyph {
-  filter: none;
-  opacity: 1;
-}
-
-.badge-card.unlocked[data-tier='gold'] { box-shadow: inset 0 0 0 1px rgba(251,191,36,.45); }
-.badge-card.unlocked[data-tier='silver'] { box-shadow: inset 0 0 0 1px rgba(180,196,210,.45); }
-.badge-card.unlocked[data-tier='bronze'] { box-shadow: inset 0 0 0 1px rgba(217,124,67,.45); }
-
-.badge-name {
-  font-size: 12px;
-  color: var(--text-dim);
-  text-align: center;
-  line-height: 1.2;
-}
-.badge-card.unlocked .badge-name { color: var(--text); }
-
-.badge-progress-bar {
-  width: 70%;
-  height: 3px;
-  background: var(--border);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.badge-progress-bar i {
-  display: block;
-  height: 100%;
-  background: var(--accent);
-}
+/* Le classi .badge-card, .badge-icon, .badge-title e .badge-prog vivono in styles.css
+   globale: ricalcano esattamente il prototipo (cerchio 52x52, border per tier,
+   box-shadow colorato sulle unlocked, barra progresso in basso). Qui niente. */
 
 /* Sheet dettaglio */
 .badge-backdrop {
@@ -141,19 +86,14 @@
   right: 12px;
 }
 
-.badge-sheet-icon {
-  font-size: 56px;
-  margin: 8px 0 12px;
-  filter: grayscale(1);
-  opacity: 0.55;
+.badge-sheet-status {
+  display: inline-block;
+  margin: 14px 0 6px;
+  color: var(--text-mute);
 }
-.badge-sheet-icon.unlocked {
-  filter: none;
-  opacity: 1;
+.badge-sheet-status.unlocked {
+  color: var(--accent);
 }
-.badge-sheet-icon[data-tier='gold'].unlocked   { text-shadow: 0 0 26px rgba(251,191,36,.5); }
-.badge-sheet-icon[data-tier='silver'].unlocked { text-shadow: 0 0 26px rgba(180,196,210,.5); }
-.badge-sheet-icon[data-tier='bronze'].unlocked { text-shadow: 0 0 26px rgba(217,124,67,.5); }
 
 .badge-sheet-title {
   margin: 0;

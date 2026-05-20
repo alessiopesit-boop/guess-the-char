@@ -21,12 +21,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   styles: `
     .lives {
       display: inline-flex;
-      gap: 3px;
+      gap: 4px;
       align-items: center;
     }
     .lives svg {
-      width: 18px;
-      height: 18px;
+      width: 14px;
+      height: 14px;
     }
   `,
 })

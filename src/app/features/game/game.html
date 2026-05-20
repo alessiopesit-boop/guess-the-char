@@ -55,10 +55,7 @@
         [disabled]="chosen() !== null || hintsLeft() <= 0"
         (click)="useHint()"
         aria-label="Use hint"
-      >
-        <span class="hint-icon">💡</span>
-        <span class="mono tabnum hint-count">{{ hintsLeft() }}</span>
-      </button>
+      >💡<span class="mono tabnum hint-count">{{ hintsLeft() }}</span></button>
     </div>
 
     @if (question(); as q) {
@@ -67,7 +64,7 @@
         [class.is-wrong]="glyphFx() === 'wrong'"
         [class.is-correct]="glyphFx() === 'correct'"
       >
-        @for (k of [idx()]; track k) {
+        @for (k of [q.glyph + ':' + idx()]; track k) {
           <div class="glyph" [class.is-wrong]="glyphFx() === 'wrong'" [class.is-correct-fast]="glyphFx() === 'correct'">
             {{ q.glyph }}
           </div>
@@ -120,6 +117,20 @@
               }
             </div>
 
+            @if (tutorial(); as t) {
+              @if (!c.correct) {
+                <div class="fb-tutorial">
+                  <span class="fb-tutorial-icon">💡</span>
+                  <div class="fb-tutorial-body">
+                    <div class="eyebrow fb-tutorial-eyebrow">
+                      {{ i18n.lang() === 'it' ? 'PROMEMORIA' : 'TIP' }}
+                    </div>
+                    {{ t.text }}
+                  </div>
+                </div>
+              }
+            }
+
             <div class="scriptcard">
               <div class="sample">{{ q.glyph }}</div>
               <div>
@@ -140,7 +151,7 @@
               </button>
             </div>
 
-            <button class="btn btn-primary btn-block fb-next" type="button" (click)="advance()" autofocus>
+            <button #nextBtn class="btn btn-primary btn-block fb-next" type="button" (click)="advance()">
               <span>{{ i18n.t('next') }}</span>
               <app-icon name="arrow-right" />
             </button>

@@ -16,11 +16,9 @@
       <span class="eyebrow">{{ todayLabel() }}</span>
       <h1 class="h1">
         @if (state().account; as a) {
-          <span>{{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }}</span>
-          <span class="home-name"> {{ a.nickname }}.</span>
+          {{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }} <span class="home-name">{{ a.nickname }}.</span>
         } @else {
-          <span>{{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }}</span>
-          <span class="home-name"> {{ i18n.lang() === 'it' ? 'lettore.' : 'reader.' }}</span>
+          {{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }} <span class="home-name">{{ i18n.lang() === 'it' ? 'lettore.' : 'reader.' }}</span>
         }
       </h1>
     </div>
@@ -156,14 +154,19 @@
         <app-icon name="arrow-right" />
       </button>
     </div>
-    <button class="badge-teaser" type="button" (click)="goBadges()">
-      <div class="badge-count">
-        <span class="v">{{ badgeStats().unlocked }}</span>
-        <span class="l">/ {{ badgeStats().total }}</span>
+    <button class="badges-teaser" type="button" (click)="goBadges()">
+      <div class="badges-teaser-meta">
+        <div class="badges-teaser-count">
+          <span class="v">{{ badgeStats().unlocked }}</span>
+          <span class="l">/ {{ badgeStats().total }}</span>
+        </div>
+        <div class="muted badges-teaser-label">
+          {{ i18n.lang() === 'it' ? 'sbloccati' : 'unlocked' }}
+        </div>
       </div>
-      <div class="badge-preview">
+      <div class="icons">
         @for (b of badgeStats().preview; track b.id) {
-          <span class="badge-ico" [class.unlocked]="b.unlocked">{{ b.icon }}</span>
+          <span [attr.data-on]="b.unlocked ? '1' : '0'" [attr.data-t]="b.tier">{{ b.icon }}</span>
         }
       </div>
     </button>

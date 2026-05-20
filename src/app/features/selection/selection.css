@@ -44,12 +44,6 @@
   font-size: 15px;
 }
 
-.group-check-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
 .script-row-l {
   display: flex;
   align-items: center;
