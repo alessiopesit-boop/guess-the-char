@@ -48,7 +48,6 @@ export interface AppState {
   sound: boolean;
   haptics: boolean;
   showCodepoint: boolean;
-  reduceMotion: boolean;
   motion: MotionLevel;
   accent: AccentHex;
   colorblind: ColorblindMode;
@@ -74,7 +73,6 @@ export const DEFAULT_STATE: AppState = {
   sound: true,
   haptics: true,
   showCodepoint: false,
-  reduceMotion: false,
   motion: 'playful',
   accent: '#fbbf24',
   colorblind: 'none',

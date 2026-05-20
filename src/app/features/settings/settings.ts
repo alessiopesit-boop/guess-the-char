@@ -38,7 +38,7 @@ export class Settings {
     this.appState.update({ accent: hex });
   }
   protected setMotion(m: MotionLevel): void {
-    this.appState.update({ motion: m, reduceMotion: false });
+    this.appState.update({ motion: m });
   }
   protected setColorblind(m: ColorblindMode): void {
     this.appState.update({ colorblind: m });
@@ -52,9 +52,6 @@ export class Settings {
   }
   protected toggleHaptics(): void {
     this.appState.update({ haptics: !this.state().haptics });
-  }
-  protected toggleReduceMotion(): void {
-    this.appState.update({ reduceMotion: !this.state().reduceMotion });
   }
   protected toggleShowCodepoint(): void {
     this.appState.update({ showCodepoint: !this.state().showCodepoint });

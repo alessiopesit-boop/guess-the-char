@@ -24,7 +24,7 @@ export class App {
         root.style.setProperty('--accent-2', pal.accent2);
         root.style.setProperty('--accent-contrast', pal.contrast);
       }
-      root.setAttribute('data-motion', s.reduceMotion ? 'minimal' : s.motion);
+      root.setAttribute('data-motion', s.motion);
       root.setAttribute('data-cb', s.colorblind);
     });
   }

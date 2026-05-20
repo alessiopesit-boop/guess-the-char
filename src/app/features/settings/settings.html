@@ -37,20 +37,11 @@
       <h3 class="h3">{{ i18n.lang() === 'it' ? 'Animazioni' : 'Motion' }}</h3>
       <div class="seg">
         @for (m of motions; track m) {
-          <button class="seg-btn" type="button" [class.is-active]="state().motion === m && !state().reduceMotion" (click)="setMotion(m)">
+          <button class="seg-btn" type="button" [class.is-active]="state().motion === m" (click)="setMotion(m)">
             {{ motionLabel(m) }}
           </button>
         }
       </div>
-      <label class="toggle-row">
-        <span>
-          <span class="toggle-label">{{ i18n.lang() === 'it' ? 'Riduci animazioni' : 'Reduce motion' }}</span>
-          <span class="toggle-sub muted">
-            {{ i18n.lang() === 'it' ? 'Forza il livello "Minimo" indipendentemente dalla scelta sopra.' : 'Forces "Minimal" regardless of the choice above.' }}
-          </span>
-        </span>
-        <input type="checkbox" class="toggle-input" [checked]="state().reduceMotion" (change)="toggleReduceMotion()" />
-      </label>
     </section>
 
     <section class="settings-section">
