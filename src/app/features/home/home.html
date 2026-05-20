@@ -1,0 +1,182 @@
+<div class="app-shell">
+  <app-bar>
+    <app-streak-pill [value]="state().streak" />
+    <app-lang-switch />
+    <button
+      class="btn-icon"
+      [attr.aria-label]="state().account ? 'Account' : i18n.t('profile')"
+      (click)="state().account ? goProfile() : goLogin()"
+    >
+      <app-icon name="user" />
+    </button>
+  </app-bar>
+
+  <div class="page">
+    <div class="home-intro">
+      <span class="eyebrow">{{ todayLabel() }}</span>
+      <h1 class="h1">
+        @if (state().account; as a) {
+          <span>{{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }}</span>
+          <span class="home-name"> {{ a.nickname }}.</span>
+        } @else {
+          <span>{{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }}</span>
+          <span class="home-name"> {{ i18n.lang() === 'it' ? 'lettore.' : 'reader.' }}</span>
+        }
+      </h1>
+    </div>
+
+    <div
+      class="daily"
+      role="button"
+      tabindex="0"
+      (click)="goDaily()"
+      (keydown.enter)="goDaily()"
+    >
+      <div class="daily-head">
+        <span class="eyebrow">{{ i18n.t('daily').toUpperCase() }}</span>
+        @if (state().dailyDone) {
+          <span class="pill success">
+            <span class="dot"></span>
+            {{ i18n.lang() === 'it' ? 'Completata' : 'Done' }}
+          </span>
+        } @else {
+          <span class="pill warm">
+            <span class="dot"></span>
+            <span>Streak {{ state().dailyStreak }}</span>
+          </span>
+        }
+      </div>
+      <h2 class="h2 daily-title">
+        {{ i18n.lang() === 'it' ? 'La sfida di oggi' : "Today's challenge" }}
+      </h2>
+      <p class="muted daily-sub">{{ i18n.t('dailySub') }}</p>
+      <div class="daily-row">
+        <div class="glyph-row">
+          @if (state().dailyDone) {
+            <span>🎯</span>
+          } @else {
+            @for (g of previewGlyphs(); track $index) {
+              <span>{{ g }}</span>
+            }
+          }
+        </div>
+        <span class="btn btn-primary daily-cta">
+          <span>
+            {{
+              state().dailyDone
+                ? (i18n.lang() === 'it' ? 'Risultato' : 'Result')
+                : (i18n.lang() === 'it' ? 'Gioca' : 'Play')
+            }}
+          </span>
+          <app-icon name="arrow-right" />
+        </span>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Modalita' : 'Game modes' }}</h3>
+    </div>
+    <div class="mode-list">
+      <button class="mode-card" type="button" (click)="goSelection('training')">
+        <div class="row">
+          <span class="icon accent">∞</span>
+          <div class="meta">
+            <h3>{{ i18n.t('training') }}</h3>
+            <p>{{ i18n.t('trainingSub') }}</p>
+          </div>
+        </div>
+        <app-icon name="chev" />
+      </button>
+      <button class="mode-card" type="button" (click)="goSelection('timed')">
+        <div class="row">
+          <span class="icon">⏱</span>
+          <div class="meta">
+            <h3>{{ i18n.t('timed') }}</h3>
+            <p>{{ i18n.t('timedSub') }}</p>
+          </div>
+        </div>
+        <app-icon name="chev" />
+      </button>
+      <button class="mode-card" type="button" (click)="goSelection('survival')">
+        <div class="row">
+          <span class="icon">♥</span>
+          <div class="meta">
+            <h3>{{ i18n.t('survival') }}</h3>
+            <p>{{ i18n.t('survivalSub') }}</p>
+          </div>
+        </div>
+        <app-icon name="chev" />
+      </button>
+      @if (weakScripts().length > 0) {
+        <button class="mode-card" type="button" (click)="goWeak()">
+          <div class="row">
+            <span class="icon warm">◎</span>
+            <div class="meta">
+              <h3>{{ i18n.t('weak') }}</h3>
+              <p>
+                @if (i18n.lang() === 'it') {
+                  Allena le {{ weakScripts().length }} scritture sotto il 60%.
+                } @else {
+                  Practice your {{ weakScripts().length }} scripts below 60%.
+                }
+              </p>
+            </div>
+          </div>
+          <app-icon name="chev" />
+        </button>
+      }
+    </div>
+
+    <div class="section-head">
+      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Le tue statistiche' : 'Your stats' }}</h3>
+      <button class="nav-btn small" type="button" (click)="goProfile()">
+        <span>{{ i18n.t('seeAll') }}</span>
+        <app-icon name="arrow-right" />
+      </button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat">
+        <span class="v">{{ state().streak }}</span>
+        <span class="l">{{ i18n.t('streak') }}</span>
+      </div>
+      <div class="stat">
+        <span class="v">{{ state().accuracy }}%</span>
+        <span class="l">{{ i18n.t('accuracy') }}</span>
+      </div>
+      <div class="stat">
+        <span class="v">{{ state().played }}</span>
+        <span class="l">{{ i18n.t('played') }}</span>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h3 class="h3">{{ i18n.t('badges') }}</h3>
+      <button class="nav-btn small" type="button" (click)="goBadges()">
+        <span>{{ i18n.t('seeAll') }}</span>
+        <app-icon name="arrow-right" />
+      </button>
+    </div>
+    <button class="badge-teaser" type="button" (click)="goBadges()">
+      <div class="badge-count">
+        <span class="v">{{ badgeStats().unlocked }}</span>
+        <span class="l">/ {{ badgeStats().total }}</span>
+      </div>
+      <div class="badge-preview">
+        @for (b of badgeStats().preview; track b.id) {
+          <span class="badge-ico" [class.unlocked]="b.unlocked">{{ b.icon }}</span>
+        }
+      </div>
+    </button>
+
+    <div class="home-foot">
+      <button class="settings-link" type="button" (click)="goSettings()">
+        <app-icon name="gear" />
+        <span>{{ i18n.t('settings') }}</span>
+      </button>
+      <button class="settings-link" type="button" (click)="goFeedback()">
+        <span class="emoji">💬</span>
+        <span>{{ i18n.t('feedback') }}</span>
+      </button>
+    </div>
+  </div>
+</div>
