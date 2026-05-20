@@ -52,8 +52,16 @@ export const routes: Routes = [
     canActivate: [onboardedGuard],
     loadComponent: () => import('./features/badges/badges').then((m) => m.Badges),
   },
-  { path: 'script/:id',        canActivate: [onboardedGuard], loadComponent: comingSoon },
-  { path: 'glyph/:scriptId/:cp', canActivate: [onboardedGuard], loadComponent: comingSoon },
+  {
+    path: 'script/:id',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/script-detail/script-detail').then((m) => m.ScriptDetail),
+  },
+  {
+    path: 'glyph/:scriptId/:cp',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/glyph-detail/glyph-detail').then((m) => m.GlyphDetail),
+  },
   { path: 'feedback',          canActivate: [onboardedGuard], loadComponent: comingSoon },
 
   // Aree social: stub fino alla 1.1.0 con Firebase.

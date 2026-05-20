@@ -1,0 +1,29 @@
+<div class="app-shell">
+  <app-bar [canBack]="true" (back)="goBack()" (goHome)="goHome()" />
+
+  <div class="page gd-page">
+    @if (script(); as s) {
+      <div class="gd-stage">
+        <div class="gd-glyph">{{ glyph() || '?' }}</div>
+        <span class="gd-codepoint mono">U+{{ cp() }}</span>
+      </div>
+
+      <button class="gd-script-card" type="button" (click)="openScript()">
+        <div class="gd-script-meta">
+          <span class="eyebrow">{{ i18n.lang() === 'it' ? 'SCRITTURA' : 'SCRIPT' }}</span>
+          <h2 class="h2 gd-script-name">{{ nameOf() }}</h2>
+          <span class="muted gd-script-region">
+            {{ s.region }} · {{ s.lang }}
+          </span>
+        </div>
+        <app-icon name="chev" />
+      </button>
+
+      <p class="gd-blurb muted">{{ s.blurb }}</p>
+    } @else {
+      <p class="muted">
+        {{ i18n.lang() === 'it' ? 'Carattere non trovato.' : 'Character not found.' }}
+      </p>
+    }
+  </div>
+</div>

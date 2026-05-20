@@ -1,0 +1,58 @@
+<div class="app-shell">
+  <app-bar [canBack]="true" (back)="goBack()" (goHome)="goHome()" />
+
+  @if (script(); as s) {
+    <div class="page sd-page">
+      <div class="sd-hero">
+        <div class="sd-glyph">{{ s.sample }}</div>
+        <div class="sd-titles">
+          <span class="eyebrow">{{ groupName().toUpperCase() }}</span>
+          <h1 class="h1">{{ nameOf() }}</h1>
+          <span class="muted sd-meta">
+            <span>{{ s.region }}</span>
+            <span>·</span>
+            <span>{{ s.lang }}</span>
+            <span>·</span>
+            <span>{{ s.era }}</span>
+          </span>
+        </div>
+      </div>
+
+      <p class="sd-blurb muted">{{ s.blurb }}</p>
+
+      @if (stats(); as st) {
+        <div class="sd-stats">
+          <div class="stat">
+            <span class="v">{{ st.accuracy }}%</span>
+            <span class="l">{{ i18n.t('accuracy') }}</span>
+          </div>
+          <div class="stat">
+            <span class="v">{{ st.correct }}</span>
+            <span class="l">{{ i18n.lang() === 'it' ? 'Corrette' : 'Correct' }}</span>
+          </div>
+          <div class="stat">
+            <span class="v">{{ st.tries }}</span>
+            <span class="l">{{ i18n.lang() === 'it' ? 'Tentativi' : 'Tries' }}</span>
+          </div>
+        </div>
+      }
+
+      <div class="divider"></div>
+
+      <h3 class="h3 sd-section-title">
+        {{ i18n.lang() === 'it' ? 'Caratteri di esempio' : 'Sample characters' }}
+      </h3>
+      <div class="sd-grid">
+        @for (g of sampleGlyphs(); track $index) {
+          <button class="sd-cell" type="button" (click)="openGlyph(g)">
+            {{ g }}
+          </button>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="page">
+      <p class="muted">{{ i18n.lang() === 'it' ? 'Scrittura non trovata.' : 'Script not found.' }}</p>
+    </div>
+  }
+</div>
