@@ -21,34 +21,56 @@ Aggiornare significa: modificare la sezione gia' esistente che descrive l'area t
 
 ## Cos'e' il progetto
 
-"Guess the Char" è un quiz interattivo a singola pagina HTML che mostra un carattere preso da uno dei sistemi di scrittura del mondo (CJK, sud-est asiatico, indiano, mediorientale, ecc.) e chiede all'utente a quale scrittura appartiene. Niente account, niente backend: tutto in-page, persistenza minima via `localStorage` per le opzioni utente. Tono: gioco-quiz, palette dark, design pulito.
+"Guess the Char" e' un quiz interattivo che mostra un carattere preso da uno dei sistemi di scrittura del mondo (CJK, sud-est asiatico, indiano, mediorientale, europeo, ecc.) e chiede all'utente a quale scrittura appartiene. Quattro modalita': Allenamento libero, Sfida a tempo, Survival, Sfida giornaliera deterministica. Niente account ne' backend per ora, persistenza solo `localStorage`. Tono: gioco-quiz, palette dark, design pulito.
 
-## Roadmap: migrazione ad Angular (importante)
+## Stack
 
-**Lo stack attuale, HTML monolitico, e' uno stato provvisorio**. La direzione del progetto e' migrare a un'app Angular vera (Angular 19+, standalone components, signals, OnPush) appena ci sara' la finestra per farlo. Quello che vedi oggi in `index.html` e' un MVP/prototipo, non l'architettura finale: e' "vecchio e va cambiato".
-
-Cosa significa nel concreto per chi lavora sul repo:
-
-- Tutto cio' che metti nel monolite **non deve creare ostacoli** alla futura migrazione. In dubbio, preferisci scelte conservative (nessuna libreria pinned, nessun pattern proprietario, niente trucchi che dipendono dall'essere "tutto in una pagina").
-- Se proponi una feature complessa che richiede architettura (stato condiviso non banale, routing, multi-pagina, modular CSS), **questo e' il segnale** che e' meglio iniziare la migrazione invece di stratificare patch sul monolite.
-- Il workflow di sviluppo descritto qui sotto (PR per scope, Conventional Commits, release-please, deploy su tag) **NON dipende dallo stack**: e' gia' lo stesso che useremo dopo la migrazione. Cambia solo `deploy.yml` (l'artifact passera' dalla root del repo all'output del build di Angular, tipo `dist/<app>/browser/`).
-- Non c'e' una data di migrazione. Quando arriva, sara' descritta in una PR `feat!:` dedicata e questo file va aggiornato di conseguenza (struttura cartelle, comandi npm, lazy loading, ecc.).
-
-In sintesi: tratta questo CLAUDE.md come un documento valido per entrambe le fasi, e tratta `index.html` come temporaneo.
-
-## Stack (oggi)
-
-- **HTML statico monolitico**. Un solo `index.html` alla root contiene markup, stili (`<style>` inline) e logica (`<script>` inline). Nessun build step, nessuna toolchain.
-- **Nessuna dipendenza JavaScript**: niente bundler, niente package manager, niente node_modules. Il sito funziona aprendolo come file locale o servendolo da un qualunque server statico.
-- **Persistenza**: `localStorage` per la lingua UI e le selezioni di famiglie/scritture. Chiavi con prefisso applicativo (es. `gtc-lang`, `gtc-active`).
-- **i18n**: italiano (default) + inglese, switch via toggle nella UI. Le stringhe localizzate vivono in oggetti JS dentro l'`<script>` di `index.html`.
+- **Angular 21+** standalone components, signals, `OnPush`, zoneless change detection. Niente NgModules.
+- **TypeScript strict**, build via `@angular/build` (esbuild). Niente test framework configurato in questa fase; `tsconfig.spec.json` resta come placeholder per il giorno in cui aggiungeremo vitest.
+- **Routing** con Angular Router e **`withHashLocation()`**: gli URL hanno la forma `/#/home`, `/#/game?mode=training`, ecc. Scelta motivata da GitHub Pages: niente trick di `404.html`, refresh sempre funzionante.
+- **Stato globale** in un service con signals (`AppStateService`), persistito automaticamente in `localStorage` (chiave `gtc.state`) via `effect`. La lingua UI vive in un service separato (`I18nService`, chiave `gtc.lang`).
+- **i18n**: oggetti TypeScript IT/EN in `src/app/core/i18n/strings.ts`. Italiano e' la lingua di default; chiavi nuove vanno aggiunte sia in IT che in EN.
+- **Stili**: un singolo `src/styles.css` globale (importato dal prototipo Claude Design as-is, classi `.btn`, `.card`, `.pill`, `.glyph-stage`, ecc.) + CSS scoped per i componenti che hanno bisogno di stili specifici.
+- **Niente backend**: lo stato e' solo locale al browser. Le aree social (login, profilo pubblico, leaderboard, sfide tra amici) sono stub "In arrivo" in attesa della 1.1.0 con Firebase Auth + Firestore.
 
 ## Struttura
 
 ```
 .
-├── index.html               # tutta l'app: markup, stili, script, dataset caratteri
-├── README.md                # facciata pubblica (cosa fa, come si usa)
+├── angular.json
+├── package.json
+├── tsconfig.json
+├── tsconfig.app.json
+├── tsconfig.spec.json
+├── public/
+│   └── favicon.ico
+├── src/
+│   ├── index.html           # link a Google Fonts del design
+│   ├── main.ts              # bootstrap dell'app standalone
+│   ├── styles.css           # stylesheet globale del design (~42 KB)
+│   └── app/
+│       ├── app.config.ts    # provideRouter (hash), providers root
+│       ├── app.routes.ts    # tabella route + onboardedGuard
+│       ├── app.ts           # root component, applica i token CSS del tema
+│       ├── core/
+│       │   ├── audio/       # SoundService, HapticsService
+│       │   ├── data/        # SCRIPTS, GROUPS, BADGES, quiz/random helpers, AVATARS
+│       │   ├── guards/      # onboardedGuard
+│       │   ├── i18n/        # STRINGS IT/EN + I18nService
+│       │   └── state/       # AppStateService + tipi AppState
+│       ├── features/        # una cartella per ogni schermata
+│       │   ├── badges/
+│       │   ├── daily-result/
+│       │   ├── game/
+│       │   ├── glyph-detail/
+│       │   ├── home/
+│       │   ├── onboarding/
+│       │   ├── script-detail/
+│       │   ├── selection/
+│       │   ├── session-result/
+│       │   └── settings/
+│       └── shared/          # componenti UI condivisi (Logo, Icon, AppBar, ecc.)
+├── README.md
 ├── CHANGELOG.md             # generato/aggiornato da release-please
 ├── LICENSE                  # MIT
 ├── CLAUDE.md                # questo file
@@ -57,28 +79,36 @@ In sintesi: tratta questo CLAUDE.md come un documento valido per entrambe le fas
 └── .github/
     ├── workflows/
     │   ├── release.yml      # release-please + riscrittura body Release/PR
-    │   └── deploy.yml       # GitHub Pages al release event
+    │   └── deploy.yml       # GitHub Pages al release event (npm ci + ng build)
     └── scripts/
         └── release-notes.py # genera "In sintesi + Dettagli" dai commit
 ```
 
 ### Convenzioni
 
-- **Tutto in `index.html`**: non spezzare in file separati prima del passaggio ad Angular. Se nasce la voglia di splittare, e' segno che e' ora di iniziare la migrazione.
-- **Stato**: variabili globali o moduli IIFE dentro lo `<script>`, non framework. Se la complessita' giustifica un framework, vedi la nota sul piano Angular.
-- **i18n**: stringhe in un dizionario JS organizzato per chiave logica. Italiano e' la lingua di default; chiavi nuove vanno aggiunte sia in IT che in EN.
-- **Dataset scritture**: oggetto JS con famiglie e caratteri. Ogni carattere puo' essere una stringa o un oggetto con campi estensibili (etimologia, link Wiktionary, ecc.) per supportare evoluzioni future.
+- **Componenti**: standalone (mai NgModules), `ChangeDetectionStrategy.OnPush`, naming Angular 21 senza suffisso `.component.ts` (es. `home.ts` / `home.html` / `home.css`, classe `export class Home`).
+- **Reattivita'**: solo signals e computed. Niente RxJS dentro la logica di stato; `toSignal(this.route.paramMap)` e' il pattern per leggere query/path params dei route.
+- **Stato**: tutto cio' che persiste tra sessioni passa da `AppStateService` (`appState.update({...})` o `appState.patch(s => ({...}))`). Niente accessi diretti a `localStorage` nei componenti.
+- **i18n**: stringhe in `core/i18n/strings.ts`. Le chiavi sono fortemente tipate (`StringKey`); aggiungerne una nuova obbliga a tradurla in entrambe le lingue.
+- **Dataset scritture**: `core/data/scripts.ts` con `SCRIPTS` (`ReadonlyArray<ScriptInfo>`) + `GROUPS`. Estendere il tipo `ScriptInfo` con nuovi campi e' OK; rinominare un id e' breaking change (perche' gli id vivono dentro `state.selected` di utenti gia' utilizzatori).
+- **Stili dei componenti**: prima riusare classi globali di `src/styles.css` (es. `.card`, `.pill`, `.btn-primary`); ricorrere a CSS scoped nel componente solo per layout/animazioni nuovi.
 
 ## Comandi
 
-Niente comandi: aprire `index.html` in un browser. Per test rapidi su un server statico:
-
 ```bash
-python3 -m http.server 8000
-# poi http://localhost:8000
+npm install              # installa dipendenze
+npm start                # ng serve, dev server su http://localhost:4200
+npm run build            # build di produzione in dist/guess-the-char/browser/
 ```
 
-Non e' configurato lint, ne' test, ne' formatter. La barra qualita' e' "il file e' leggibile" + "il sito funziona".
+Niente lint, ne' test (per ora) ne' formatter configurato come task npm. Prettier e' presente come devDep ma non invocato da CI: lo usiamo come default dell'editor.
+
+Per simulare un deploy locale stile Pages:
+
+```bash
+npm run build -- --base-href=/guess-the-char/
+npx http-server dist/guess-the-char/browser/
+```
 
 ## Branching e Pull Request
 
@@ -234,10 +264,11 @@ Cose da sapere se lo modifichi:
 
 ## Vincoli e cose da non fare
 
-- **Non** introdurre dipendenze npm o un build step prima di una migrazione esplicita ad Angular: il valore di questo progetto e' "apri e funziona".
-- **Non** spezzare `index.html` in file separati JS/CSS senza un motivo dichiarato: pochi file ma piu' grandi sono ok in questa fase.
-- **Non** rimuovere `.nojekyll` senza una buona ragione: senza il file Pages prova a interpretare i nomi che iniziano con `_` come Jekyll.
-- **Non** committare file generati o cache.
+- **Non** rimuovere `withHashLocation()` da `app.config.ts` senza prima decidere come gestire le route refresh-friendly su Pages (servirebbe un `404.html` che ridireziona a `index.html`, e per ora non c'e').
+- **Non** bypassare `AppStateService` con scritture dirette a `localStorage`: la chiave `gtc.state` ha uno schema mergiato col `DEFAULT_STATE` ed evita di rompere lo stato di utenti gia' registrati.
+- **Non** introdurre librerie UI esterne (Material, PrimeNG, Tailwind) senza necessita': il design system del prototipo e' gia' coerente e pesato.
+- **Non** rimuovere `.nojekyll` o cambiare il `base-href` in `deploy.yml` senza aggiornare entrambi insieme.
+- **Non** committare `dist/`, `node_modules`, `.angular/cache`, ne' file con segreti.
 
 ## Note operative per l'assistente
 
