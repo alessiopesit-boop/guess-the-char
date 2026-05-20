@@ -91,3 +91,67 @@
 .fb-blurb {
   margin-top: 6px !important;
 }
+
+.fb-discover {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.fb-discover .btn {
+  font-size: 13px;
+  gap: 6px;
+}
+
+/* Sheet con info aggiuntive sul glifo o sulla scrittura, sopra la partita */
+.info-backdrop {
+  align-items: center;
+  z-index: 90;
+}
+.info-sheet {
+  max-width: 420px;
+  border-radius: 22px;
+  padding: 24px 22px;
+  animation: pop 0.18s ease;
+  text-align: center;
+  position: relative;
+}
+.info-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.info-glyph {
+  font-family: var(--font-glyph);
+  font-size: 120px;
+  line-height: 1.05;
+  margin: 14px 0 6px;
+  color: var(--accent);
+}
+.info-cp {
+  font-size: 13px;
+  color: var(--text-mute);
+  letter-spacing: 0.06em;
+}
+.info-glyph-note {
+  font-size: 13px;
+  margin-top: 18px;
+  text-align: left;
+}
+
+.info-script-title {
+  margin: 8px 0 4px;
+}
+.info-script-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+  justify-content: center;
+}
+.info-script-blurb {
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: left;
+  margin-top: 14px;
+}

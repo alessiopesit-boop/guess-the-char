@@ -85,6 +85,8 @@ export class Game implements OnDestroy {
   protected readonly idx = signal(0);
   protected readonly question = signal<Question | null>(null);
   protected readonly chosen = signal<{ id: string; correct: boolean } | null>(null);
+  /** Overlay informativo aperto sopra la partita; non interrompe il gioco. */
+  protected readonly infoOverlay = signal<'glyph' | 'script' | null>(null);
   protected readonly lives = signal(SURVIVAL_LIVES);
   protected readonly secondsLeft = signal(TIMED_DURATION);
   protected readonly streakLocal = signal(0);
@@ -299,6 +301,14 @@ export class Game implements OnDestroy {
     this.router.navigate(['/home']);
   }
 
+  protected openInfo(type: 'glyph' | 'script'): void {
+    this.infoOverlay.set(type);
+  }
+
+  protected closeInfo(): void {
+    this.infoOverlay.set(null);
+  }
+
   protected nameOf(opt: ScriptInfo): string {
     return this.i18n.lang() === 'en' ? opt.nameEn : opt.nameIt;
   }
@@ -322,7 +332,13 @@ export class Game implements OnDestroy {
 
   @HostListener('window:keydown', ['$event'])
   protected onKey(e: KeyboardEvent): void {
-    if (e.key === 'Escape') return;
+    if (e.key === 'Escape') {
+      if (this.infoOverlay()) {
+        e.preventDefault();
+        this.closeInfo();
+      }
+      return;
+    }
     if (this.chosen()) {
       if (!this.isTimed() && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault();

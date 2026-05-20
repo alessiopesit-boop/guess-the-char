@@ -129,12 +129,55 @@
               </div>
             </div>
 
+            <div class="fb-discover">
+              <button class="btn btn-ghost" type="button" (click)="openInfo('glyph')">
+                <span>{{ i18n.lang() === 'it' ? 'Il carattere' : 'The character' }}</span>
+                <app-icon name="arrow-right" />
+              </button>
+              <button class="btn btn-ghost" type="button" (click)="openInfo('script')">
+                <span>{{ i18n.lang() === 'it' ? 'La scrittura' : 'The script' }}</span>
+                <app-icon name="arrow-right" />
+              </button>
+            </div>
+
             <button class="btn btn-primary btn-block fb-next" type="button" (click)="advance()" autofocus>
               <span>{{ i18n.t('next') }}</span>
               <app-icon name="arrow-right" />
             </button>
           </div>
         }
+      }
+
+      @if (infoOverlay(); as kind) {
+        <div class="sheet-backdrop info-backdrop" (click)="closeInfo()">
+          <div class="sheet info-sheet" (click)="$event.stopPropagation()">
+            <button class="btn-icon info-close" type="button" (click)="closeInfo()" aria-label="Close">
+              <app-icon name="close" />
+            </button>
+
+            @if (kind === 'glyph') {
+              <span class="eyebrow">{{ i18n.lang() === 'it' ? 'CARATTERE' : 'CHARACTER' }}</span>
+              <div class="info-glyph">{{ q.glyph }}</div>
+              <div class="info-cp mono">U+{{ q.cp }}</div>
+              <p class="muted info-glyph-note">
+                {{ i18n.lang() === 'it'
+                  ? 'Carattere del blocco Unicode della scrittura ' + nameOf(q.correct) + '. Le informazioni di dettaglio sul singolo glifo (etimologia, significato, ricorrenze) arriveranno con una fonte esterna nelle release successive.'
+                  : 'A character from the Unicode block for ' + nameOf(q.correct) + '. Detailed information about the single glyph (etymology, meaning, frequency) will arrive with an external data source in future releases.' }}
+              </p>
+            } @else {
+              <span class="eyebrow">{{ i18n.lang() === 'it' ? 'SCRITTURA' : 'SCRIPT' }}</span>
+              <h2 class="h2 info-script-title">{{ nameOf(q.correct) }}</h2>
+              <div class="info-script-meta muted">
+                <span>{{ q.correct.region }}</span>
+                <span>·</span>
+                <span>{{ q.correct.lang }}</span>
+                <span>·</span>
+                <span>{{ q.correct.era }}</span>
+              </div>
+              <p class="info-script-blurb">{{ q.correct.blurb }}</p>
+            }
+          </div>
+        </div>
       }
     }
   </div>
