@@ -11,13 +11,9 @@
 
     <p class="muted selection-count">
       @if (i18n.lang() === 'it') {
-        <span>Hai selezionato</span>
-        <span class="emph">{{ selectedCount() }}</span>
-        <span>scritture su {{ total }}.</span>
+        Hai selezionato <span class="emph">{{ selectedCount() }}</span> scritture su {{ total }}.
       } @else {
-        <span>Selected</span>
-        <span class="emph">{{ selectedCount() }}</span>
-        <span>of {{ total }} scripts.</span>
+        Selected <span class="emph">{{ selectedCount() }}</span> of {{ total }} scripts.
       }
     </p>
 

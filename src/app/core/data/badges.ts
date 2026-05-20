@@ -15,6 +15,7 @@ export interface BadgeDef {
   descIt: string;
   descEn: string;
   questIt: string;
+  questEn: string;
   check: (s: AppState) => number;
   target: number;
   valueOf: (s: AppState) => number;
@@ -33,6 +34,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Raggiungi una striscia di 5 risposte corrette.',
     descEn: 'Reach a streak of 5 correct answers in a row.',
     questIt: 'Rispondi a 5 caratteri di fila senza sbagliare.',
+    questEn: 'Answer 5 characters in a row without mistakes.',
     check: (s) => Math.min(1, s.bestStreak / 5),
     target: 5,
     valueOf: (s) => s.bestStreak,
@@ -43,6 +45,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Striscia di 15 risposte corrette.',
     descEn: 'Streak of 15 correct answers.',
     questIt: 'Concatena 15 risposte giuste senza errori.',
+    questEn: 'Chain 15 correct answers without errors.',
     check: (s) => Math.min(1, s.bestStreak / 15),
     target: 15,
     valueOf: (s) => s.bestStreak,
@@ -53,6 +56,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Striscia di 50 risposte corrette.',
     descEn: 'Streak of 50 correct answers.',
     questIt: 'Cinquanta caratteri di fila, zero errori. Sublime.',
+    questEn: 'Fifty characters in a row, zero mistakes. Sublime.',
     check: (s) => Math.min(1, s.bestStreak / 50),
     target: 50,
     valueOf: (s) => s.bestStreak,
@@ -65,6 +69,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Mantieni precisione almeno dell\'80% su almeno 50 risposte.',
     descEn: 'Keep accuracy of at least 80% over at least 50 answers.',
     questIt: 'Gioca almeno 50 partite con precisione 80% o piu\'.',
+    questEn: 'Play at least 50 rounds while keeping 80% accuracy or higher.',
     check: (s) =>
       s.played >= 50
         ? s.accuracy >= 80
@@ -82,6 +87,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Rispondi a 100 caratteri.',
     descEn: 'Answer 100 characters.',
     questIt: 'Rispondi a un totale di 100 caratteri (anche sbagliando).',
+    questEn: 'Answer 100 characters in total (mistakes included).',
     check: (s) => Math.min(1, s.played / 100),
     target: 100,
     valueOf: (s) => s.played,
@@ -92,6 +98,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Rispondi a 500 caratteri.',
     descEn: 'Answer 500 characters.',
     questIt: 'Cinquecento caratteri visti. Sei in viaggio.',
+    questEn: 'Five hundred characters seen. You are on your way.',
     check: (s) => Math.min(1, s.played / 500),
     target: 500,
     valueOf: (s) => s.played,
@@ -104,6 +111,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Completa la sfida giornaliera per 7 giorni di fila.',
     descEn: 'Finish the daily challenge 7 days in a row.',
     questIt: 'Una sfida al giorno per 7 giorni consecutivi.',
+    questEn: 'One daily challenge per day, for seven days in a row.',
     check: (s) => Math.min(1, (s.dailyStreak || 0) / 7),
     target: 7,
     valueOf: (s) => s.dailyStreak || 0,
@@ -114,6 +122,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Concludi una sfida giornaliera con 5 su 5.',
     descEn: 'Get a perfect 5 out of 5 on a daily challenge.',
     questIt: 'Cinque caratteri, cinque risposte giuste.',
+    questEn: 'Five characters, five correct answers.',
     check: (s) => ((s.dailyHistory || []).some((d) => d.score === 5) ? 1 : 0),
     target: 5,
     valueOf: (s) => Math.max(0, ...(s.dailyHistory || []).map((d) => d.score)),
@@ -126,6 +135,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Indovina almeno un carattere per ogni gruppo di scritture.',
     descEn: 'Get at least one correct in every script group.',
     questIt: 'Una risposta corretta in ognuno dei 5 gruppi.',
+    questEn: 'One correct answer in each of the 5 script groups.',
     check: (s) => {
       const ok = new Set<string>();
       for (const [id, v] of Object.entries(s.perScript || {})) {
@@ -154,6 +164,7 @@ export const BADGES: ReadonlyArray<BadgeDef> = [
     descIt: 'Affronta almeno una volta tutte le scritture.',
     descEn: 'Encounter every script at least once.',
     questIt: 'Vedi ogni scrittura del catalogo almeno una volta.',
+    questEn: 'Encounter every script in the catalog at least once.',
     check: (s) => Object.keys(s.perScript || {}).length / SCRIPTS.length,
     target: SCRIPTS.length,
     valueOf: (s) => Object.keys(s.perScript || {}).length,

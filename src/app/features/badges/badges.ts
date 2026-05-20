@@ -42,6 +42,9 @@ export class Badges {
   protected descOf(b: BadgeWithProgress): string {
     return this.i18n.lang() === 'en' ? b.descEn : b.descIt;
   }
+  protected questOf(b: BadgeWithProgress): string {
+    return this.i18n.lang() === 'en' ? b.questEn : b.questIt;
+  }
 
   protected progressPct(b: BadgeWithProgress): number {
     return Math.round(b.progress * 100);

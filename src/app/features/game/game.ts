@@ -303,6 +303,23 @@ export class Game implements OnDestroy {
     return this.i18n.lang() === 'en' ? opt.nameEn : opt.nameIt;
   }
 
+  /** Stato visuale dell'opzione (`data-state`): '' | 'dim' | 'reveal' | 'correct' | 'wrong'. */
+  protected optState(opt: ScriptInfo): string {
+    if (this.eliminated().includes(opt.id)) return 'dim';
+    const c = this.chosen();
+    if (!c) return '';
+    const q = this.question();
+    if (!q) return '';
+    if (opt.id === q.correct.id) return 'reveal';
+    if (opt.id === c.id) return c.correct ? 'correct' : 'wrong';
+    return 'dim';
+  }
+
+  /** Regione del prototipo "Giappone / Mondo arabo" -> prima parola per il tag. */
+  protected tagOf(opt: ScriptInfo): string {
+    return opt.region.split(/[\s/]/)[0];
+  }
+
   @HostListener('window:keydown', ['$event'])
   protected onKey(e: KeyboardEvent): void {
     if (e.key === 'Escape') return;

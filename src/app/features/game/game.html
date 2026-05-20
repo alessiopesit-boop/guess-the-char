@@ -67,54 +67,69 @@
         [class.is-wrong]="glyphFx() === 'wrong'"
         [class.is-correct]="glyphFx() === 'correct'"
       >
-        <div
-          class="glyph"
-          [class.is-wrong]="glyphFx() === 'wrong'"
-          [class.is-correct-fast]="glyphFx() === 'correct'"
-          [attr.data-idx]="idx()"
-        >
-          {{ q.glyph }}
-        </div>
+        @for (k of [idx()]; track k) {
+          <div class="glyph" [class.is-wrong]="glyphFx() === 'wrong'" [class.is-correct-fast]="glyphFx() === 'correct'">
+            {{ q.glyph }}
+          </div>
+        }
         @if (showCp()) {
           <span class="glyph-codepoint mono">U+{{ q.cp }}</span>
         }
       </div>
 
-      <div class="options">
+      <div class="opt-list">
         @for (opt of q.options; track opt.id; let i = $index) {
           <button
-            class="option"
+            class="opt"
             type="button"
-            [class.is-correct]="chosen() !== null && opt.id === q.correct.id"
-            [class.is-wrong]="chosen()?.id === opt.id && chosen() !== null && !chosen()!.correct"
-            [class.is-eliminated]="eliminated().includes(opt.id)"
+            [attr.data-state]="optState(opt)"
             [disabled]="chosen() !== null || eliminated().includes(opt.id)"
             (click)="pick(opt)"
           >
-            <span class="opt-n">{{ i + 1 }}</span>
-            <span class="opt-name">{{ nameOf(opt) }}</span>
+            <span class="opt-key">{{ i + 1 }}</span>
+            <span>{{ nameOf(opt) }}</span>
+            <span class="opt-tag">{{ tagOf(opt) }}</span>
           </button>
         }
       </div>
 
       @if (chosen(); as c) {
-        @if (!isTimed()) {
-          <div
-            class="feedback-bar"
-            [class.is-correct]="c.correct"
-            [class.is-wrong]="!c.correct"
-          >
-            <div class="fb-row">
-              <div class="fb-label">
-                {{ c.correct ? i18n.t('correct') : i18n.t('wrong') }}
+        @if (isTimed()) {
+          <div [class]="'quietfb ' + (c.correct ? 'correct' : 'wrong')">
+            @if (c.correct) {
+              <span>✓ {{ i18n.lang() === 'it' ? 'era' : 'it was' }} {{ nameOf(q.correct) }}</span>
+              <span class="meta-combo"> +{{ 10 * (combo() > 1 ? combo() - 1 : 1) }}</span>
+            } @else {
+              <span>✗ {{ i18n.lang() === 'it' ? 'era' : 'it was' }} {{ nameOf(q.correct) }}</span>
+            }
+          </div>
+        } @else {
+          <div [class]="'fb-bar ' + (c.correct ? 'correct' : 'wrong')">
+            <div class="fb-title">
+              <span class="badge" aria-hidden="true">
+                @if (c.correct) {
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l3 3 5-6"/></svg>
+                } @else {
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+                }
+              </span>
+              @if (c.correct) {
+                <span>{{ i18n.t('correct') }}</span>
+              } @else {
+                <span>{{ i18n.t('wrong') }} {{ i18n.lang() === 'it' ? 'era' : 'it was' }} {{ nameOf(q.correct) }}</span>
+              }
+            </div>
+
+            <div class="scriptcard">
+              <div class="sample">{{ q.glyph }}</div>
+              <div>
+                <h3>{{ nameOf(q.correct) }}</h3>
+                <p>{{ q.correct.region }} · {{ q.correct.lang }} · U+{{ q.cp }}</p>
+                <p class="fb-blurb">{{ q.correct.blurb.split('.')[0] }}.</p>
               </div>
-              <div class="fb-name">{{ nameOf(q.correct) }}</div>
             </div>
-            <div class="fb-info">
-              <div class="fb-region">{{ q.correct.region }} · {{ q.correct.lang }}</div>
-              <div class="fb-cp mono">U+{{ q.cp }}</div>
-            </div>
-            <button class="btn btn-primary fb-next" type="button" (click)="advance()">
+
+            <button class="btn btn-primary btn-block fb-next" type="button" (click)="advance()" autofocus>
               <span>{{ i18n.t('next') }}</span>
               <app-icon name="arrow-right" />
             </button>
