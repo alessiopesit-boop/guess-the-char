@@ -37,7 +37,11 @@ export const routes: Routes = [
     canActivate: [onboardedGuard],
     loadComponent: () => import('./features/daily-result/daily-result').then((m) => m.DailyResult),
   },
-  { path: 'session-result',    canActivate: [onboardedGuard], loadComponent: comingSoon },
+  {
+    path: 'session-result',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/session-result/session-result').then((m) => m.SessionResult),
+  },
   { path: 'settings',          canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'badges',            canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'script/:id',        canActivate: [onboardedGuard], loadComponent: comingSoon },

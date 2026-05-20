@@ -1,0 +1,52 @@
+<div class="app-shell">
+  <app-bar [canBack]="true" leftMode="nav" (back)="goBack()" (goHome)="goHome()" />
+
+  <div class="page">
+    <div class="result-hero">
+      <span class="eyebrow">{{ modeLabel().toUpperCase() }}</span>
+      <div class="big tabnum">{{ displayScore() }}</div>
+      <div class="muted">{{ subline() }}</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <span class="v">{{ accuracy() }}%</span>
+        <span class="l">{{ i18n.t('accuracy') }}</span>
+      </div>
+      <div class="stat">
+        <span class="v">{{ correct() }}</span>
+        <span class="l">{{ i18n.lang() === 'it' ? 'Corrette' : 'Correct' }}</span>
+      </div>
+      <div class="stat">
+        <span class="v">{{ total() - correct() }}</span>
+        <span class="l">{{ i18n.lang() === 'it' ? 'Errori' : 'Wrong' }}</span>
+      </div>
+    </div>
+
+    @if (history().length > 0) {
+      <div class="divider"></div>
+      <h3 class="h3 result-section-title">
+        {{ i18n.lang() === 'it' ? 'Sequenza' : 'Sequence' }}
+      </h3>
+      <div class="sequence-grid">
+        @for (h of history(); track $index) {
+          <div class="seq-cell" [class.is-correct]="h.correct" [class.is-wrong]="!h.correct">
+            {{ h.glyph }}
+          </div>
+        }
+      </div>
+    }
+
+    <div class="divider"></div>
+
+    <div class="result-actions">
+      <button class="btn btn-primary btn-block result-btn" type="button" (click)="playAgain()">
+        <span>{{ i18n.t('playAgain') }}</span>
+        <app-icon name="arrow-right" />
+      </button>
+      <button class="btn btn-ghost btn-block" type="button" (click)="goHome()">
+        {{ i18n.lang() === 'it' ? 'Torna alla home' : 'Back to home' }}
+      </button>
+    </div>
+  </div>
+</div>
