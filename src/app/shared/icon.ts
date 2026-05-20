@@ -10,7 +10,8 @@ export type IconName =
   | 'gear'
   | 'check'
   | 'bolt'
-  | 'share';
+  | 'share'
+  | 'arrow-right';
 
 @Component({
   selector: 'app-icon',
@@ -46,6 +47,9 @@ export type IconName =
       }
       @case ('share') {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+      }
+      @case ('arrow-right') {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
       }
     }
   `,

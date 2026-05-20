@@ -1,0 +1,70 @@
+.onb-page {
+  min-height: calc(100dvh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+.onb-slide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+}
+.onb-slide.fwd { animation: onb-slide-fwd 260ms var(--tx-ease); }
+.onb-slide.back { animation: onb-slide-back 260ms var(--tx-ease); }
+
+[data-motion='minimal'] .onb-slide { animation: tx-fade 140ms ease !important; }
+
+@keyframes onb-slide-fwd {
+  from { transform: translateX(40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes onb-slide-back {
+  from { transform: translateX(-40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.onb-copy {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.onb-body {
+  font-size: 15px;
+  margin: 0;
+}
+
+.onb-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 12px;
+}
+
+.onb-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.onb-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  transition: width 0.2s;
+}
+.onb-dot.is-active {
+  width: 22px;
+  background: var(--accent);
+}
+
+.onb-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
