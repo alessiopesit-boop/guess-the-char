@@ -301,6 +301,7 @@ Cose da sapere se lo modifichi:
 - **Niente `404.html` fallback SPA**: il routing usa `withHashLocation()`, quindi tutti i deep link vivono dopo il `#` e il path effettivo servito da Pages e' sempre `index.html`. Se in futuro si volesse passare a `PathLocationStrategy` servira' aggiungere il trick `404.html` (vedi rafgraph-style).
 - `.nojekyll` (vuoto, presente alla root) impedisce a Pages di processare i file via Jekyll. Lo step del workflow lo copia automaticamente in `_site/`.
 - Prima pubblicazione: in *Settings > Pages* del repo va scelto "Source: GitHub Actions" una volta sola.
+- Anche l'environment `github-pages` (creato in automatico la prima volta che Pages e' attivato) va sbloccato per i tag: di default consente deploy solo dal branch `main`, ma il nostro workflow parte dal tag `vX.Y.Z`. Una sola volta, aggiungere una "deployment branch policy" con `name: v*` e `type: tag` (via *Settings > Environments > github-pages > Deployment branches and tags*, oppure via `gh api -X POST repos/<owner>/<repo>/environments/github-pages/deployment-branch-policies -f name='v*' -f type='tag'`). Senza questo, il job `deploy` fallisce con "Tag X.Y.Z is not allowed to deploy to github-pages due to environment protection rules".
 
 ## Vincoli e cose da non fare
 
