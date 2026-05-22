@@ -180,24 +180,7 @@ feat(scripts): aggiungi alfabeto armeno
 L'armeno (Հայերեն) entra nelle scritture mediorientali con 38 caratteri base. Disponibile come scrittura selezionabile, con link a Wiktionary per ciascun carattere.
 ```
 
-Cosa esce nella GitHub Release con l'attuale formato (indice in cima, dettagli sotto):
-
-```
-## In sintesi
-
-**Novita'**
-- Aggiungi alfabeto armeno
-
----
-
-## Dettagli
-
-### Aggiungi alfabeto armeno
-
-L'armeno (Հայերեն) entra nelle scritture mediorientali con 38 caratteri base. Disponibile come scrittura selezionabile, con link a Wiktionary per ciascun carattere.
-```
-
-Notare: nessun `feat(scripts): ...` letterale visibile. Il bullet in cima viene dal subject ripulito + capitalizzato; il blocco dettaglio in fondo prende il body discorsivo.
+Nella Release pubblicata appare come bullet "Aggiungi alfabeto armeno" sotto la sezione "Novita'" (in cima, indice), e come blocco con `### Aggiungi alfabeto armeno` + il body discorsivo sotto "Dettagli". Il prefisso `feat(scripts):` non compare mai: viene ripulito e il subject capitalizzato.
 
 Body **consigliato sempre** per `feat:`, `fix:`, `perf:`, `refactor:`. Se proprio manca (cambio piccolissimo e ovvio), il workflow fa un fallback: usa il subject ripulito del prefisso e capitalizzato. Esempio: `fix(footer): typo nel copyright` senza body diventa nella Release "Typo nel copyright.". Funziona ma e' meno bello: meglio scrivere il body.
 
@@ -224,15 +207,7 @@ Il `-D` (maiuscolo) ignora il check "branch gia' mergiato": serve perche' lo squ
 
 ### Setup repo: gia' applicato via API
 
-Le impostazioni del repo (merge strategy, commit message di default, auto-delete branch, branch protection su `main`, workflow permissions) **sono gia' state applicate** via API con un PAT fine-grained dell'account `alessiopesit-boop`. Stato corrente:
-
-- Merge: solo squash merging. `Allow merge commits` e `Allow rebase merging` disattivati.
-- Default commit message dello squash: `PR_TITLE` + `PR_BODY`. Il commit su `main` eredita titolo e descrizione della PR.
-- `Automatically delete head branches`: attivo (i branch sono auto-cancellati dopo il merge).
-- Branch protection su `main`: PR obbligatoria (0 review richiesti), `Require linear history` attivo, `Allow force pushes` e `Allow deletions` disattivati.
-- Workflow permissions: `Read and write` con `Allow GitHub Actions to create and approve pull requests` attivo (serve a release-please per aprire la Release PR).
-
-Se per qualunque ragione queste impostazioni venissero modificate a mano, si possono riapplicare via `gh api` (richiede PAT con `Administration: write` sul repo); il payload e' visibile nei commit dei chore che le hanno introdotte.
+Sul repo sono gia' attivi via API (con PAT fine-grained dell'account `alessiopesit-boop`): squash-only merge, `PR_TITLE` + `PR_BODY` come default del commit di squash, `Automatically delete head branches` attivo, branch protection su `main` con linear history e PR obbligatoria (0 review), workflow permissions in `Read and write` con creazione PR consentita (serve a release-please). Se vengono modificate a mano, si riapplicano via `gh api` (richiede `Administration: write` sul PAT).
 
 ## Versioning
 
@@ -265,11 +240,7 @@ Cosa NON apparira' mai nella Release PR perche' release-please li ignora dal bum
 
 Quindi se mergi solo `chore:` / `docs:` la Release PR **non viene aperta**. Serve almeno un commit `fix:` / `feat:` / `perf:` da quando e' uscito l'ultimo tag.
 
-Cose che **non** devi fare a mano (rispetto a prima):
-
-- Bump di `package.json`: no, lo fa release-please.
-- Tag git: no, lo fa release-please.
-- Modifiche a `CHANGELOG.md`: no, lo riscrive release-please. Eccezione: se vuoi correggere un refuso o aggiungere una nota a posteriori, puoi farlo in una PR separata di tipo `docs:`.
+**Non** modificare a mano `package.json`, `CHANGELOG.md` o creare tag git: tutto e' gestito da release-please. Unica eccezione: una correzione di refuso o nota a posteriori nel CHANGELOG, in una PR `docs:` separata.
 
 Modi di forzare la prossima versione (raramente serve):
 
