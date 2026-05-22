@@ -74,8 +74,12 @@
 .stats-grid > .stat:active { transform: translateY(1px); }
 
 /* Il container .badges-teaser e i cerchi `.icons > span[data-on][data-t]` sono
-   stylati in styles.css globale, identici al prototipo. Qui solo i piccoli
-   helper di contenuto a sinistra: numero unlocked/totale e label. */
+   stylati in styles.css globale, identici al prototipo. Qui forziamo la
+   larghezza al 100% perche' il button HTML e' inline di default, ed
+   esponiamo gli helper di contenuto a sinistra. */
+.badges-teaser {
+  width: 100%;
+}
 .badges-teaser-meta {
   display: flex;
   flex-direction: column;
