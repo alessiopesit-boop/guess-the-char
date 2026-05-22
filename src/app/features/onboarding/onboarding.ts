@@ -34,6 +34,9 @@ const STEPS: ReadonlyArray<OnboardingStep> = [
   },
 ];
 
+const SWIPE_THRESHOLD = 50;
+const SWIPE_MAX_OFFAXIS = 60;
+
 @Component({
   selector: 'app-onboarding',
   imports: [Icon, LangSwitch, Logo],
@@ -41,9 +44,6 @@ const STEPS: ReadonlyArray<OnboardingStep> = [
   templateUrl: './onboarding.html',
   styleUrl: './onboarding.css',
 })
-const SWIPE_THRESHOLD = 50;
-const SWIPE_MAX_OFFAXIS = 60;
-
 export class Onboarding {
   protected readonly i18n = inject(I18nService);
   private readonly appState = inject(AppStateService);
