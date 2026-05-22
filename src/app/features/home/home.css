@@ -75,34 +75,42 @@
 
 /* Il container .badges-teaser e i cerchi `.icons > span[data-on][data-t]` sono
    stylati in styles.css globale, identici al prototipo. Qui forziamo la
-   larghezza al 100% perche' il button HTML e' inline di default, ed
-   esponiamo gli helper di contenuto a sinistra. */
+   larghezza al 100% (il button HTML e' inline di default), riduciamo
+   leggermente il padding verticale e mettiamo numero / totale / label tutto
+   su una riga sola, centrata verticalmente. */
 .badges-teaser {
   width: 100%;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 .badges-teaser-meta {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.badges-teaser-count {
-  display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 4px;
+  line-height: 1;
 }
-.badges-teaser-count .v {
+.badges-teaser-meta .v {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 22px;
   color: var(--accent);
-  line-height: 1;
 }
-.badges-teaser-count .l {
+.badges-teaser-meta .l {
   font-size: 13px;
   color: var(--text-dim);
 }
 .badges-teaser-label {
   font-size: 12px;
+  margin-left: 6px;
+}
+
+/* Le icone di modalita' (emoji ∞ / ⏱ / ♥) restano centrate nel quadratino
+   38x38: passiamo al font di display + line-height 1 per evitare la baseline
+   del mono che le fa scendere fuori asse. */
+.mode-card .icon {
+  font-family: var(--font-display), 'Apple Color Emoji', 'Segoe UI Emoji', system-ui;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .home-foot {

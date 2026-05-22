@@ -40,6 +40,7 @@ interface LangOption {
     .lang-code-display {
       font-family: var(--font-mono);
       font-size: 12px;
+      line-height: 1;
       color: var(--text-dim);
       transition: color var(--hover-dur) ease;
     }
@@ -47,15 +48,20 @@ interface LangOption {
     .lang-switch.is-open .lang-code-display { color: var(--text); }
 
     /* Chevron rivolta in basso a riposo, ruota a "in alto" quando il
-       dropdown e' aperto. transform anziche' rotation iteration cosi'
-       l'animazione resta legata allo stato. */
+       dropdown e' aperto. inline-flex + align/justify center fanno sì che
+       l'SVG sia centrato nel proprio box e la rotazione avvenga intorno al
+       centro effettivo (non al baseline del testo accanto). */
     .lang-chev {
       display: inline-flex;
-      width: 12px;
-      height: 12px;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
       transform: rotate(90deg);
+      transform-origin: center center;
       transition: transform 180ms var(--tx-ease);
     }
+    .lang-chev svg { width: 14px; height: 14px; display: block; }
     .lang-switch.is-open .lang-chev { transform: rotate(-90deg); }
     [data-motion='minimal'] .lang-chev { transition: none; }
     .lang-pop {
