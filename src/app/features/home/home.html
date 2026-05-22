@@ -1,6 +1,5 @@
 <div class="app-shell">
   <app-bar>
-    <app-streak-pill [value]="state().streak" />
     <app-lang-switch />
     <button
       class="btn-icon"
@@ -23,25 +22,21 @@
       </h1>
     </div>
 
-    <div
-      class="daily"
-      role="button"
-      tabindex="0"
-      (click)="goDaily()"
-      (keydown.enter)="goDaily()"
-    >
+    <div class="daily">
       <div class="daily-head">
         <span class="eyebrow">{{ i18n.t('daily').toUpperCase() }}</span>
         @if (state().dailyDone) {
-          <span class="pill success">
+          <button type="button" class="pill success daily-status" (click)="openInfo('dailyStreak', $event)">
             <span class="dot"></span>
             {{ i18n.lang() === 'it' ? 'Completata' : 'Done' }}
-          </span>
+          </button>
         } @else {
-          <span class="pill warm">
+          <button type="button" class="pill warm daily-status" (click)="openInfo('dailyStreak', $event)">
             <span class="dot"></span>
-            <span>Streak {{ state().dailyStreak }}</span>
-          </span>
+            <span>
+              {{ i18n.lang() === 'it' ? 'Giorni consecutivi' : 'Days in a row' }} {{ state().dailyStreak }}
+            </span>
+          </button>
         }
       </div>
       <h2 class="h2 daily-title">
@@ -58,7 +53,7 @@
             }
           }
         </div>
-        <span class="btn btn-primary daily-cta">
+        <button type="button" class="btn btn-primary daily-cta" (click)="goDaily()">
           <span>
             {{
               state().dailyDone
@@ -67,7 +62,7 @@
             }}
           </span>
           <app-icon name="arrow-right" />
-        </span>
+        </button>
       </div>
     </div>
 
@@ -133,18 +128,18 @@
       </button>
     </div>
     <div class="stats-grid">
-      <div class="stat">
+      <button class="stat" type="button" (click)="openInfo('streak')">
         <span class="v">{{ state().streak }}</span>
         <span class="l">{{ i18n.t('streak') }}</span>
-      </div>
-      <div class="stat">
+      </button>
+      <button class="stat" type="button" (click)="openInfo('accuracy')">
         <span class="v">{{ state().accuracy }}%</span>
         <span class="l">{{ i18n.t('accuracy') }}</span>
-      </div>
-      <div class="stat">
+      </button>
+      <button class="stat" type="button" (click)="openInfo('played')">
         <span class="v">{{ state().played }}</span>
         <span class="l">{{ i18n.t('played') }}</span>
-      </div>
+      </button>
     </div>
 
     <div class="section-head">
@@ -184,4 +179,8 @@
 
     <p class="home-version mono" aria-label="Versione applicazione">{{ buildLabel }}</p>
   </div>
+
+  @if (infoOverlay()) {
+    <app-info-sheet [title]="infoTitle()" [body]="infoBody()" (close)="closeInfo()" />
+  }
 </div>

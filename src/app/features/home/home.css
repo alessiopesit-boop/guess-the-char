@@ -32,6 +32,17 @@
   gap: 6px;
 }
 
+/* Il badge "Completata" / "Giorni consecutivi" e' ora un button cliccabile
+   per aprire la modale informativa. Manteniamo l'aspetto della .pill. */
+.daily-status {
+  border: 1px solid transparent;
+  cursor: pointer;
+  font: inherit;
+  transition: filter var(--hover-dur) ease, transform var(--hover-dur) ease;
+}
+.daily-status:hover { filter: brightness(1.1); }
+.daily-status:active { transform: translateY(1px); }
+
 .mode-list {
   display: flex;
   flex-direction: column;
@@ -50,6 +61,17 @@
   grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
 }
+/* Le tre stat sono cliccabili per aprire la modale info; restano visivamente
+   identiche al box stat globale di styles.css ma diventano focus-friendly. */
+.stats-grid > .stat {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  transition: background var(--hover-dur) ease, transform var(--hover-dur) ease;
+}
+.stats-grid > .stat:hover { background: var(--surface-2); }
+.stats-grid > .stat:active { transform: translateY(1px); }
 
 /* Il container .badges-teaser e i cerchi `.icons > span[data-on][data-t]` sono
    stylati in styles.css globale, identici al prototipo. Qui solo i piccoli
