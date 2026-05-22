@@ -39,10 +39,12 @@ jobs:
         run: npm ci
 
       - name: Build Angular (production)
-        # Il repo e' un project Pages: il sito vive su
+        # `npm run build` (e non `npx ng build`) per attivare lo step
+        # `prebuild` che genera src/build-info.ts con versione e hash. Il repo
+        # e' un project Pages: il sito vive su
         # https://alessiopesit-boop.github.io/guess-the-char/, quindi il base
         # href dei bundle deve essere /guess-the-char/.
-        run: npx ng build --configuration=production --base-href=/guess-the-char/
+        run: npm run build -- --configuration=production --base-href=/guess-the-char/
 
       - name: Prepara cartella per Pages
         run: |

@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "prestart": "node scripts/generate-build-info.mjs",
     "start": "ng serve",
+    "prebuild": "node scripts/generate-build-info.mjs --prod",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

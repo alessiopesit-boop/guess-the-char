@@ -101,6 +101,18 @@ npm start                # ng serve, dev server su http://localhost:4200
 npm run build            # build di produzione in dist/guess-the-char/browser/
 ```
 
+Sia `npm start` sia `npm run build` lanciano automaticamente lo step
+`scripts/generate-build-info.mjs`, che scrive `src/build-info.ts`
+(in `.gitignore`) con `version` (da `.release-please-manifest.json`)
+e `gitHash` (da `git rev-parse --short HEAD`). Il file viene rigenerato
+a ogni avvio; serve al footer in basso a destra che mostra:
+
+- in dev (`npm start`): l'hash di commit corrente seguito da `· dev`;
+- in produzione (`npm run build`): solo `vX.Y.Z`, piccolo e discreto.
+
+Se modifichi i path del manifest o lo schema del file generato, aggiorna
+sia `app.ts` (campo `buildLabel`) sia il template `app.html`.
+
 Niente lint, ne' test (per ora) ne' formatter configurato come task npm. Prettier e' presente come devDep ma non invocato da CI: lo usiamo come default dell'editor.
 
 Per simulare un deploy locale stile Pages:
