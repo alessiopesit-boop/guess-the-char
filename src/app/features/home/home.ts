@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
@@ -7,13 +7,15 @@ import { buildQuestion, mulberry32, seedFromDate } from '../../core/data/quiz';
 import { computeBadges } from '../../core/data/badges';
 import { AppBar } from '../../shared/app-bar';
 import { Icon } from '../../shared/icon';
+import { InfoSheet } from '../../shared/info-sheet';
 import { LangSwitch } from '../../shared/lang-switch';
-import { StreakPill } from '../../shared/streak-pill';
 import { APP_VERSION, BUILD_CONTEXT, BUILD_SHA } from '../../core/build-info';
+
+type InfoKind = 'streak' | 'accuracy' | 'played' | 'dailyStreak';
 
 @Component({
   selector: 'app-home',
-  imports: [AppBar, Icon, LangSwitch, StreakPill],
+  imports: [AppBar, Icon, InfoSheet, LangSwitch],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -28,6 +30,59 @@ export class Home {
   /** Versione mostrata in fondo alla home. In dev include "dev" e l'hash di commit. */
   protected readonly buildLabel =
     BUILD_CONTEXT === 'release' ? `v${APP_VERSION}` : `v${APP_VERSION} · dev · ${BUILD_SHA}`;
+
+  /** Quale modale informativa e' aperta in questo momento (null = nessuna). */
+  protected readonly infoOverlay = signal<InfoKind | null>(null);
+
+  protected readonly infoTitle = computed(() => {
+    const isIt = this.i18n.lang() === 'it';
+    switch (this.infoOverlay()) {
+      case 'streak':
+        return isIt ? 'Striscia' : 'Streak';
+      case 'accuracy':
+        return isIt ? 'Precisione' : 'Accuracy';
+      case 'played':
+        return isIt ? 'Partite' : 'Played';
+      case 'dailyStreak':
+        return isIt ? 'Giorni consecutivi' : 'Days in a row';
+      default:
+        return '';
+    }
+  });
+
+  protected readonly infoBody = computed(() => {
+    const isIt = this.i18n.lang() === 'it';
+    const s = this.state();
+    switch (this.infoOverlay()) {
+      case 'streak':
+        return isIt
+          ? `Risposte corrette consecutive in qualunque modalita'. Ricomincia da zero al primo errore. Migliore di sempre: ${s.bestStreak}.`
+          : `Correct answers in a row across any mode. Resets to zero on your first mistake. Personal best: ${s.bestStreak}.`;
+      case 'accuracy':
+        return isIt
+          ? 'Percentuale di risposte corrette sul totale dei caratteri ai quali hai risposto. Si aggiorna a ogni risposta.'
+          : 'Percentage of correct answers over all the characters you have responded to. Updated after every answer.';
+      case 'played':
+        return isIt
+          ? 'Numero totale di caratteri ai quali hai risposto in tutte le modalita\', corretti e sbagliati insieme.'
+          : 'Total number of characters you have answered across all modes, correct and wrong combined.';
+      case 'dailyStreak':
+        return isIt
+          ? `Giorni consecutivi in cui hai concluso la sfida giornaliera. Si azzera se ne salti uno.${s.dailyStreak > 0 ? ` Sei a ${s.dailyStreak}.` : ''}`
+          : `Days in a row you finished the daily challenge. Resets if you skip a day.${s.dailyStreak > 0 ? ` You're on ${s.dailyStreak}.` : ''}`;
+      default:
+        return '';
+    }
+  });
+
+  protected openInfo(kind: InfoKind, e?: Event): void {
+    e?.stopPropagation();
+    this.infoOverlay.set(kind);
+  }
+
+  protected closeInfo(): void {
+    this.infoOverlay.set(null);
+  }
 
   protected readonly todayLabel = computed(() => {
     const locale = this.i18n.lang() === 'it' ? 'it-IT' : 'en-GB';
