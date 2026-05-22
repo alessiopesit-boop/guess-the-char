@@ -176,3 +176,19 @@
   text-align: left;
   margin-top: 14px;
 }
+
+/* Indicatori del meta-counter sopra il glifo */
+.meta-pct {
+  color: var(--text-dim);
+  margin-left: 2px;
+}
+
+/* Le opzioni eliminate dal "Hint" non hanno piu' la barra-cancella sul testo:
+   diventano solo un filo piu' tenui dello stato originale, niente piu' tratto
+   che attraversa il nome — era difficile riconoscere quale fosse stata
+   rimossa. Il pulsante resta non cliccabile (gestione lato componente). */
+.opt[data-state='dim'] {
+  text-decoration: none;
+  opacity: 0.25;
+  pointer-events: none;
+}

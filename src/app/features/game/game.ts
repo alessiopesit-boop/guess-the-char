@@ -109,11 +109,33 @@ export class Game implements OnDestroy {
 
   protected readonly totalDaily = DAILY_TOTAL;
   protected readonly correctCount = computed(() => this.history().filter((h) => h.correct).length);
+
+  /**
+   * Avanzamento mostrato dalla progress bar in alto:
+   * - daily: quante delle 5 carte hai gia' visto (cresce 0→1)
+   * - timed: quanto tempo ti resta, NON quanto ne hai usato (parte piena, decresce 1→0)
+   * - survival: quante vite ti restano (parte piena, decresce 1→0)
+   * - training (default): non c'e' un totale, la barra viene nascosta nel template
+   */
   protected readonly totalProgress = computed(() => {
     if (this.isDaily()) return this.idx() / DAILY_TOTAL;
-    if (this.isTimed()) return (TIMED_DURATION - this.secondsLeft()) / TIMED_DURATION;
-    return Math.min(this.history().length / 20, 1);
+    if (this.isTimed()) return this.secondsLeft() / TIMED_DURATION;
+    if (this.isSurvival()) return this.lives() / SURVIVAL_LIVES;
+    return 0;
   });
+
+  /** Vero quando ha senso mostrare la barra di progresso; in training no. */
+  protected readonly hasProgress = computed(
+    () => this.isDaily() || this.isTimed() || this.isSurvival(),
+  );
+
+  /** Percentuale di risposte corrette finora, intera (0..100). 0 se ancora nulla. */
+  protected readonly accuracyPct = computed(() => {
+    const total = this.history().length;
+    if (total === 0) return 0;
+    return Math.round((100 * this.correctCount()) / total);
+  });
+
   protected readonly showCp = computed(() => this.state().showCodepoint);
 
   private timerId: ReturnType<typeof setInterval> | null = null;

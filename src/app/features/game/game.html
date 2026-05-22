@@ -8,9 +8,11 @@
       <app-icon name="close" />
     </button>
     <div class="progress-wrap">
-      <div class="progress">
-        <i [style.width.%]="totalProgress() * 100"></i>
-      </div>
+      @if (hasProgress()) {
+        <div class="progress">
+          <i [style.width.%]="totalProgress() * 100"></i>
+        </div>
+      }
     </div>
     <div class="gamebar-r">
       @if (isTimed()) {
@@ -29,6 +31,9 @@
         @switch (mode()) {
           @case ('daily') {
             <span>{{ i18n.lang() === 'it' ? 'Sfida' : 'Daily' }} · {{ idx() + 1 }}/{{ totalDaily }}</span>
+            @if (history().length > 0) {
+              <span class="meta-pct"> ({{ accuracyPct() }}%)</span>
+            }
           }
           @case ('timed') {
             <span>{{ i18n.t('timed') }} · </span>
@@ -39,12 +44,18 @@
           }
           @case ('survival') {
             <span>Survival · {{ correctCount() }}</span>
+            @if (history().length > 0) {
+              <span class="meta-pct"> ({{ accuracyPct() }}%)</span>
+            }
           }
           @default {
             @if (weakOnly()) {
               <span>{{ i18n.t('weak') }} · {{ correctCount() }}/{{ history().length }}</span>
             } @else {
               <span>{{ i18n.t('training') }} · {{ correctCount() }}/{{ history().length }}</span>
+            }
+            @if (history().length > 0) {
+              <span class="meta-pct"> ({{ accuracyPct() }}%)</span>
             }
           }
         }
