@@ -15,6 +15,24 @@
   <!-- Noto fallback selettivo per gli script non-Latin, cosi' le metriche dei glifi restano coerenti. -->
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&family=Noto+Sans+KR:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500&family=Noto+Sans+Bengali:wght@400;500&family=Noto+Sans+Tamil:wght@400;500&family=Noto+Sans+Thai:wght@400;500&family=Noto+Sans+Lao:wght@400;500&family=Noto+Sans+Khmer:wght@400;500&family=Noto+Sans+Arabic:wght@400;500&family=Noto+Sans+Hebrew:wght@400;500&family=Noto+Sans+Armenian:wght@400;500&family=Noto+Sans+Georgian:wght@400;500&family=Noto+Sans+Gurmukhi:wght@400;500&display=swap" />
+
+  <script>
+    // SPA fallback restore: se public/404.html ha salvato un path in
+    // sessionStorage prima di riportarci alla root, qui lo riapplichiamo
+    // via history.replaceState prima del bootstrap Angular. In dev
+    // (ng serve) sessionStorage e' vuoto e questo blocco non fa nulla.
+    (function () {
+      try {
+        var redirect = sessionStorage.getItem('gtc-redirect');
+        if (redirect) {
+          sessionStorage.removeItem('gtc-redirect');
+          history.replaceState(null, '', redirect);
+        }
+      } catch (e) {
+        // sessionStorage non disponibile, accettiamo il path attuale.
+      }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

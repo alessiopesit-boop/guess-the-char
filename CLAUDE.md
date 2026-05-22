@@ -29,7 +29,7 @@ Niente backend per ora: tutto in-memory, persistenza via `localStorage` per stat
 
 - **Angular 21.2+**, standalone components, `ChangeDetectionStrategy.OnPush` ovunque, **zoneless change detection** (`provideZonelessChangeDetection`).
 - **Signals** (`signal`, `computed`, `effect`) per stato reattivo. Niente NgRx; RxJS solo come dipendenza implicita del Router (`toSignal(this.route.paramMap)` e' il pattern per leggere query/path params).
-- **Routing**: `provideRouter` con **`withHashLocation()`**: gli URL hanno la forma `/#/home`, `/#/game?mode=training`, ecc. Scelta motivata da GitHub Pages: niente trick di `404.html`, il refresh diretto su una qualunque route funziona sempre.
+- **Routing**: `provideRouter` con path location standard (no `#` nelle URL) e scroll restoration "top". Su GitHub Pages il refresh su una route deep funziona via `public/404.html`: quando Pages non trova il path sul filesystem serve il 404, che salva l'URL richiesto in `sessionStorage` (chiave `gtc-redirect`) e fa redirect a `/guess-the-char/`. Lo script in `src/index.html` ripristina il path originale via `history.replaceState` prima del bootstrap Angular.
 - **Styling**: un singolo `src/styles.css` globale (importato dal prototipo Claude Design as-is, classi `.btn`, `.card`, `.pill`, `.glyph-stage`, ecc., ~42KB) + CSS scoped per i componenti che hanno bisogno di layout o animazioni specifiche.
 - **Build/test**: nuovo builder `@angular/build` (esbuild + vite dev server). Vitest e' presente come devDep ma non sono ancora configurati test; `tsconfig.spec.json` resta come placeholder.
 - **Niente lint configurato**, Prettier presente come devDep ma non invocato da CI (usato come default dell'editor). Editor config in `.editorconfig`.
@@ -42,7 +42,7 @@ src/
   main.ts                   # bootstrap dell'app standalone
   styles.css                # stylesheet globale del design (~42 KB)
   app/
-    app.config.ts           # provideRouter (hash), provideZonelessChangeDetection
+    app.config.ts           # provideRouter (path location + scroll top), provideZonelessChangeDetection
     app.routes.ts           # tabella route + onboardedGuard
     app.ts                  # root component: router-outlet + footer build stamp + applica i token CSS del tema
     core/
@@ -269,7 +269,7 @@ Cose da sapere se lo modifichi:
 - Il build di produzione viene fatto con `--base-href=/guess-the-char/`: lo richiede il fatto che il sito vive su un sottopath del dominio `*.github.io`. Se cambia il nome del repo, va aggiornato anche qui.
 - Il workflow chiama `npm run build` (non `npx ng build`): cosi' parte lo step `prebuild` di `package.json` che scrive `build-sha.local.ts` (vedi sezione "Build info").
 - L'output di Angular 21 con builder `@angular/build` finisce in `dist/guess-the-char/browser/`: e' la cartella caricata come artifact Pages.
-- **Niente `404.html` fallback SPA**: il routing usa `withHashLocation()`, quindi tutti i deep link vivono dopo il `#` e il path effettivo servito da Pages e' sempre `index.html`. Se in futuro si volesse passare a `PathLocationStrategy` servira' aggiungere il trick `404.html` (vedi rafgraph-style).
+- `public/404.html` e' il fallback SPA "rafgraph-style": GitHub Pages lo serve per qualunque path inesistente, lui salva `location.pathname + search + hash` in `sessionStorage.gtc-redirect` e redireziona a `/guess-the-char/`. `src/index.html` legge quel valore prima del bootstrap Angular e ripristina l'URL via `history.replaceState`. Cosi' i deep link `/guess-the-char/game` funzionano anche al refresh diretto. Viene copiato automaticamente nel `dist/` come asset.
 - `.nojekyll` (vuoto, presente alla root) impedisce a Pages di processare i file via Jekyll. Lo step del workflow lo copia automaticamente in `_site/`.
 - Prima pubblicazione: in *Settings > Pages* del repo va scelto "Source: GitHub Actions" una volta sola.
 - Anche l'environment `github-pages` (creato in automatico la prima volta che Pages e' attivato) va sbloccato per i tag: di default consente deploy solo dal branch `main`, ma il nostro workflow parte dal tag `vX.Y.Z`. Una sola volta, aggiungere una "deployment branch policy" con `name: v*` e `type: tag` (via *Settings > Environments > github-pages > Deployment branches and tags*, oppure via `gh api -X POST repos/<owner>/<repo>/environments/github-pages/deployment-branch-policies -f name='v*' -f type='tag'`). Senza questo, il job `deploy` fallisce con "Tag X.Y.Z is not allowed to deploy to github-pages due to environment protection rules".
@@ -277,7 +277,7 @@ Cose da sapere se lo modifichi:
 ## Vincoli e cose da non fare
 
 - **Non** introdurre RxJS observable per stato applicativo: usa signal/effect. RxJS resta ammesso solo dove serve a integrare API Angular che lo richiedono (es. `toSignal` su params di `Router`).
-- **Non** rimuovere `withHashLocation()` da `app.config.ts` senza prima decidere come gestire le route refresh-friendly su Pages (servirebbe un `404.html` che ridireziona a `index.html`, e per ora non c'e').
+- **Non** rimuovere lo script SPA-fallback in `src/index.html` ne' lo script di `public/404.html` senza aver configurato un'alternativa al routing path-location: rompe il refresh diretto su route diverse da `/`.
 - **Non** bypassare `AppStateService` con scritture dirette a `localStorage`: la chiave `gtc.state` ha uno schema mergiato col `DEFAULT_STATE` ed evita di rompere lo stato di utenti gia' utilizzatori.
 - **Non** introdurre librerie UI esterne (Material, PrimeNG, Tailwind) senza necessita': il design system del prototipo e' gia' coerente e pesato.
 - **Non** convertire a SCSS o CSS modules per componente senza un buon motivo: lo styling globale e' una scelta, non un'omissione.
