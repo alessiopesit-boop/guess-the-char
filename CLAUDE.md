@@ -17,7 +17,7 @@ Istruzioni per Claude Code (e qualunque altro assistente AI compatibile) che lav
 
 Se la modifica e' una piccola correzione (typo, refactor locale, rinomina di una variabile privata, fix CSS puntuale), **non** serve aggiornare ne' CLAUDE.md ne' README. In dubbio: aggiorna CLAUDE.md (interno) e valuta se anche README (esterno).
 
-Aggiornare significa: modificare la sezione gia' esistente che descrive l'area toccata. Non aggiungere log di modifiche o changelog qui, il `git log` e il `CHANGELOG.md` (gestito da release-please, vedi sotto) sono le fonti di verita' per la cronologia.
+Aggiornare significa: modificare la sezione gia' esistente che descrive l'area toccata. Non aggiungere log di modifiche o changelog qui, il `git log` e' l'unica fonte di verita' per la cronologia.
 
 ## Cos'e' il progetto
 
@@ -107,7 +107,6 @@ Se modifichi questa logica: ricordati che il file `build-info.prod.ts` deve esis
 ## Comandi
 
 ```bash
-npm install        # installa dipendenze (lancia anche write-build-sha.mjs via postinstall)
 npm start          # ng serve, dev server su http://localhost:4200
 npm run build      # build di produzione in dist/guess-the-char/browser/
 npm run watch      # build dev con --watch
@@ -115,13 +114,6 @@ npm test           # vitest (nessuna spec custom presente)
 ```
 
 Non e' configurato `ng e2e`, non c'e' un comando di lint.
-
-Per simulare un deploy locale stile Pages:
-
-```bash
-npm run build -- --base-href=/guess-the-char/
-npx http-server dist/guess-the-char/browser/
-```
 
 ## Branching e Pull Request
 
@@ -143,9 +135,9 @@ Esempi: `feat/script-armenian`, `fix/score-reset-edge-case`, `chore/bump-actions
 
 **Una PR copre uno scope logico.** Due bug non correlati, anche piccoli, vanno in due PR separate. Regola pratica: se lo `scope` del Conventional Commit dovrebbe essere diverso tra una modifica e l'altra, sono due PR (es. `fix(ui):` + `fix(scoring):` non si bundlano).
 
-Vale anche se si tocca lo stesso file: se `src/styles.css` riceve un fix CSS al carrello e uno separato al feedback di gioco, due PR. Il refactor "di passaggio" mentre si sistema altro va evitato; se serve, una `refactor:` dedicata.
+Vale anche se si tocca lo stesso file: se `src/styles.css` riceve un fix CSS al menu lingua e uno separato al feedback di gioco, due PR. Il refactor "di passaggio" mentre si sistema altro va evitato; se serve, una `refactor:` dedicata.
 
-Eccezione: ritocchi adiacenti che condividono lo stesso "perche'" possono stare in una sola PR. Tipico esempio: una pass di responsiveness mobile che tocca diverse sezioni e ha un solo motivo ("rendere il sito leggibile su iPhone") puo' stare in `fix(ui):` o `fix(mobile):` unico. Ma se i fix sono indipendenti, sono due PR.
+Eccezione: ritocchi adiacenti che condividono lo stesso "perche'" possono stare in una sola PR. Tipico esempio: una pass di responsiveness mobile che tocca quattro sezioni e ha un solo motivo ("rendere il sito leggibile su iPhone") puo' stare in `fix(ui):` o `fix(mobile):` unico. Ma se i fix sono indipendenti (un tap-highlight nelle impostazioni + un margin sbagliato nel feedback del quiz), sono due PR.
 
 Perche': PR piccole e mono-scope sono piu' rapide da revieware, piu' facili da rollbaccare e generano release notes piu' pulite (un bullet per voce, ogni voce e' un cambio comprensibile a se' stante).
 
@@ -244,7 +236,7 @@ Se per qualunque ragione queste impostazioni venissero modificate a mano, si pos
 
 ## Versioning
 
-Schema [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`. La fonte di verita' e' il campo `version` in `package.json` (e `.release-please-manifest.json`, mantenuti in sync). Da li' il footer la legge a build-time e la mostra sul sito.
+Schema [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`. La fonte di verita' e' il campo `version` in `package.json` (e `.release-please-manifest.json`). Da li' il footer la legge a build-time e la mostra sul sito.
 
 ### Rilascio: lo fa release-please, non tu
 
