@@ -9,6 +9,28 @@
   color: var(--accent);
 }
 
+/* Pillola "streak di gioco" in evidenza sotto al saluto. Compare solo se
+   l'utente ha una serie attiva (>0): se 0 la nascondiamo per non mostrare
+   "0 di fila" che fa peggio del nulla. Cliccabile per aprire la modale info. */
+.home-streak {
+  align-self: flex-start;
+  margin-top: 10px;
+  cursor: pointer;
+  font: inherit;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+}
+.home-streak-value {
+  font-weight: 700;
+  color: var(--warm);
+}
+.home-streak-label {
+  color: var(--warm);
+  opacity: 0.85;
+}
+.home-streak:hover { filter: brightness(1.1); }
+
 .daily-head {
   display: flex;
   justify-content: space-between;

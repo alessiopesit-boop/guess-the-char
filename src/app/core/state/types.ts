@@ -58,7 +58,10 @@ export interface AppState {
 
 export const DEFAULT_STATE: AppState = {
   onboarded: false,
-  selected: ['hiragana', 'hangul', 'devanagari', 'arabic', 'thai', 'greek'],
+  // Nessuna scrittura selezionata di default: la prima volta che l'utente entra
+  // in "Scegli le scritture" deve compiere una scelta esplicita. La sua scelta
+  // viene poi memorizzata in localStorage e riproposta nelle sessioni seguenti.
+  selected: [],
   streak: 0,
   bestStreak: 0,
   played: 0,
