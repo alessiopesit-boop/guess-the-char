@@ -20,6 +20,13 @@
           {{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }} <span class="home-name">{{ i18n.lang() === 'it' ? 'lettore.' : 'reader.' }}</span>
         }
       </h1>
+      @if (state().streak > 0) {
+        <button type="button" class="pill warm home-streak" (click)="openInfo('streak', $event)">
+          <app-icon name="flame" />
+          <span class="home-streak-value tabnum">{{ state().streak }}</span>
+          <span class="home-streak-label">{{ i18n.lang() === 'it' ? 'di fila' : 'in a row' }}</span>
+        </button>
+      }
     </div>
 
     <div class="daily">
@@ -32,8 +39,8 @@
           </button>
         } @else {
           <button type="button" class="pill warm daily-status" (click)="openInfo('dailyStreak', $event)">
-            <span class="dot"></span>
-            <span>{{ state().dailyStreak }} {{ i18n.lang() === 'it' ? 'giorni' : 'days' }}</span>
+            <app-icon name="calendar" />
+            <span class="tabnum">{{ state().dailyStreak }}</span>
           </button>
         }
       </div>
