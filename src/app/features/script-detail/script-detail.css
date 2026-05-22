@@ -1,0 +1,82 @@
+.sd-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 32px;
+}
+
+.sd-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sd-glyph {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-glyph);
+  font-size: 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.sd-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sd-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.sd-blurb {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.sd-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.sd-section-title {
+  margin-bottom: 8px;
+}
+
+.sd-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+
+.sd-cell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: var(--font-glyph);
+  font-size: 22px;
+  cursor: pointer;
+  transition:
+    background var(--hover-dur) ease,
+    transform var(--hover-dur) ease;
+}
+.sd-cell:hover {
+  background: var(--surface-2);
+}
+.sd-cell:active {
+  transform: scale(0.96);
+}

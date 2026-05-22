@@ -1,0 +1,143 @@
+.badges-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 32px;
+}
+
+.badges-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+
+.badges-count {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.badges-count .v {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--accent);
+  line-height: 1;
+}
+.badges-count .l {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.badges-progress {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.badges-bar {
+  position: relative;
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.badges-bar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 240ms var(--tx-ease);
+}
+
+.badges-progress-label {
+  font-size: 12px;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+/* Le classi .badge-card, .badge-icon, .badge-title e .badge-prog vivono in styles.css
+   globale: ricalcano esattamente il prototipo (cerchio 52x52, border per tier,
+   box-shadow colorato sulle unlocked, barra progresso in basso). Qui niente. */
+
+/* Sheet dettaglio */
+.badge-backdrop {
+  align-items: center;
+  z-index: 80;
+}
+.badge-sheet {
+  max-width: 380px;
+  border-radius: 20px;
+  padding: 22px;
+  animation: pop .18s ease;
+  text-align: center;
+  position: relative;
+}
+.badge-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.badge-sheet-status {
+  display: inline-block;
+  margin: 14px 0 6px;
+  color: var(--text-mute);
+}
+.badge-sheet-status.unlocked {
+  color: var(--accent);
+}
+
+.badge-sheet-title {
+  margin: 0;
+}
+
+.badge-sheet-desc {
+  margin: 6px 0 18px;
+  font-size: 14px;
+}
+
+.badge-sheet-quest {
+  text-align: left;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+.badge-sheet-quest p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.badge-sheet-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.badge-bar {
+  position: relative;
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.badge-bar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 240ms var(--tx-ease);
+}
+.badge-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}

@@ -1,0 +1,53 @@
+<div class="app-shell">
+  <app-bar [canBack]="true" leftMode="nav" (back)="goBack()" (goHome)="goHome()" />
+
+  <div class="page">
+    <div class="result-hero">
+      <span class="eyebrow warm-text">
+        {{ i18n.lang() === 'it' ? 'SFIDA GIORNALIERA' : 'DAILY CHALLENGE' }} · #{{ dayN() }}
+      </span>
+      <div class="big tabnum">
+        <span>{{ score() }}</span><span class="result-total">/5</span>
+      </div>
+      <div class="muted">{{ headline() }}</div>
+    </div>
+
+    <div class="emoji-grid">{{ grid() || '⬜⬜⬜⬜⬜' }}</div>
+
+    <div class="result-stats">
+      <div class="stat">
+        <span class="v">{{ state().dailyStreak }}</span>
+        <span class="l">{{ i18n.lang() === 'it' ? 'Striscia giornaliera' : 'Daily streak' }}</span>
+      </div>
+      <div class="stat">
+        <span class="v">{{ perfectDays() }}</span>
+        <span class="l">{{ i18n.lang() === 'it' ? 'Punteggi pieni' : 'Perfect days' }}</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="result-actions">
+      <button class="btn btn-primary btn-block result-btn" type="button" (click)="share()">
+        <span>
+          {{
+            copied()
+              ? (i18n.lang() === 'it' ? 'Copiato negli appunti' : 'Copied to clipboard')
+              : (i18n.lang() === 'it' ? 'Condividi risultato' : 'Share result')
+          }}
+        </span>
+        @if (copied()) {
+          <app-icon name="check" />
+        } @else {
+          <app-icon name="share" />
+        }
+      </button>
+      <button class="btn btn-ghost btn-block" type="button" (click)="goHome()">
+        {{ i18n.lang() === 'it' ? 'Torna alla home' : 'Back to home' }}
+      </button>
+      <p class="muted next-tomorrow">
+        {{ i18n.lang() === 'it' ? 'La prossima sfida arriva domani.' : 'New challenge tomorrow.' }}
+      </p>
+    </div>
+  </div>
+</div>

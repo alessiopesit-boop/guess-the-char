@@ -1,0 +1,178 @@
+.gamebar {
+  align-items: center;
+}
+
+.progress-wrap {
+  flex: 1;
+  padding: 0 14px;
+}
+
+.gamebar-r {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: calc(100dvh - 80px);
+}
+
+.game-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-score {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.meta-combo {
+  color: var(--warm);
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+/* La lista delle opzioni: il prototipo ha display: flex column gap 10 inline. */
+.opt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Pulsante "Hint" stile lampadina, ambra. Era nello style inline del prototipo. */
+.hint-btn {
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  background: rgba(251, 191, 36, 0.08);
+  color: var(--warm);
+  border-radius: 999px;
+  font-size: 13px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition:
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease;
+}
+.hint-btn:hover:not(:disabled) {
+  background: rgba(251, 191, 36, 0.16);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+.hint-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.hint-count {
+  color: var(--warm);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+/* Banner "promemoria" alla prima risposta sbagliata in Allenamento */
+.fb-tutorial {
+  padding: 12px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  animation: pop 0.25s ease;
+}
+.fb-tutorial-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+.fb-tutorial-body {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+}
+.fb-tutorial-eyebrow {
+  color: var(--warm);
+  margin-bottom: 4px;
+}
+
+/* Bottone "Prossimo carattere" sotto la feedback bar */
+.fb-next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.fb-blurb {
+  margin-top: 6px !important;
+}
+
+.fb-discover {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.fb-discover .btn {
+  font-size: 13px;
+  gap: 6px;
+}
+
+/* Sheet con info aggiuntive sul glifo o sulla scrittura, sopra la partita */
+.info-backdrop {
+  align-items: center;
+  z-index: 90;
+}
+.info-sheet {
+  max-width: 420px;
+  border-radius: 22px;
+  padding: 24px 22px;
+  animation: pop 0.18s ease;
+  text-align: center;
+  position: relative;
+}
+.info-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.info-glyph {
+  font-family: var(--font-glyph);
+  font-size: 120px;
+  line-height: 1.05;
+  margin: 14px 0 6px;
+  color: var(--accent);
+}
+.info-cp {
+  font-size: 13px;
+  color: var(--text-mute);
+  letter-spacing: 0.06em;
+}
+.info-glyph-note {
+  font-size: 13px;
+  margin-top: 18px;
+  text-align: left;
+}
+
+.info-script-title {
+  margin: 8px 0 4px;
+}
+.info-script-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+  justify-content: center;
+}
+.info-script-blurb {
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: left;
+  margin-top: 14px;
+}

@@ -1,0 +1,195 @@
+<div class="app-shell">
+  @if (flash(); as f) {
+    <div [class]="'flash ' + f"></div>
+  }
+
+  <div class="appbar gamebar">
+    <button class="btn-icon" type="button" (click)="exit()" aria-label="Exit">
+      <app-icon name="close" />
+    </button>
+    <div class="progress-wrap">
+      <div class="progress">
+        <i [style.width.%]="totalProgress() * 100"></i>
+      </div>
+    </div>
+    <div class="gamebar-r">
+      @if (isTimed()) {
+        <app-timer-ring [seconds]="secondsLeft()" [max]="60" />
+      } @else if (isSurvival()) {
+        <app-lives [count]="lives()" />
+      } @else {
+        <app-streak-pill [value]="streakLocal()" />
+      }
+    </div>
+  </div>
+
+  <div class="page game-page">
+    <div class="game-meta">
+      <span class="eyebrow">
+        @switch (mode()) {
+          @case ('daily') {
+            <span>{{ i18n.lang() === 'it' ? 'Sfida' : 'Daily' }} · {{ idx() + 1 }}/{{ totalDaily }}</span>
+          }
+          @case ('timed') {
+            <span>{{ i18n.t('timed') }} · </span>
+            <span class="meta-score">{{ score() }}</span>
+            @if (combo() > 1) {
+              <span class="meta-combo"> ×{{ combo() }}</span>
+            }
+          }
+          @case ('survival') {
+            <span>Survival · {{ correctCount() }}</span>
+          }
+          @default {
+            @if (weakOnly()) {
+              <span>{{ i18n.t('weak') }} · {{ correctCount() }}/{{ history().length }}</span>
+            } @else {
+              <span>{{ i18n.t('training') }} · {{ correctCount() }}/{{ history().length }}</span>
+            }
+          }
+        }
+      </span>
+      <button
+        class="hint-btn"
+        type="button"
+        [disabled]="chosen() !== null || hintsLeft() <= 0"
+        (click)="useHint()"
+        aria-label="Use hint"
+      >💡<span class="mono tabnum hint-count">{{ hintsLeft() }}</span></button>
+    </div>
+
+    @if (question(); as q) {
+      <div
+        class="glyph-stage"
+        [class.is-wrong]="glyphFx() === 'wrong'"
+        [class.is-correct]="glyphFx() === 'correct'"
+      >
+        @for (k of [q.glyph + ':' + idx()]; track k) {
+          <div class="glyph" [class.is-wrong]="glyphFx() === 'wrong'" [class.is-correct-fast]="glyphFx() === 'correct'">
+            {{ q.glyph }}
+          </div>
+        }
+        @if (showCp()) {
+          <span class="glyph-codepoint mono">U+{{ q.cp }}</span>
+        }
+      </div>
+
+      <div class="opt-list">
+        @for (opt of q.options; track opt.id; let i = $index) {
+          <button
+            class="opt"
+            type="button"
+            [attr.data-state]="optState(opt)"
+            [disabled]="chosen() !== null || eliminated().includes(opt.id)"
+            (click)="pick(opt)"
+          >
+            <span class="opt-key">{{ i + 1 }}</span>
+            <span>{{ nameOf(opt) }}</span>
+            <span class="opt-tag">{{ tagOf(opt) }}</span>
+          </button>
+        }
+      </div>
+
+      @if (chosen(); as c) {
+        @if (isTimed()) {
+          <div [class]="'quietfb ' + (c.correct ? 'correct' : 'wrong')">
+            @if (c.correct) {
+              <span>✓ {{ i18n.lang() === 'it' ? 'era' : 'it was' }} {{ nameOf(q.correct) }}</span>
+              <span class="meta-combo"> +{{ 10 * (combo() > 1 ? combo() - 1 : 1) }}</span>
+            } @else {
+              <span>✗ {{ i18n.lang() === 'it' ? 'era' : 'it was' }} {{ nameOf(q.correct) }}</span>
+            }
+          </div>
+        } @else {
+          <div [class]="'fb-bar ' + (c.correct ? 'correct' : 'wrong')">
+            <div class="fb-title">
+              <span class="badge" aria-hidden="true">
+                @if (c.correct) {
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l3 3 5-6"/></svg>
+                } @else {
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+                }
+              </span>
+              @if (c.correct) {
+                <span>{{ i18n.t('correct') }}</span>
+              } @else {
+                <span>{{ i18n.t('wrong') }} {{ i18n.lang() === 'it' ? 'era' : 'it was' }} {{ nameOf(q.correct) }}</span>
+              }
+            </div>
+
+            @if (tutorial(); as t) {
+              @if (!c.correct) {
+                <div class="fb-tutorial">
+                  <span class="fb-tutorial-icon">💡</span>
+                  <div class="fb-tutorial-body">
+                    <div class="eyebrow fb-tutorial-eyebrow">
+                      {{ i18n.lang() === 'it' ? 'PROMEMORIA' : 'TIP' }}
+                    </div>
+                    {{ t.text }}
+                  </div>
+                </div>
+              }
+            }
+
+            <div class="scriptcard">
+              <div class="sample">{{ q.glyph }}</div>
+              <div>
+                <h3>{{ nameOf(q.correct) }}</h3>
+                <p>{{ q.correct.region }} · {{ q.correct.lang }} · U+{{ q.cp }}</p>
+                <p class="fb-blurb">{{ q.correct.blurb.split('.')[0] }}.</p>
+              </div>
+            </div>
+
+            <div class="fb-discover">
+              <button class="btn btn-ghost" type="button" (click)="openInfo('glyph')">
+                <span>{{ i18n.lang() === 'it' ? 'Il carattere' : 'The character' }}</span>
+                <app-icon name="arrow-right" />
+              </button>
+              <button class="btn btn-ghost" type="button" (click)="openInfo('script')">
+                <span>{{ i18n.lang() === 'it' ? 'La scrittura' : 'The script' }}</span>
+                <app-icon name="arrow-right" />
+              </button>
+            </div>
+
+            <button #nextBtn class="btn btn-primary btn-block fb-next" type="button" (click)="advance()">
+              <span>{{ i18n.t('next') }}</span>
+              <app-icon name="arrow-right" />
+            </button>
+          </div>
+        }
+      }
+
+      @if (infoOverlay(); as kind) {
+        <div class="sheet-backdrop info-backdrop" (click)="closeInfo()">
+          <div class="sheet info-sheet" (click)="$event.stopPropagation()">
+            <button class="btn-icon info-close" type="button" (click)="closeInfo()" aria-label="Close">
+              <app-icon name="close" />
+            </button>
+
+            @if (kind === 'glyph') {
+              <span class="eyebrow">{{ i18n.lang() === 'it' ? 'CARATTERE' : 'CHARACTER' }}</span>
+              <div class="info-glyph">{{ q.glyph }}</div>
+              <div class="info-cp mono">U+{{ q.cp }}</div>
+              <p class="muted info-glyph-note">
+                {{ i18n.lang() === 'it'
+                  ? 'Carattere del blocco Unicode della scrittura ' + nameOf(q.correct) + '. Le informazioni di dettaglio sul singolo glifo (etimologia, significato, ricorrenze) arriveranno con una fonte esterna nelle release successive.'
+                  : 'A character from the Unicode block for ' + nameOf(q.correct) + '. Detailed information about the single glyph (etymology, meaning, frequency) will arrive with an external data source in future releases.' }}
+              </p>
+            } @else {
+              <span class="eyebrow">{{ i18n.lang() === 'it' ? 'SCRITTURA' : 'SCRIPT' }}</span>
+              <h2 class="h2 info-script-title">{{ nameOf(q.correct) }}</h2>
+              <div class="info-script-meta muted">
+                <span>{{ q.correct.region }}</span>
+                <span>·</span>
+                <span>{{ q.correct.lang }}</span>
+                <span>·</span>
+                <span>{{ q.correct.era }}</span>
+              </div>
+              <p class="info-script-blurb">{{ q.correct.blurb }}</p>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

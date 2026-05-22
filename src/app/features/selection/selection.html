@@ -1,0 +1,120 @@
+<div class="app-shell">
+  <app-bar [canBack]="true" (back)="goBack()" (goHome)="goHome()" />
+
+  <div class="page selection-page">
+    <div class="selection-head">
+      <div>
+        <span class="eyebrow">{{ modeLabel().toUpperCase() }}</span>
+        <h1 class="h1 selection-title">{{ i18n.t('chooseScripts') }}</h1>
+      </div>
+    </div>
+
+    <p class="muted selection-count">
+      @if (i18n.lang() === 'it') {
+        Hai selezionato <span class="emph">{{ selectedCount() }}</span> scritture su {{ total }}.
+      } @else {
+        Selected <span class="emph">{{ selectedCount() }}</span> of {{ total }} scripts.
+      }
+    </p>
+
+    <div class="selection-actions">
+      <button class="nav-btn small" type="button" (click)="selectAll()">
+        {{ i18n.lang() === 'it' ? 'Seleziona tutte' : 'Select all' }}
+      </button>
+      <button class="nav-btn small" type="button" (click)="clearAll()">
+        {{ i18n.lang() === 'it' ? 'Pulisci' : 'Clear' }}
+      </button>
+    </div>
+
+    <div class="group-list">
+      @for (g of groups; track g.id) {
+        <div class="group-card">
+          <div
+            class="group-head"
+            role="button"
+            tabindex="0"
+            [attr.aria-expanded]="isOpen(g.id)"
+            (click)="toggleOpen(g.id)"
+            (keydown.enter)="toggleOpen(g.id)"
+            (keydown.space)="toggleOpen(g.id); $event.preventDefault()"
+          >
+            <app-icon name="chev" class="chev" [attr.data-open]="isOpen(g.id) ? '1' : '0'" />
+            <span class="preview">{{ g.sample }}</span>
+            <div class="group-meta">
+              <div class="group-name">{{ nameOf(g.nameIt, g.nameEn) }}</div>
+              <div class="count">{{ groupCount(g.id).on }}/{{ groupCount(g.id).total }}</div>
+            </div>
+            <div class="right">
+              <button
+                class="check"
+                type="button"
+                [attr.data-on]="groupState(g.id)"
+                [attr.aria-label]="'Toggle ' + g.nameEn"
+                (click)="$event.stopPropagation(); toggleGroup(g.id)"
+              >
+                @switch (groupState(g.id)) {
+                  @case ('1') {
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l3 3 5-6"/></svg>
+                  }
+                  @case ('partial') {
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3.5 7h7"/></svg>
+                  }
+                }
+              </button>
+            </div>
+          </div>
+
+          @if (isOpen(g.id)) {
+            <div class="group-body">
+              @for (s of scriptsOf(g.id); track s.id) {
+                <div
+                  class="script-row"
+                  role="button"
+                  tabindex="0"
+                  (click)="toggleScript(s.id)"
+                  (keydown.enter)="toggleScript(s.id)"
+                  (keydown.space)="toggleScript(s.id); $event.preventDefault()"
+                >
+                  <div class="script-row-l">
+                    <span class="preview">{{ s.sample }}</span>
+                    <div class="script-meta">
+                      <div class="script-name">{{ nameOf(s.nameIt, s.nameEn) }}</div>
+                      <div class="script-region">{{ s.region }}</div>
+                    </div>
+                  </div>
+                  <button
+                    class="check"
+                    type="button"
+                    [attr.data-on]="isSelected(s.id) ? '1' : '0'"
+                    [attr.aria-label]="'Toggle ' + s.nameEn"
+                    (click)="$event.stopPropagation(); toggleScript(s.id)"
+                  >
+                    @if (isSelected(s.id)) {
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l3 3 5-6"/></svg>
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="selection-cta">
+      <button
+        class="btn btn-primary btn-block selection-start"
+        type="button"
+        [disabled]="selectedCount() < 2"
+        (click)="start()"
+      >
+        @if (selectedCount() < 2) {
+          {{ i18n.lang() === 'it' ? 'Seleziona almeno 2' : 'Pick at least 2' }}
+        } @else {
+          <span>{{ i18n.t('start') }}</span>
+          <app-icon name="arrow-right" />
+        }
+      </button>
+    </div>
+  </div>
+</div>

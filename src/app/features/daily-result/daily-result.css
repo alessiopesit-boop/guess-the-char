@@ -1,0 +1,56 @@
+.result-hero {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 0 6px;
+}
+
+.warm-text { color: var(--warm); }
+
+.big {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 72px;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.result-total {
+  color: var(--text-mute);
+  font-weight: 600;
+}
+
+.emoji-grid {
+  text-align: center;
+  font-size: 30px;
+  letter-spacing: 4px;
+  padding: 16px 0;
+}
+
+.result-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.next-tomorrow {
+  font-size: 12px;
+  text-align: center;
+  margin-top: 4px;
+}

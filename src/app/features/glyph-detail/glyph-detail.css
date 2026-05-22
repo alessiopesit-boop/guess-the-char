@@ -1,0 +1,70 @@
+.gd-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 32px;
+}
+
+.gd-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0 8px;
+}
+
+.gd-glyph {
+  width: 180px;
+  height: 180px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-glyph);
+  font-size: 120px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  color: var(--text);
+}
+
+.gd-codepoint {
+  font-size: 13px;
+  color: var(--text-mute);
+  letter-spacing: 0.05em;
+}
+
+.gd-script-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: background var(--hover-dur) ease;
+}
+.gd-script-card:hover {
+  background: var(--surface-2);
+}
+
+.gd-script-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+}
+
+.gd-script-name {
+  margin: 0;
+}
+
+.gd-script-region {
+  font-size: 13px;
+}
+
+.gd-blurb {
+  font-size: 14px;
+  line-height: 1.55;
+}

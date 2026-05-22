@@ -1,0 +1,86 @@
+<div class="app-shell">
+  <app-bar [canBack]="true" [title]="i18n.t('settings')" (back)="goBack()" (goHome)="goHome()" />
+
+  <div class="page settings-page">
+    <section class="settings-section">
+      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Lingua' : 'Language' }}</h3>
+      <div class="seg">
+        @for (l of langs; track l) {
+          <button class="seg-btn" type="button" [class.is-active]="i18n.lang() === l" (click)="setLang(l)">
+            {{ l === 'it' ? 'Italiano' : 'English' }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Colore accent' : 'Accent color' }}</h3>
+      <div class="swatches">
+        @for (a of accents; track a.accent) {
+          <button
+            class="swatch"
+            type="button"
+            [class.is-active]="state().accent === a.accent"
+            [style.background]="a.accent"
+            [attr.aria-label]="a.name"
+            (click)="setAccent(a.accent)"
+          >
+            @if (state().accent === a.accent) {
+              <app-icon name="check" />
+            }
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Animazioni' : 'Motion' }}</h3>
+      <div class="seg">
+        @for (m of motions; track m) {
+          <button class="seg-btn" type="button" [class.is-active]="state().motion === m" (click)="setMotion(m)">
+            {{ motionLabel(m) }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Accessibilita' : 'Accessibility' }}</h3>
+      <div class="seg">
+        @for (m of cbModes; track m) {
+          <button class="seg-btn" type="button" [class.is-active]="state().colorblind === m" (click)="setColorblind(m)">
+            {{ cbLabel(m) }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Audio e feedback' : 'Audio and feedback' }}</h3>
+      <label class="toggle-row">
+        <span class="toggle-label">{{ i18n.lang() === 'it' ? 'Suoni' : 'Sounds' }}</span>
+        <input type="checkbox" class="toggle-input" [checked]="state().sound" (change)="toggleSound()" />
+      </label>
+      <label class="toggle-row">
+        <span class="toggle-label">{{ i18n.lang() === 'it' ? 'Vibrazione' : 'Haptics' }}</span>
+        <input type="checkbox" class="toggle-input" [checked]="state().haptics" (change)="toggleHaptics()" />
+      </label>
+      <label class="toggle-row">
+        <span>
+          <span class="toggle-label">{{ i18n.lang() === 'it' ? 'Mostra codice Unicode' : 'Show Unicode codepoint' }}</span>
+          <span class="toggle-sub muted">
+            {{ i18n.lang() === 'it' ? 'Sotto al glifo del quiz appare sempre il codice U+XXXX.' : 'The U+XXXX codepoint appears under each quiz glyph.' }}
+          </span>
+        </span>
+        <input type="checkbox" class="toggle-input" [checked]="state().showCodepoint" (change)="toggleShowCodepoint()" />
+      </label>
+    </section>
+
+    <section class="settings-section">
+      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Dati' : 'Data' }}</h3>
+      <button class="btn btn-ghost btn-block reset-btn" type="button" (click)="resetProgress()">
+        {{ i18n.lang() === 'it' ? 'Resetta tutti i progressi' : 'Reset all progress' }}
+      </button>
+    </section>
+  </div>
+</div>

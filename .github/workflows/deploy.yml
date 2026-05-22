@@ -29,18 +29,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Angular (production)
+        # `npm run build` (e non `npx ng build`) per attivare lo step
+        # `prebuild` che genera src/build-info.ts con versione e hash. Il repo
+        # e' un project Pages: il sito vive su
+        # https://alessiopesit-boop.github.io/guess-the-char/, quindi il base
+        # href dei bundle deve essere /guess-the-char/.
+        run: npm run build -- --configuration=production --base-href=/guess-the-char/
+
       - name: Prepara cartella per Pages
         run: |
           set -euo pipefail
           mkdir -p _site
-          # Copia in _site tutto cio' che e' web-pubblicabile dalla root,
-          # escludendo i file di meta-repo (CI, doc, manifest, license).
-          # `cp -a` preserva permessi/symlink; il dot-glob attiva e' attivato
-          # implicitamente dall'elenco esplicito qua sotto.
-          shopt -s extglob
-          # Copia tutto eccetto le esclusioni.
-          cp -a !(.git|.github|_site|CLAUDE.md|CHANGELOG.md|README.md|LICENSE|release-please-config.json|.release-please-manifest.json) _site/
-          # `.nojekyll` esplicito dentro _site (anche se gia' presente alla root)
+          cp -a dist/guess-the-char/browser/. _site/
+          # .nojekyll evita che Pages processi file con prefisso _
           touch _site/.nojekyll
           ls -la _site
 

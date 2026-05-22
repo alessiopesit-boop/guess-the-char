@@ -1,0 +1,101 @@
+.home-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+
+.home-name {
+  color: var(--accent);
+}
+
+.daily-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.daily-title {
+  margin-top: 8px;
+}
+
+.daily-sub {
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+.daily-cta {
+  height: 40px;
+  font-size: 14px;
+  padding: 0 14px;
+  gap: 6px;
+}
+
+.mode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-btn.small {
+  height: 30px;
+  font-size: 12px;
+  padding: 0 12px;
+  gap: 4px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+/* Il container .badges-teaser e i cerchi `.icons > span[data-on][data-t]` sono
+   stylati in styles.css globale, identici al prototipo. Qui solo i piccoli
+   helper di contenuto a sinistra: numero unlocked/totale e label. */
+.badges-teaser-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.badges-teaser-count {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.badges-teaser-count .v {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--accent);
+  line-height: 1;
+}
+.badges-teaser-count .l {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.badges-teaser-label {
+  font-size: 12px;
+}
+
+.home-foot {
+  margin-top: 26px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-foot .emoji {
+  font-size: 14px;
+}
+
+.home-version {
+  margin: 20px 0 calc(env(safe-area-inset-bottom, 0px) + 4px);
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-mute);
+  opacity: 0.7;
+}

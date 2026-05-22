@@ -1,0 +1,46 @@
+<div class="app-shell">
+  <div class="appbar">
+    <div class="appbar-l">
+      @if (step() > 0) {
+        <button class="nav-btn" (click)="go(step() - 1)">
+          <app-icon name="back" />
+          <span style="font-size: 13px">{{ i18n.t('back') }}</span>
+        </button>
+      } @else {
+        <app-logo />
+      }
+    </div>
+    <div class="appbar-r">
+      <button class="nav-btn" (click)="done()">{{ i18n.t('skip') }}</button>
+    </div>
+  </div>
+
+  <div class="page onb-page">
+    @for (k of [slideKey()]; track k) {
+      <div [class]="'onb-slide ' + dir()" [attr.data-step]="step()">
+        <div class="onb-grid">
+          @for (g of current().glyphs; track $index) {
+            <div class="g">{{ g }}</div>
+          }
+        </div>
+        <div class="onb-copy">
+          <div class="eyebrow">{{ current().eyebrow }}</div>
+          <h1 class="h1">{{ currentTitle() }}</h1>
+          <p class="muted onb-body">{{ currentBody() }}</p>
+        </div>
+      </div>
+    }
+
+    <div class="onb-foot">
+      <div class="onb-dots">
+        @for (s of steps; track $index; let i = $index) {
+          <span class="onb-dot" [class.is-active]="i === step()"></span>
+        }
+      </div>
+      <button class="btn btn-primary btn-block onb-cta" (click)="next()">
+        <span>{{ continueLabel() }}</span>
+        <app-icon name="arrow-right" />
+      </button>
+    </div>
+  </div>
+</div>
