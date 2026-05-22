@@ -86,9 +86,23 @@
   right: 12px;
 }
 
+/* Sheet dettaglio traguardo: hero stacked (icona sopra, status sotto, tutto
+   centrato), titolo e descrizione centrati, card "come sbloccarlo" allineata
+   a sinistra, barra di progresso con etichetta sotto. */
+.badge-sheet-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 14px;
+}
+/* Override del global .badge-icon-lg che e' inline-grid: nel contesto della
+   sheet vogliamo che si comporti da block-level dentro la colonna. */
+.badge-sheet-hero .badge-icon-lg {
+  display: grid;
+  margin: 0;
+}
 .badge-sheet-status {
-  display: inline-block;
-  margin: 14px 0 6px;
   color: var(--text-mute);
 }
 .badge-sheet-status.unlocked {
@@ -96,12 +110,13 @@
 }
 
 .badge-sheet-title {
-  margin: 0;
+  margin: 0 0 6px;
 }
 
 .badge-sheet-desc {
-  margin: 6px 0 18px;
+  margin: 0 0 18px;
   font-size: 14px;
+  line-height: 1.55;
 }
 
 .badge-sheet-quest {
@@ -109,19 +124,20 @@
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 16px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
 }
 .badge-sheet-quest p {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   font-size: 13px;
+  line-height: 1.5;
   color: var(--text);
 }
 
 .badge-sheet-progress {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 .badge-bar {
   position: relative;

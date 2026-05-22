@@ -33,9 +33,7 @@
         } @else {
           <button type="button" class="pill warm daily-status" (click)="openInfo('dailyStreak', $event)">
             <span class="dot"></span>
-            <span>
-              {{ i18n.lang() === 'it' ? 'Giorni consecutivi' : 'Days in a row' }} {{ state().dailyStreak }}
-            </span>
+            <span>{{ state().dailyStreak }} {{ i18n.lang() === 'it' ? 'giorni' : 'days' }}</span>
           </button>
         }
       </div>
@@ -152,13 +150,9 @@
     </div>
     <button class="badges-teaser" type="button" (click)="goBadges()">
       <div class="badges-teaser-meta">
-        <div class="badges-teaser-count">
-          <span class="v">{{ badgeStats().unlocked }}</span>
-          <span class="l">/ {{ badgeStats().total }}</span>
-        </div>
-        <div class="muted badges-teaser-label">
-          {{ i18n.lang() === 'it' ? 'sbloccati' : 'unlocked' }}
-        </div>
+        <span class="v">{{ badgeStats().unlocked }}</span>
+        <span class="l">/ {{ badgeStats().total }}</span>
+        <span class="muted badges-teaser-label">{{ i18n.lang() === 'it' ? 'sbloccati' : 'unlocked' }}</span>
       </div>
       <div class="icons">
         @for (b of badgeStats().preview; track b.id) {
