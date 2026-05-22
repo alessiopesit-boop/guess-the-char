@@ -183,12 +183,36 @@
   margin-left: 2px;
 }
 
-/* Le opzioni eliminate dal "Hint" non hanno piu' la barra-cancella sul testo:
-   diventano solo un filo piu' tenui dello stato originale, niente piu' tratto
-   che attraversa il nome — era difficile riconoscere quale fosse stata
-   rimossa. Il pulsante resta non cliccabile (gestione lato componente). */
+/* Opzioni eliminate dall'Hint: devono restare riconoscibili a colpo d'occhio
+   come "escluse" senza la barra-cancella sul testo (che si confondeva).
+   Sfondo piu' scuro, bordo tratteggiato, testo tenue, e il numero della
+   scorciatoia (1/2/3/4) viene sostituito da una piccola croce. Non cliccabili. */
 .opt[data-state='dim'] {
   text-decoration: none;
-  opacity: 0.25;
+  opacity: 0.7;
   pointer-events: none;
+  background: var(--surface-2);
+  border-style: dashed;
+  border-color: var(--border-strong);
+  color: var(--text-mute);
+}
+.opt[data-state='dim'] .opt-key {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: transparent;
+  position: relative;
+}
+.opt[data-state='dim'] .opt-key::after {
+  content: '✕';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-mute);
+}
+.opt[data-state='dim'] .opt-tag {
+  opacity: 0.4;
 }
