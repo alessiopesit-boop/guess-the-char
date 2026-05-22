@@ -1276,3 +1276,28 @@ button {
   letter-spacing: .04em;
   animation: quiet-in 200ms ease;
 }
+
+/* ── Route transitions (View Transitions API) ───────────────────────
+   Crossfade con un accenno di slide orizzontale al cambio route.
+   Solo browser che supportano `document.startViewTransition` (Chrome,
+   Edge moderni): gli altri vedono il cambio istantaneo, niente di rotto.
+   In modalita' animazioni "minimal" la transizione e' istantanea. */
+@view-transition { navigation: auto; }
+::view-transition-old(root) {
+  animation: tx-route-out 220ms var(--tx-ease) forwards;
+}
+::view-transition-new(root) {
+  animation: tx-route-in 220ms var(--tx-ease) forwards;
+}
+@keyframes tx-route-out {
+  to { opacity: 0; transform: translateX(-6%); }
+}
+@keyframes tx-route-in {
+  from { opacity: 0; transform: translateX(6%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+[data-motion='minimal'] ::view-transition-old(root),
+[data-motion='minimal'] ::view-transition-new(root) {
+  animation-duration: 0ms;
+}
+

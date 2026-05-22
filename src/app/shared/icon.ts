@@ -16,6 +16,12 @@ export type IconName =
 @Component({
   selector: 'app-icon',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // L'host element diventa inline-flex centrato: cosi' l'SVG e' sempre
+  // perfettamente allineato col testo accanto in container come .nav-btn,
+  // .pill, .btn senza dover ripetere align-items in ogni dichiarazione.
+  host: {
+    style: 'display: inline-flex; align-items: center; justify-content: center; line-height: 0;',
+  },
   template: `
     @switch (name()) {
       @case ('chev') {
