@@ -6,14 +6,14 @@ Istruzioni per Claude Code (e qualunque altro assistente AI compatibile) che lav
 
 **Ogni volta che modifichi il codice in modo non banale, aggiorna anche questo file (CLAUDE.md)** se la modifica:
 
-- introduce o rimuove una dipendenza, una libreria, un dataset esterno;
-- cambia una convenzione (naming, struttura del file, pattern di stato, persistenza in `localStorage`, ecc.);
-- cambia il flusso utente principale (selezione famiglie, quiz, risposta, scoring);
-- aggiunge una nuova lingua dell'interfaccia, una nuova famiglia di scritture, un nuovo dataset;
-- modifica il comportamento di pubblicazione (Pages, CI, workflow);
+- introduce o rimuove una dipendenza, uno script npm, una route, una schermata, un servizio core o un componente shared;
+- cambia una convenzione (naming, struttura cartelle, prefisso selettori, pattern signal/effect, persistenza in `localStorage`, ecc.);
+- cambia il flusso utente principale (onboarding, home, selezione, gioco, riepilogo);
+- aggiunge una nuova lingua, palette o "tweak" runtime;
+- modifica il comportamento di build/dev/test;
 - introduce un vincolo non ovvio (workaround, bug noto, limite di un'API).
 
-**Aggiorna anche `README.md`** quando una modifica e' significativa per chi legge il repo da fuori (chiunque apra il sorgente su GitHub): nuova feature visibile, cambio dell'URL del sito, requisiti di setup. Il README e' la facciata pubblica del progetto, deve restare sintetico ma aggiornato.
+**Aggiorna anche `README.md`** quando una modifica e' significativa per chi legge il repo da fuori (chiunque apra il sorgente su GitHub): nuova feature visibile, cambio di comandi (npm scripts), cambio di stack o di flusso di sviluppo, nuovo URL del sito, requisiti di setup. Il README e' la facciata pubblica del progetto, deve restare sintetico ma aggiornato.
 
 Se la modifica e' una piccola correzione (typo, refactor locale, rinomina di una variabile privata, fix CSS puntuale), **non** serve aggiornare ne' CLAUDE.md ne' README. In dubbio: aggiorna CLAUDE.md (interno) e valuta se anche README (esterno).
 
@@ -21,99 +21,100 @@ Aggiornare significa: modificare la sezione gia' esistente che descrive l'area t
 
 ## Cos'e' il progetto
 
-"Guess the Char" e' un quiz interattivo che mostra un carattere preso da uno dei sistemi di scrittura del mondo (CJK, sud-est asiatico, indiano, mediorientale, europeo, ecc.) e chiede all'utente a quale scrittura appartiene. Quattro modalita': Allenamento libero, Sfida a tempo, Survival, Sfida giornaliera deterministica. Niente account ne' backend per ora, persistenza solo `localStorage`. Tono: gioco-quiz, palette dark, design pulito.
+Quiz interattivo single-page per imparare a riconoscere a colpo d'occhio i sistemi di scrittura del mondo: appare un glifo (hiragana, devanagari, arabo, greco, ecc.) e l'utente sceglie tra quattro opzioni. Quattro modalita': Allenamento libero, Sfida a tempo, Survival, Sfida giornaliera deterministica con griglia emoji condivisibile. Tono estetico: gioco-quiz, dark, palette ambra di default.
+
+Niente backend per ora: tutto in-memory, persistenza via `localStorage` per stato di gioco, lingua UI e preferenze visive. Le aree social (login, profilo pubblico, leaderboard, sfide tra amici) sono stub "In arrivo" in attesa della 1.1.0 con Firebase Auth + Firestore.
 
 ## Stack
 
-- **Angular 21+** standalone components, signals, `OnPush`, zoneless change detection. Niente NgModules.
-- **TypeScript strict**, build via `@angular/build` (esbuild). Niente test framework configurato in questa fase; `tsconfig.spec.json` resta come placeholder per il giorno in cui aggiungeremo vitest.
-- **Routing** con Angular Router e **`withHashLocation()`**: gli URL hanno la forma `/#/home`, `/#/game?mode=training`, ecc. Scelta motivata da GitHub Pages: niente trick di `404.html`, refresh sempre funzionante.
-- **Stato globale** in un service con signals (`AppStateService`), persistito automaticamente in `localStorage` (chiave `gtc.state`) via `effect`. La lingua UI vive in un service separato (`I18nService`, chiave `gtc.lang`).
-- **i18n**: oggetti TypeScript IT/EN in `src/app/core/i18n/strings.ts`. Italiano e' la lingua di default; chiavi nuove vanno aggiunte sia in IT che in EN.
-- **Stili**: un singolo `src/styles.css` globale (importato dal prototipo Claude Design as-is, classi `.btn`, `.card`, `.pill`, `.glyph-stage`, ecc.) + CSS scoped per i componenti che hanno bisogno di stili specifici.
-- **Niente backend**: lo stato e' solo locale al browser. Le aree social (login, profilo pubblico, leaderboard, sfide tra amici) sono stub "In arrivo" in attesa della 1.1.0 con Firebase Auth + Firestore.
+- **Angular 21.2+**, standalone components, `ChangeDetectionStrategy.OnPush` ovunque, **zoneless change detection** (`provideZonelessChangeDetection`).
+- **Signals** (`signal`, `computed`, `effect`) per stato reattivo. Niente NgRx; RxJS solo come dipendenza implicita del Router (`toSignal(this.route.paramMap)` e' il pattern per leggere query/path params).
+- **Routing**: `provideRouter` con **`withHashLocation()`**: gli URL hanno la forma `/#/home`, `/#/game?mode=training`, ecc. Scelta motivata da GitHub Pages: niente trick di `404.html`, il refresh diretto su una qualunque route funziona sempre.
+- **Styling**: un singolo `src/styles.css` globale (importato dal prototipo Claude Design as-is, classi `.btn`, `.card`, `.pill`, `.glyph-stage`, ecc., ~42KB) + CSS scoped per i componenti che hanno bisogno di layout o animazioni specifiche.
+- **Build/test**: nuovo builder `@angular/build` (esbuild + vite dev server). Vitest e' presente come devDep ma non sono ancora configurati test; `tsconfig.spec.json` resta come placeholder.
+- **Niente lint configurato**, Prettier presente come devDep ma non invocato da CI (usato come default dell'editor). Editor config in `.editorconfig`.
 
 ## Struttura
 
 ```
-.
-├── angular.json
-├── package.json
-├── tsconfig.json
-├── tsconfig.app.json
-├── tsconfig.spec.json
-├── public/
-│   └── favicon.ico
-├── src/
-│   ├── index.html           # link a Google Fonts del design
-│   ├── main.ts              # bootstrap dell'app standalone
-│   ├── styles.css           # stylesheet globale del design (~42 KB)
-│   └── app/
-│       ├── app.config.ts    # provideRouter (hash), providers root
-│       ├── app.routes.ts    # tabella route + onboardedGuard
-│       ├── app.ts           # root component, applica i token CSS del tema
-│       ├── core/
-│       │   ├── audio/       # SoundService, HapticsService
-│       │   ├── data/        # SCRIPTS, GROUPS, BADGES, quiz/random helpers, AVATARS
-│       │   ├── guards/      # onboardedGuard
-│       │   ├── i18n/        # STRINGS IT/EN + I18nService
-│       │   └── state/       # AppStateService + tipi AppState
-│       ├── features/        # una cartella per ogni schermata
-│       │   ├── badges/
-│       │   ├── daily-result/
-│       │   ├── game/
-│       │   ├── glyph-detail/
-│       │   ├── home/
-│       │   ├── onboarding/
-│       │   ├── script-detail/
-│       │   ├── selection/
-│       │   ├── session-result/
-│       │   └── settings/
-│       └── shared/          # componenti UI condivisi (Logo, Icon, AppBar, ecc.)
-├── README.md
-├── CHANGELOG.md             # generato/aggiornato da release-please
-├── LICENSE                  # MIT
-├── CLAUDE.md                # questo file
-├── release-please-config.json
-├── .release-please-manifest.json
-└── .github/
-    ├── workflows/
-    │   ├── release.yml      # release-please + riscrittura body Release/PR
-    │   └── deploy.yml       # GitHub Pages al release event (npm ci + ng build)
-    └── scripts/
-        └── release-notes.py # genera "In sintesi + Dettagli" dai commit
+src/
+  index.html                # base href + link a Google Fonts (Bricolage Grotesque + Geist + Noto Sans <Script>)
+  main.ts                   # bootstrap dell'app standalone
+  styles.css                # stylesheet globale del design (~42 KB)
+  app/
+    app.config.ts           # provideRouter (hash), provideZonelessChangeDetection
+    app.routes.ts           # tabella route + onboardedGuard
+    app.ts                  # root component: router-outlet + footer build stamp + applica i token CSS del tema
+    core/
+      audio/                # SoundService, HapticsService
+      data/                 # SCRIPTS, GROUPS, BADGES, quiz/random helpers (mulberry32, seedFromDate, buildQuestion), AVATARS, fake-leaderboard, script-hints
+      guards/               # onboardedGuard
+      i18n/                 # STRINGS IT/EN + I18nService + helper t()
+      state/                # AppStateService + tipi AppState + ACCENT_PALETTES
+      build-info.ts         # versione corrente + contesto (dev/release) + hash di commit
+      build-info.prod.ts    # variante usata in production via fileReplacements
+    features/               # una cartella per ogni schermata
+      badges/
+      daily-result/
+      game/
+      glyph-detail/
+      home/
+      onboarding/
+      script-detail/
+      selection/
+      session-result/
+      settings/
+    shared/                 # componenti UI condivisi (Logo, Icon, AppBar, LangSwitch, StreakPill, TimerRing, Lives, ConfirmDialog, TransitionWrap, ComingSoon)
+scripts/                    # script Node usati come npm hook (postinstall, prestart, prebuild)
 ```
 
 ### Convenzioni
 
+- **Selettori**: prefisso `app-` (default, configurato in `angular.json`). Mantienilo.
 - **Componenti**: standalone (mai NgModules), `ChangeDetectionStrategy.OnPush`, naming Angular 21 senza suffisso `.component.ts` (es. `home.ts` / `home.html` / `home.css`, classe `export class Home`).
-- **Reattivita'**: solo signals e computed. Niente RxJS dentro la logica di stato; `toSignal(this.route.paramMap)` e' il pattern per leggere query/path params dei route.
-- **Stato**: tutto cio' che persiste tra sessioni passa da `AppStateService` (`appState.update({...})` o `appState.patch(s => ({...}))`). Niente accessi diretti a `localStorage` nei componenti.
-- **i18n**: stringhe in `core/i18n/strings.ts`. Le chiavi sono fortemente tipate (`StringKey`); aggiungerne una nuova obbliga a tradurla in entrambe le lingue.
+- **Lazy loading** di ogni schermata via `loadComponent: () => import(...)`. Quando aggiungi una pagina segui lo stesso pattern in `app.routes.ts`.
+- **Reattivita'**: solo signals e computed. Niente RxJS dentro la logica di stato; `toSignal(this.route.paramMap)` per i parametri di route.
+- **Stato globale**: signal dentro un service `@Injectable({ providedIn: 'root' })`. Effetto in costruttore per side-effect (DOM, localStorage). Vedi `AppStateService` e `I18nService` come modello.
+- **Persistenza `localStorage`**: sempre dentro `try/catch` (ambienti senza storage). Chiavi con prefisso `gtc.` (`gtc.state` per lo stato di gioco, `gtc.lang` per la lingua). Tutto cio' che persiste tra sessioni passa da `AppStateService` (`appState.update({...})` o `appState.patch(s => ({...}))`). Niente accessi diretti a `localStorage` nei componenti.
+- **i18n**: stringhe in `core/i18n/strings.ts`. Le chiavi sono fortemente tipate (`StringKey`); aggiungerne una nuova obbliga a tradurla in entrambe le lingue (IT default + EN). Per leggerle nei template usa `i18n.t('chiave')`.
 - **Dataset scritture**: `core/data/scripts.ts` con `SCRIPTS` (`ReadonlyArray<ScriptInfo>`) + `GROUPS`. Estendere il tipo `ScriptInfo` con nuovi campi e' OK; rinominare un id e' breaking change (perche' gli id vivono dentro `state.selected` di utenti gia' utilizzatori).
-- **Stili dei componenti**: prima riusare classi globali di `src/styles.css` (es. `.card`, `.pill`, `.btn-primary`); ricorrere a CSS scoped nel componente solo per layout/animazioni nuovi.
+- **Stili dei componenti**: prima riusare classi globali di `src/styles.css` (es. `.card`, `.pill`, `.btn-primary`, `.glyph-stage`, `.opt`, `.fb-bar`, ecc.); ricorrere a CSS scoped nel componente solo per layout/animazioni nuovi specifici.
+
+### Servizi core (cosa fanno)
+
+- `AppStateService` (`core/state/app-state.service.ts`): signal con lo stato persistito (selezione scritture, streak normale e giornaliero, accuracy, badge, preferenze utente come accent/motion/sound/haptics/showCodepoint/colorblind). Lettura iniziale da `localStorage` con merge sui default, scrittura automatica via `effect` a ogni cambio. La sfida giornaliera si resetta automaticamente al cambio di giorno.
+- `I18nService` (`core/i18n/i18n.service.ts`): signal con la lingua corrente (`'it'` / `'en'`), `computed` sul dizionario corrente, helper `t(key)` per recuperare la stringa nel template. Persistenza su `localStorage` chiave `gtc.lang`.
+- `SoundService` (`core/audio/sound.service.ts`): suoni del quiz generati live via Web Audio API (nessun file audio caricato). Rispetta automaticamente il toggle "Suoni" dello stato. Tre primitive: `playCorrect`, `playWrong`, `playTick`.
+- `HapticsService` (`core/audio/haptics.service.ts`): vibrazione discreta tramite Vibration API sui dispositivi che la supportano, anch'essa governata dal toggle "Vibrazione" dello stato.
+- `onboardedGuard` (`core/guards/onboarded.guard.ts`): `CanActivateFn` applicata a quasi tutte le route; se `state.onboarded` e' falso reindirizza a `/onboarding`. Da ricordare quando si aggiunge una route.
+
+### Build info (dev vs release)
+
+`core/build-info.ts` espone `APP_VERSION`, `BUILD_CONTEXT` (`'dev'` o `'release'`) e `BUILD_SHA` (hash short del commit, solo in dev). Il footer del root component lo usa per distinguere visivamente le build di sviluppo da quelle pubblicate:
+
+- In **dev** (default, `npm start`): footer mostra `v0.2.0 · dev · abc1234`.
+- In **release** (build di produzione, CI): footer mostra solo `v0.2.0`, niente suffisso "dev".
+
+Il meccanismo:
+
+- `src/app/core/build-info.ts` (committato): consumato dal codice, importa `BUILD_SHA` dal file local-only e `version` da `package.json`.
+- `src/app/core/build-info.prod.ts` (committato): sostituisce `build-info.ts` in configuration `production` via `fileReplacements` di `angular.json`. Non importa `build-sha.local.ts`, ha `BUILD_CONTEXT = 'release'` e `BUILD_SHA = ''`.
+- `src/app/core/build-sha.local.ts` (gitignored): contiene solo `export const BUILD_SHA = '<sha>'`. Autogenerato da `scripts/write-build-sha.mjs` ad ogni `npm install`/`start`/`build` (npm scripts `postinstall`/`prestart`/`prebuild`). Se git non e' disponibile, fallback a `'unknown'`.
+- `scripts/write-build-sha.mjs`: legge `git rev-parse --short HEAD` e scrive il file.
+
+Se modifichi questa logica: ricordati che il file `build-info.prod.ts` deve esistere e avere la stessa shape esportata, altrimenti il build di produzione fallisce.
 
 ## Comandi
 
 ```bash
-npm install              # installa dipendenze
-npm start                # ng serve, dev server su http://localhost:4200
-npm run build            # build di produzione in dist/guess-the-char/browser/
+npm install        # installa dipendenze (lancia anche write-build-sha.mjs via postinstall)
+npm start          # ng serve, dev server su http://localhost:4200
+npm run build      # build di produzione in dist/guess-the-char/browser/
+npm run watch      # build dev con --watch
+npm test           # vitest (nessuna spec custom presente)
 ```
 
-Sia `npm start` sia `npm run build` lanciano automaticamente lo step
-`scripts/generate-build-info.mjs`, che scrive `src/build-info.ts`
-(in `.gitignore`) con `version` (da `.release-please-manifest.json`)
-e `gitHash` (da `git rev-parse --short HEAD`). Il file viene rigenerato
-a ogni avvio; serve al footer in basso a destra che mostra:
-
-- in dev (`npm start`): l'hash di commit corrente seguito da `· dev`;
-- in produzione (`npm run build`): solo `vX.Y.Z`, piccolo e discreto.
-
-Se modifichi i path del manifest o lo schema del file generato, aggiorna
-sia `app.ts` (campo `buildLabel`) sia il template `app.html`.
-
-Niente lint, ne' test (per ora) ne' formatter configurato come task npm. Prettier e' presente come devDep ma non invocato da CI: lo usiamo come default dell'editor.
+Non e' configurato `ng e2e`, non c'e' un comando di lint.
 
 Per simulare un deploy locale stile Pages:
 
@@ -142,23 +143,26 @@ Esempi: `feat/script-armenian`, `fix/score-reset-edge-case`, `chore/bump-actions
 
 **Una PR copre uno scope logico.** Due bug non correlati, anche piccoli, vanno in due PR separate. Regola pratica: se lo `scope` del Conventional Commit dovrebbe essere diverso tra una modifica e l'altra, sono due PR (es. `fix(ui):` + `fix(scoring):` non si bundlano).
 
-Vale anche se si tocca lo stesso file: se `index.html` riceve un fix UI al menu lingua e uno separato al calcolo del punteggio, due PR. Il refactor "di passaggio" mentre si sistema altro va evitato; se serve, una `refactor:` dedicata.
+Vale anche se si tocca lo stesso file: se `src/styles.css` riceve un fix CSS al carrello e uno separato al feedback di gioco, due PR. Il refactor "di passaggio" mentre si sistema altro va evitato; se serve, una `refactor:` dedicata.
 
 Eccezione: ritocchi adiacenti che condividono lo stesso "perche'" possono stare in una sola PR. Tipico esempio: una pass di responsiveness mobile che tocca diverse sezioni e ha un solo motivo ("rendere il sito leggibile su iPhone") puo' stare in `fix(ui):` o `fix(mobile):` unico. Ma se i fix sono indipendenti, sono due PR.
 
-Perche': PR piccole e mono-scope sono piu' rapide da revieware, piu' facili da rollbaccare e generano release notes piu' pulite.
+Perche': PR piccole e mono-scope sono piu' rapide da revieware, piu' facili da rollbaccare e generano release notes piu' pulite (un bullet per voce, ogni voce e' un cambio comprensibile a se' stante).
 
 ### Commit: Conventional Commits + body discorsivo
 
 Tutti i commit (e i titoli delle PR) seguono [Conventional Commits](https://www.conventionalcommits.org/).
 
 - Il **subject** e' la riga breve e tecnica, sempre nel formato `tipo(scope opzionale): cosa`. Serve a release-please per capire il tipo di cambio (bump version) e per generare il **bullet** dell'indice nella GitHub Release (subject ripulito del prefisso e capitalizzato).
-- Il **body** e' una **descrizione user-facing breve, 1-2 frasi**, dal punto di vista di chi visita il sito (non dello sviluppatore). Niente nomi di file, regole CSS, dettagli implementativi a meno che non sia il punto. Compare nella sezione "Dettagli" della GitHub Release sotto il titoletto omonimo.
+- Il **body** e' una **descrizione user-facing breve, 1-2 frasi**, dal punto di vista di chi visita il sito (non dello sviluppatore). Niente nomi di file, regole CSS, signal/effect, regex e altro jargon tecnico a meno che non sia il punto. Compare nella sezione "Dettagli" della GitHub Release sotto il titoletto omonimo.
 
 Anti-esempi di body troppo tecnici:
 
-- ❌ `Spostato il toggle "Reset score" da un onclick inline a un addEventListener nel DOMContentLoaded.` (chi visita non sa cosa significhi)
-- ✅ `Il pulsante "Reset" ora si attiva subito al caricamento della pagina invece di aspettare il primo click.`
+- ❌ `Sostituito flex-wrap: nowrap con flex-wrap: wrap nelle media query a 640px su .options.` (chi visita non sa cosa sia flex-wrap)
+- ✅ `Su mobile le quattro risposte ora vanno a capo invece di scrollare fuori schermo a destra.`
+
+- ❌ `Aggiunto effect() in app.ts che setta data-motion sull'html in base allo stato.` (e' un how-to per il dev)
+- ✅ `Cambiare l'intensita' delle animazioni nelle impostazioni ora ha effetto immediato su tutta l'app.`
 
 **Niente hard-wrap a 72 caratteri** nel body. La vecchia convenzione "git da terminale" spezza le righe a 72 chars, ma GitHub Flavored Markdown rende ogni newline singolo come `<br>` nelle Release: le frasi appaiono spezzate a metà. Scrivi **una frase per riga lunga** (anche 200 chars, non importa), e separa i paragrafi con una **riga vuota**. Lo step Python nel workflow `release.yml` ha comunque un `unwrap_paragraphs()` che ricongiunge i wrap, ma e' un cerotto: meglio non spezzarle alla fonte.
 
@@ -184,7 +188,26 @@ feat(scripts): aggiungi alfabeto armeno
 L'armeno (Հայերեն) entra nelle scritture mediorientali con 38 caratteri base. Disponibile come scrittura selezionabile, con link a Wiktionary per ciascun carattere.
 ```
 
-Body **consigliato sempre** per `feat:`, `fix:`, `perf:`, `refactor:`. Se proprio manca (cambio piccolissimo e ovvio), il workflow fa un fallback: usa il subject ripulito del prefisso e capitalizzato.
+Cosa esce nella GitHub Release con l'attuale formato (indice in cima, dettagli sotto):
+
+```
+## In sintesi
+
+**Novita'**
+- Aggiungi alfabeto armeno
+
+---
+
+## Dettagli
+
+### Aggiungi alfabeto armeno
+
+L'armeno (Հայերեն) entra nelle scritture mediorientali con 38 caratteri base. Disponibile come scrittura selezionabile, con link a Wiktionary per ciascun carattere.
+```
+
+Notare: nessun `feat(scripts): ...` letterale visibile. Il bullet in cima viene dal subject ripulito + capitalizzato; il blocco dettaglio in fondo prende il body discorsivo.
+
+Body **consigliato sempre** per `feat:`, `fix:`, `perf:`, `refactor:`. Se proprio manca (cambio piccolissimo e ovvio), il workflow fa un fallback: usa il subject ripulito del prefisso e capitalizzato. Esempio: `fix(footer): typo nel copyright` senza body diventa nella Release "Typo nel copyright.". Funziona ma e' meno bello: meglio scrivere il body.
 
 ### Merge: squash sempre
 
@@ -197,7 +220,7 @@ Quindi quando apri la PR cura titolo **e** descrizione: insieme diventano il com
 
 ### Pulizia branch dopo il merge
 
-Il branch **remoto** viene cancellato in automatico dal repo (setting `delete_branch_on_merge: true`). Lato **locale** invece i branch restano sulla tua macchina anche dopo che la PR e' stata mergiata. Ogni tanto vale la pena ripulire:
+Il branch **remoto** viene cancellato in automatico dal repo (setting `delete_branch_on_merge: true` gia' applicato). Lato **locale** invece i branch restano sulla tua macchina anche dopo che la PR e' stata mergiata. Ogni tanto vale la pena ripulire:
 
 ```bash
 git fetch --prune                       # rimuove i tracking branch (origin/...) gia' scomparsi sul remoto
@@ -207,9 +230,9 @@ git branch | grep -vE '^\*|main$' | xargs -r git branch -D
 
 Il `-D` (maiuscolo) ignora il check "branch gia' mergiato": serve perche' lo squash merge non lascia una merge-base diretta, quindi `git branch -d` non li riconoscerebbe come mergiati.
 
-### Setup repo
+### Setup repo: gia' applicato via API
 
-Le impostazioni del repo (merge strategy, commit message di default, auto-delete branch, branch protection su `main`, workflow permissions) vengono applicate via API con un PAT fine-grained. Stato target:
+Le impostazioni del repo (merge strategy, commit message di default, auto-delete branch, branch protection su `main`, workflow permissions) **sono gia' state applicate** via API con un PAT fine-grained dell'account `alessiopesit-boop`. Stato corrente:
 
 - Merge: solo squash merging. `Allow merge commits` e `Allow rebase merging` disattivati.
 - Default commit message dello squash: `PR_TITLE` + `PR_BODY`. Il commit su `main` eredita titolo e descrizione della PR.
@@ -217,9 +240,11 @@ Le impostazioni del repo (merge strategy, commit message di default, auto-delete
 - Branch protection su `main`: PR obbligatoria (0 review richiesti), `Require linear history` attivo, `Allow force pushes` e `Allow deletions` disattivati.
 - Workflow permissions: `Read and write` con `Allow GitHub Actions to create and approve pull requests` attivo (serve a release-please per aprire la Release PR).
 
+Se per qualunque ragione queste impostazioni venissero modificate a mano, si possono riapplicare via `gh api` (richiede PAT con `Administration: write` sul repo); il payload e' visibile nei commit dei chore che le hanno introdotte.
+
 ## Versioning
 
-Schema [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`. La fonte di verita' e' il campo in `.release-please-manifest.json` (il release-type e' `simple`, quindi non c'e' nessun `package.json` da bumpare).
+Schema [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`. La fonte di verita' e' il campo `version` in `package.json` (e `.release-please-manifest.json`, mantenuti in sync). Da li' il footer la legge a build-time e la mostra sul sito.
 
 ### Rilascio: lo fa release-please, non tu
 
@@ -229,7 +254,7 @@ Cosa succede in pratica:
 
 1. Mergi su `main` un commit `feat:` o `fix:` (qualunque commit "rilasciabile" secondo Conventional Commits).
 2. Il workflow `release.yml` parte ad ogni push su `main`. release-please apre **automaticamente** una PR speciale tipo `chore(main): release X.Y.Z` che contiene:
-   - bump di `.release-please-manifest.json`;
+   - bump di `package.json` e `.release-please-manifest.json`;
    - aggiornamento di `CHANGELOG.md` con i commit dell'ultimo ciclo, raggruppati per tipo (Features, Bug Fixes, ecc.).
 
    Subito dopo, uno step dello stesso workflow **riscrive il body della Release PR** nello stesso stile "In sintesi" + "Dettagli" che vedrai nella Release pubblicata, cosi' chi la review vede gia' un'anteprima fedele delle release notes. Non serve aprire la PR e ritoccarla a mano: ad ogni nuovo commit rilasciabile la PR viene rigenerata e riscritta automaticamente.
@@ -237,12 +262,20 @@ Cosa succede in pratica:
 4. **La tua unica decisione** e' quando rilasciare: quando ti sembra ci sia abbastanza materiale, mergi la Release PR. Solo allora release-please:
    - crea il tag git (`vX.Y.Z` con la `v`);
    - crea la GitHub Release;
-   - lo step finale del workflow **riscrive il body della Release** in due sezioni: **In sintesi** in cima (bullet con il subject ripulito per ogni voce, raggruppati per tipo: Novita', Correzioni, Performance, Refactor, Modifiche incompatibili) e **Dettagli** sotto (titoletti `###` con il body discorsivo, solo per le voci che hanno un body).
+   - lo step finale del workflow **riscrive il body della Release** in due sezioni: **In sintesi** in cima (bullet con il subject ripulito per ogni voce, raggruppati per tipo: Novita', Correzioni, Performance, Refactor, Modifiche incompatibili) e **Dettagli** sotto (titoletti `###` con il body discorsivo, solo per le voci che hanno un body). Risultato: chi legge a colpo d'occhio vede l'indice; chi scrolla trova le descrizioni umane.
 
    La logica di composizione delle note vive in `.github/scripts/release-notes.py` (riceve `--range`, stampa il body su stdout). Lo stesso script alimenta sia la riscrittura della Release pubblicata sia quella della Release PR in attesa di merge.
 
+Cosa NON apparira' mai nella Release PR perche' release-please li ignora dal bumping:
+
+- `chore:`, `docs:`, `ci:`, `build:`, `style:`, `test:`, `refactor:` (eccezione: `refactor` appare comunque nelle note come "Refactor", ma non bumpa MAJOR).
+- I commit di release-please stesso (`chore(main): release X.Y.Z`).
+
+Quindi se mergi solo `chore:` / `docs:` la Release PR **non viene aperta**. Serve almeno un commit `fix:` / `feat:` / `perf:` da quando e' uscito l'ultimo tag.
+
 Cose che **non** devi fare a mano (rispetto a prima):
 
+- Bump di `package.json`: no, lo fa release-please.
 - Tag git: no, lo fa release-please.
 - Modifiche a `CHANGELOG.md`: no, lo riscrive release-please. Eccezione: se vuoi correggere un refuso o aggiungere una nota a posteriori, puoi farlo in una PR separata di tipo `docs:`.
 
@@ -258,32 +291,45 @@ Modi di forzare la prossima versione (raramente serve):
 
 ## Deploy: GitHub Pages
 
-Pubblicazione via GitHub Actions, workflow `.github/workflows/deploy.yml`.
+Pubblicazione su `https://alessiopesit-boop.github.io/guess-the-char/` via GitHub Actions, workflow `.github/workflows/deploy.yml`.
 
-**Trigger: solo Release pubblicata** (`on: release: types: [published]`). Cioe': quando mergi la Release PR di release-please nasce un tag + una GitHub Release; quel `release: published` fa partire il deploy. **I merge su `main` da soli non vanno live**: questa e' una scelta deliberata, cosi' il sito in produzione coincide sempre con un tag.
+**Trigger: solo Release pubblicata** (`on: release: types: [published]`). Cioe': quando mergi la Release PR di release-please nasce un tag + una GitHub Release; quel `release: published` fa partire il deploy. **I merge su `main` da soli non vanno live**: questa e' una scelta deliberata, cosi' il sito in produzione coincide sempre con un tag e la versione mostrata nel footer non e' mai "falsa" (= sempre allineata al `package.json` di quel tag).
 
 Conseguenze pratiche:
 
-- Tra una release e l'altra, `main` accumula PR mergiate ma il sito live resta alla versione precedente. Per vedere l'ultimo `main` non rilasciato, apri `index.html` localmente.
+- Tra una release e l'altra, `main` accumula PR mergiate ma il sito live resta alla versione precedente. Per vedere l'ultimo `main` non rilasciato, build locale (`npm start` o `npm run build`).
 - Se proprio serve mostrare a qualcuno un'anteprima di `main` non ancora rilasciato (demo, screenshot), si lancia a mano `Actions > Deploy to GitHub Pages > Run workflow` (trigger `workflow_dispatch`). Va considerato un'eccezione, non la norma.
 - Per rilasciare in fretta dopo aver mergiato qualche PR, basta mergiare anche la Release PR che release-please tiene aperta: il deploy parte subito dopo.
 
 Cose da sapere se lo modifichi:
 
-- L'artifact Pages e' l'intera root del repo (eccetto `.github`, `LICENSE`, `README.md`, `CLAUDE.md`, `CHANGELOG.md`, manifest e config di release-please).
-- `.nojekyll` (vuoto) e' presente alla root per impedire a Pages di processare i file via Jekyll.
+- Il build di produzione viene fatto con `--base-href=/guess-the-char/`: lo richiede il fatto che il sito vive su un sottopath del dominio `*.github.io`. Se cambia il nome del repo, va aggiornato anche qui.
+- Il workflow chiama `npm run build` (non `npx ng build`): cosi' parte lo step `prebuild` di `package.json` che scrive `build-sha.local.ts` (vedi sezione "Build info").
+- L'output di Angular 21 con builder `@angular/build` finisce in `dist/guess-the-char/browser/`: e' la cartella caricata come artifact Pages.
+- **Niente `404.html` fallback SPA**: il routing usa `withHashLocation()`, quindi tutti i deep link vivono dopo il `#` e il path effettivo servito da Pages e' sempre `index.html`. Se in futuro si volesse passare a `PathLocationStrategy` servira' aggiungere il trick `404.html` (vedi rafgraph-style).
+- `.nojekyll` (vuoto, presente alla root) impedisce a Pages di processare i file via Jekyll. Lo step del workflow lo copia automaticamente in `_site/`.
 - Prima pubblicazione: in *Settings > Pages* del repo va scelto "Source: GitHub Actions" una volta sola.
 
 ## Vincoli e cose da non fare
 
+- **Non** introdurre RxJS observable per stato applicativo: usa signal/effect. RxJS resta ammesso solo dove serve a integrare API Angular che lo richiedono (es. `toSignal` su params di `Router`).
 - **Non** rimuovere `withHashLocation()` da `app.config.ts` senza prima decidere come gestire le route refresh-friendly su Pages (servirebbe un `404.html` che ridireziona a `index.html`, e per ora non c'e').
-- **Non** bypassare `AppStateService` con scritture dirette a `localStorage`: la chiave `gtc.state` ha uno schema mergiato col `DEFAULT_STATE` ed evita di rompere lo stato di utenti gia' registrati.
+- **Non** bypassare `AppStateService` con scritture dirette a `localStorage`: la chiave `gtc.state` ha uno schema mergiato col `DEFAULT_STATE` ed evita di rompere lo stato di utenti gia' utilizzatori.
 - **Non** introdurre librerie UI esterne (Material, PrimeNG, Tailwind) senza necessita': il design system del prototipo e' gia' coerente e pesato.
+- **Non** convertire a SCSS o CSS modules per componente senza un buon motivo: lo styling globale e' una scelta, non un'omissione.
 - **Non** rimuovere `.nojekyll` o cambiare il `base-href` in `deploy.yml` senza aggiornare entrambi insieme.
-- **Non** committare `dist/`, `node_modules`, `.angular/cache`, ne' file con segreti.
+- **Non** committare `dist/`, `node_modules/`, `.angular/cache`, ne' file con segreti, ne' `build-sha.local.ts` (gia' in `.gitignore`).
+
+## Quando aggiungi una pagina nuova
+
+1. Crea `src/app/features/<nome>/<nome>.ts` (+ `<nome>.html`, `<nome>.css` opzionali) come standalone component, `OnPush`, selettore `app-<nome>` o simile, classe `export class <Nome>`.
+2. Aggiungi la route in `src/app/app.routes.ts` con `loadComponent` e (quasi sempre) `canActivate: [onboardedGuard]`. Se la pagina deve essere accessibile anche senza onboarding (es. `/login`), lascia il guard fuori.
+3. Se serve un link di navigazione dalla home o da un'altra schermata, aggiorna il componente che lo deve esporre.
+4. Se ci sono stringhe nuove rivolte all'utente, aggiungi la chiave a `STRINGS_IT` e la traduzione in `STRINGS_EN` in `core/i18n/strings.ts` (sono fortemente tipate, TypeScript ti aiuta).
+5. **Aggiorna questo file** se la pagina introduce un nuovo concetto (categoria di pagina, dipendenza, pattern).
 
 ## Note operative per l'assistente
 
 - Quando ti viene chiesto di "fare X" rispondi in italiano (il proprietario lavora in italiano).
 - Niente em-dash (`—`) e niente freccia (`→`) nei file di questo repo, ne' nei messaggi: usa virgole, due punti, parentesi, o parole ("a", "verso", "diventa").
-- Prima di marcare un task come finito, controlla che il sito funzioni aprendolo localmente.
+- Prima di marcare un task come finito, lancia `npm run build` (o almeno `npm start` e controlla console) per essere sicuro che compili.
