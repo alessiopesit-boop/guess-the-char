@@ -77,6 +77,13 @@
     </section>
 
     <section class="settings-section">
+      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Aiuto' : 'Help' }}</h3>
+      <button class="btn btn-ghost btn-block" type="button" (click)="replayOnboarding()">
+        {{ i18n.lang() === 'it' ? 'Rivedi la presentazione' : 'Replay the intro' }}
+      </button>
+    </section>
+
+    <section class="settings-section">
       <h3 class="h3">{{ i18n.lang() === 'it' ? 'Dati' : 'Data' }}</h3>
       <button class="btn btn-ghost btn-block reset-btn" type="button" (click)="resetProgress()">
         {{ i18n.lang() === 'it' ? 'Resetta tutti i progressi' : 'Reset all progress' }}

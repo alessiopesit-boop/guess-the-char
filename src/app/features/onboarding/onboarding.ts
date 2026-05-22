@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
 import { Icon } from '../../shared/icon';
+import { LangSwitch } from '../../shared/lang-switch';
 import { Logo } from '../../shared/logo';
 
 interface OnboardingStep {
@@ -35,7 +36,7 @@ const STEPS: ReadonlyArray<OnboardingStep> = [
 
 @Component({
   selector: 'app-onboarding',
-  imports: [Icon, Logo],
+  imports: [Icon, LangSwitch, Logo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './onboarding.html',
   styleUrl: './onboarding.css',
