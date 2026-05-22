@@ -57,6 +57,10 @@ export class Settings {
     this.appState.update({ showCodepoint: !this.state().showCodepoint });
   }
 
+  protected replayOnboarding(): void {
+    this.router.navigate(['/onboarding']);
+  }
+
   protected resetProgress(): void {
     const msg =
       this.i18n.lang() === 'it'
