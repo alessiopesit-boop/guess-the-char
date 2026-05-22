@@ -3,7 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { AppStateService } from './core/state/app-state.service';
 import { ACCENT_PALETTES } from './core/state/types';
-import { APP_VERSION, BUILD_CONTEXT, BUILD_SHA } from './core/build-info';
+import { BUILD_CONTEXT } from './core/build-info';
 
 @Component({
   selector: 'app-root',
@@ -15,9 +15,6 @@ import { APP_VERSION, BUILD_CONTEXT, BUILD_SHA } from './core/build-info';
 export class App {
   private readonly appState = inject(AppStateService);
   private readonly title = inject(Title);
-  /** Stringa minuscola in basso a destra: hash di commit in dev, vX.Y.Z in release. */
-  protected readonly buildLabel =
-    BUILD_CONTEXT === 'release' ? `v${APP_VERSION}` : `v${APP_VERSION} · dev · ${BUILD_SHA}`;
 
   constructor() {
     // In sviluppo, prefissa il nome della scheda con "[dev] " per distinguere a

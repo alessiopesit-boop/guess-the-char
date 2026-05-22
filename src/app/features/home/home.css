@@ -90,3 +90,12 @@
 .home-foot .emoji {
   font-size: 14px;
 }
+
+.home-version {
+  margin: 20px 0 calc(env(safe-area-inset-bottom, 0px) + 4px);
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-mute);
+  opacity: 0.7;
+}

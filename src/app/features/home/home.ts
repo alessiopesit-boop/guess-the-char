@@ -9,6 +9,7 @@ import { AppBar } from '../../shared/app-bar';
 import { Icon } from '../../shared/icon';
 import { LangSwitch } from '../../shared/lang-switch';
 import { StreakPill } from '../../shared/streak-pill';
+import { APP_VERSION, BUILD_CONTEXT, BUILD_SHA } from '../../core/build-info';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +24,10 @@ export class Home {
   protected readonly appState = inject(AppStateService);
 
   protected readonly state = this.appState.state;
+
+  /** Versione mostrata in fondo alla home. In dev include "dev" e l'hash di commit. */
+  protected readonly buildLabel =
+    BUILD_CONTEXT === 'release' ? `v${APP_VERSION}` : `v${APP_VERSION} · dev · ${BUILD_SHA}`;
 
   protected readonly todayLabel = computed(() => {
     const locale = this.i18n.lang() === 'it' ? 'it-IT' : 'en-GB';
