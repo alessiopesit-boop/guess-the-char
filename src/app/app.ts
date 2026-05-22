@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { AppStateService } from './core/state/app-state.service';
 import { ACCENT_PALETTES } from './core/state/types';
@@ -13,11 +14,20 @@ import { APP_VERSION, BUILD_CONTEXT, BUILD_SHA } from './core/build-info';
 })
 export class App {
   private readonly appState = inject(AppStateService);
+  private readonly title = inject(Title);
   /** Stringa minuscola in basso a destra: hash di commit in dev, vX.Y.Z in release. */
   protected readonly buildLabel =
     BUILD_CONTEXT === 'release' ? `v${APP_VERSION}` : `v${APP_VERSION} · dev · ${BUILD_SHA}`;
 
   constructor() {
+    // In sviluppo, prefissa il nome della scheda con "[dev] " per distinguere a
+    // colpo d'occhio le build locali da quelle pubblicate. In production il
+    // file fileReplaced ha BUILD_CONTEXT='release' e il title resta com'e'.
+    if (BUILD_CONTEXT === 'dev') {
+      const base = this.title.getTitle() || 'Indovina il carattere';
+      if (!base.startsWith('[dev] ')) this.title.setTitle(`[dev] ${base}`);
+    }
+
     // Applica i token del tema sul root <html> ogni volta che cambia lo stato.
     effect(() => {
       const s = this.appState.state();
