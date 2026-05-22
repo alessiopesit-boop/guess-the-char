@@ -360,9 +360,11 @@ export class Game implements OnDestroy {
     return 'dim';
   }
 
-  /** Regione del prototipo "Giappone / Mondo arabo" -> prima parola per il tag. */
+  /** Regione del prototipo "Giappone / Mondo arabo" -> prima parola per il tag.
+   *  In modalita' inglese usa il campo regionEn, cosi' anche il tag e' tradotto. */
   protected tagOf(opt: ScriptInfo): string {
-    return opt.region.split(/[\s/]/)[0];
+    const region = this.i18n.lang() === 'en' ? opt.regionEn : opt.region;
+    return region.split(/[\s/]/)[0];
   }
 
   @HostListener('window:keydown', ['$event'])

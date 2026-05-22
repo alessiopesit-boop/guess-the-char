@@ -40,6 +40,9 @@ const STEPS: ReadonlyArray<OnboardingStep> = [
   templateUrl: './onboarding.html',
   styleUrl: './onboarding.css',
 })
+const SWIPE_THRESHOLD = 50;
+const SWIPE_MAX_OFFAXIS = 60;
+
 export class Onboarding {
   protected readonly i18n = inject(I18nService);
   private readonly appState = inject(AppStateService);
@@ -48,6 +51,9 @@ export class Onboarding {
   protected readonly steps = STEPS;
   protected readonly step = signal(0);
   protected readonly dir = signal<'fwd' | 'back'>('fwd');
+
+  /** Coordinate iniziali del touch (per il riconoscimento dello swipe). */
+  private touchStart: { x: number; y: number } | null = null;
 
   protected readonly current = computed(() => STEPS[this.step()]);
   protected readonly isLast = computed(() => this.step() === STEPS.length - 1);
@@ -98,6 +104,34 @@ export class Onboarding {
       }
     } else if (e.key === 'ArrowLeft' && this.step() > 0) {
       e.preventDefault();
+      this.go(this.step() - 1);
+    }
+  }
+
+  @HostListener('touchstart', ['$event'])
+  protected onTouchStart(e: TouchEvent): void {
+    const t = e.touches[0];
+    if (!t) return;
+    this.touchStart = { x: t.clientX, y: t.clientY };
+  }
+
+  @HostListener('touchend', ['$event'])
+  protected onTouchEnd(e: TouchEvent): void {
+    const start = this.touchStart;
+    this.touchStart = null;
+    if (!start) return;
+    const end = e.changedTouches[0];
+    if (!end) return;
+    const dx = end.clientX - start.x;
+    const dy = end.clientY - start.y;
+    // Riconosci come swipe solo se prevale l'asse orizzontale e supera la soglia.
+    if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_MAX_OFFAXIS) return;
+    if (dx < 0) {
+      // Swipe verso sinistra: avanza.
+      if (this.step() < STEPS.length - 1) this.go(this.step() + 1);
+      else this.done();
+    } else if (this.step() > 0) {
+      // Swipe verso destra: torna indietro.
       this.go(this.step() - 1);
     }
   }
