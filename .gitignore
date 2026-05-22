@@ -46,5 +46,5 @@ Thumbs.db
 # Claude Code local settings
 .claude/
 
-# Auto-generato a ogni npm start / npm run build da scripts/generate-build-info.mjs
-src/build-info.ts
+# Auto-generato a ogni npm install / start / build da scripts/write-build-sha.mjs
+src/app/core/build-sha.local.ts

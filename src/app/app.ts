@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/cor
 import { RouterOutlet } from '@angular/router';
 import { AppStateService } from './core/state/app-state.service';
 import { ACCENT_PALETTES } from './core/state/types';
-import { BUILD_INFO } from '../build-info';
+import { APP_VERSION, BUILD_CONTEXT, BUILD_SHA } from './core/build-info';
 
 @Component({
   selector: 'app-root',
@@ -14,9 +14,8 @@ import { BUILD_INFO } from '../build-info';
 export class App {
   private readonly appState = inject(AppStateService);
   /** Stringa minuscola in basso a destra: hash di commit in dev, vX.Y.Z in release. */
-  protected readonly buildLabel = BUILD_INFO.isProduction
-    ? `v${BUILD_INFO.version}`
-    : `${BUILD_INFO.gitHash} · dev`;
+  protected readonly buildLabel =
+    BUILD_CONTEXT === 'release' ? `v${APP_VERSION}` : `v${APP_VERSION} · dev · ${BUILD_SHA}`;
 
   constructor() {
     // Applica i token del tema sul root <html> ogni volta che cambia lo stato.
