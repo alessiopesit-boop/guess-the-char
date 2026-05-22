@@ -13,10 +13,10 @@ interface LangOption {
   imports: [Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="lang-switch">
-      <button class="nav-btn" (click)="toggle($event)" aria-label="Language">
+    <div class="lang-switch" [class.is-open]="open()">
+      <button class="nav-btn lang-trigger" (click)="toggle($event)" [attr.aria-expanded]="open()" aria-label="Language">
         <span class="lang-code-display">{{ i18n.lang().toUpperCase() }}</span>
-        <app-icon name="chev" />
+        <span class="lang-chev"><app-icon name="chev" /></span>
       </button>
       @if (open()) {
         <div class="lang-pop">
@@ -33,11 +33,31 @@ interface LangOption {
   styles: `
     :host { display: inline-block; }
     .lang-switch { position: relative; }
+    .lang-trigger {
+      gap: 6px;
+      padding: 0 10px;
+    }
     .lang-code-display {
       font-family: var(--font-mono);
       font-size: 12px;
       color: var(--text-dim);
+      transition: color var(--hover-dur) ease;
     }
+    .lang-trigger:hover .lang-code-display,
+    .lang-switch.is-open .lang-code-display { color: var(--text); }
+
+    /* Chevron rivolta in basso a riposo, ruota a "in alto" quando il
+       dropdown e' aperto. transform anziche' rotation iteration cosi'
+       l'animazione resta legata allo stato. */
+    .lang-chev {
+      display: inline-flex;
+      width: 12px;
+      height: 12px;
+      transform: rotate(90deg);
+      transition: transform 180ms var(--tx-ease);
+    }
+    .lang-switch.is-open .lang-chev { transform: rotate(-90deg); }
+    [data-motion='minimal'] .lang-chev { transition: none; }
     .lang-pop {
       position: absolute;
       top: calc(100% + 6px);
