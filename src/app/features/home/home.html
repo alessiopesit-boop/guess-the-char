@@ -49,13 +49,14 @@
       </h2>
       <p class="muted daily-sub">{{ i18n.t('dailySub') }}</p>
       <div class="daily-row">
-        <div class="glyph-row">
+        <div class="glyph-row" [attr.aria-label]="i18n.lang() === 'it' ? 'Anteprima dei caratteri di oggi' : 'Today preview characters'">
           @if (state().dailyDone) {
             <span>🎯</span>
           } @else {
             @for (g of previewGlyphs(); track $index) {
               <span>{{ g }}</span>
             }
+            <span class="glyph-more" aria-hidden="true">…</span>
           }
         </div>
         <span class="btn btn-primary daily-cta">
