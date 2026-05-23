@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!--
-    Il sito e' una SPA Angular con path location: solo la URL della root e'
-    servita da Pages come file fisico (index.html). Tutte le altre route
-    (/home, /selection, /daily, ecc.) sono client-side, e quando Google
-    le crawla direttamente trova il 404.html di fallback con meta noindex.
-    Listing una sola URL evita di sporcare il rapporto di Search Console
-    con "Pagine con redirect" per le sub-route. Google bot moderno esegue
-    JavaScript e raggiunge da solo le altre schermate dalla home.
-  -->
   <url>
     <loc>https://alessiopesit-boop.github.io/guess-the-char/</loc>
     <changefreq>weekly</changefreq>
