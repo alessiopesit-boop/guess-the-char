@@ -5,6 +5,13 @@ Tutte le modifiche rilevanti a questo progetto sono documentate qui.
 Il formato si basa su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/),
 e il progetto segue il [Semantic Versioning](https://semver.org/lang/it/).
 
+## [1.2.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.1.0...v1.2.0) (2026-05-23)
+
+
+### Features
+
+* **seo:** meta tag, sitemap, robots e structured data ([#32](https://github.com/alessiopesit-boop/guess-the-char/issues/32)) ([b2673fb](https://github.com/alessiopesit-boop/guess-the-char/commit/b2673fb18bde8cfff8ad5df9ff0fa032f3ff4e0b))
+
 ## [1.1.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.0.0...v1.1.0) (2026-05-22)
 
 
