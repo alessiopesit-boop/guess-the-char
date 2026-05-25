@@ -23,6 +23,7 @@ import { Icon } from '../../shared/icon';
 import { StreakPill } from '../../shared/streak-pill';
 import { TimerRing } from '../../shared/timer-ring';
 import { Lives } from '../../shared/lives';
+import { ConfirmDialog } from '../../shared/confirm-dialog';
 
 export type GameMode = 'training' | 'timed' | 'survival' | 'daily';
 
@@ -39,7 +40,7 @@ const COMBO_MAX = 5;
 
 @Component({
   selector: 'app-game',
-  imports: [Icon, StreakPill, TimerRing, Lives],
+  imports: [Icon, StreakPill, TimerRing, Lives, ConfirmDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './game.html',
   styleUrl: './game.css',
@@ -90,6 +91,8 @@ export class Game implements OnDestroy {
   protected readonly chosen = signal<{ id: string; correct: boolean } | null>(null);
   /** Overlay informativo aperto sopra la partita; non interrompe il gioco. */
   protected readonly infoOverlay = signal<'glyph' | 'script' | null>(null);
+  /** Dialog di conferma quando si preme X: distingue Allenamento con storia (vai al riepilogo) dagli altri casi (esci alla home). */
+  protected readonly exitDialog = signal<'training-finish' | 'leave' | null>(null);
 
   /** Tutorial "first wrong" mostrato una sola volta nella storia dell'utente, solo in modalita' Allenamento. */
   protected readonly tutorial = signal<{ scriptId: string; text: string } | null>(null);
@@ -351,7 +354,25 @@ export class Game implements OnDestroy {
   }
 
   protected exit(): void {
-    this.router.navigate(['/home']);
+    if (this.isTraining() && this.history().length > 0) {
+      this.exitDialog.set('training-finish');
+    } else {
+      this.exitDialog.set('leave');
+    }
+  }
+
+  protected confirmExit(): void {
+    const kind = this.exitDialog();
+    this.exitDialog.set(null);
+    if (kind === 'training-finish') {
+      this.finishSession();
+    } else {
+      this.router.navigate(['/home']);
+    }
+  }
+
+  protected cancelExit(): void {
+    this.exitDialog.set(null);
   }
 
   protected openInfo(type: 'glyph' | 'script'): void {
@@ -392,12 +413,18 @@ export class Game implements OnDestroy {
   @HostListener('window:keydown', ['$event'])
   protected onKey(e: KeyboardEvent): void {
     if (e.key === 'Escape') {
+      if (this.exitDialog()) {
+        e.preventDefault();
+        this.cancelExit();
+        return;
+      }
       if (this.infoOverlay()) {
         e.preventDefault();
         this.closeInfo();
       }
       return;
     }
+    if (this.exitDialog()) return;
     if (this.chosen()) {
       if (!this.isTimed() && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault();
