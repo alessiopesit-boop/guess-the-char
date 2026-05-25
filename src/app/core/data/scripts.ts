@@ -3,8 +3,15 @@ export type GroupId = 'east' | 'sea' | 'indic' | 'me' | 'eu';
 export interface ScriptInfo {
   id: string;
   group: GroupId;
+  /** Nome visibile all'utente, scelto per essere subito riconoscibile (di solito la lingua
+   *  piu' nota associata alla scrittura: "Hindi" per devanagari, "Russo" non per cirillico
+   *  perche' "Cirillico" e' gia' familiare, ecc.). Quando la convenzione "nome popolare" non
+   *  coincide con il nome tecnico della scrittura, valorizza anche `scriptName`. */
   nameIt: string;
   nameEn: string;
+  /** Nome tecnico della scrittura (devanagari, gurmukhi, ...), opzionale. Mostrato nella
+   *  scheda dettaglio sotto il titolo se diverso da `nameIt`. Non usato nel quiz. */
+  scriptName?: string;
   region: string;
   regionEn: string;
   lang: string;
@@ -31,10 +38,10 @@ export const SCRIPTS: ReadonlyArray<ScriptInfo> = [
   { id: 'lao',        group: 'sea',   nameIt: 'Lao',          nameEn: 'Lao',         region: 'Laos',             regionEn: 'Laos',           lang: 'Lao',                        samples: 'ກຂຄງຈສຊຍດຕຖທນບປຜຝພຟມຍຣລວຫອຮ', sample: 'ກ', era: 'XIV sec.', blurb: 'Imparentato col thai, con forme un po’ piu’ tondeggianti. Pochi grafemi rispetto al thai.' },
   { id: 'khmer',      group: 'sea',   nameIt: 'Khmer',        nameEn: 'Khmer',       region: 'Cambogia',         regionEn: 'Cambodia',       lang: 'Khmer',                      samples: 'កខគឃងចឆជឈញដឋឌណតថទធនបផពភមយរលវសហអ', sample: 'ក', era: 'VII sec.', blurb: 'Alfabeto della Cambogia, derivato dall’antica scrittura Pallava. Si riconosce per la complessita’ verticale dei subscript.' },
 
-  { id: 'devanagari', group: 'indic', nameIt: 'Devanagari',   nameEn: 'Devanagari',  region: 'India / Nepal',    regionEn: 'India / Nepal',  lang: 'Hindi, Sanscrito, Nepalese', samples: 'अआइईउऊऋएऐओऔकखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसह', sample: 'य', era: '~VII sec.', blurb: 'Scrittura piu’ diffusa del subcontinente indiano. Riconoscibile dalla linea orizzontale superiore (शिरोरेखा) che lega le lettere.' },
+  { id: 'devanagari', group: 'indic', nameIt: 'Hindi',        nameEn: 'Hindi',       scriptName: 'Devanagari', region: 'India / Nepal',    regionEn: 'India / Nepal',  lang: 'Hindi, Sanscrito, Nepalese', samples: 'अआइईउऊऋएऐओऔकखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसह', sample: 'य', era: '~VII sec.', blurb: 'Scrittura piu’ diffusa del subcontinente indiano, chiamata tecnicamente Devanagari. Riconoscibile dalla linea orizzontale superiore (शिरोरेखा) che lega le lettere.' },
   { id: 'bengali',    group: 'indic', nameIt: 'Bengalese',    nameEn: 'Bengali',     region: 'Bengala',          regionEn: 'Bengal',         lang: 'Bengalese, Assamese',        samples: 'অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ', sample: 'অ', era: '~XI sec.', blurb: 'Anch’essa con linea superiore, ma con curve piu’ morbide e archi caratteristici rispetto al devanagari.' },
   { id: 'tamil',      group: 'indic', nameIt: 'Tamil',        nameEn: 'Tamil',       region: 'Tamil Nadu',       regionEn: 'Tamil Nadu',     lang: 'Tamil',                      samples: 'அஆஇஈஉஊஎஏஐஒஓகஙசஞடணதநபமயரலவழளறன', sample: 'அ', era: '~III sec. a.C.', blurb: 'Linee tonde, niente linea superiore, pochi conjunct. Una delle scritture piu’ antiche ancora in uso.' },
-  { id: 'gurmukhi',   group: 'indic', nameIt: 'Gurmukhi',     nameEn: 'Gurmukhi',    region: 'Punjab',           regionEn: 'Punjab',         lang: 'Punjabi',                    samples: 'ਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮਯਰਲਵਸ਼ਸਹ', sample: 'ਪ', era: 'XVI sec.', blurb: 'Sviluppata per la liturgia sikh. Linea superiore presente; forme piu’ squadrate del devanagari.' },
+  { id: 'gurmukhi',   group: 'indic', nameIt: 'Punjabi',      nameEn: 'Punjabi',     scriptName: 'Gurmukhi', region: 'Punjab',           regionEn: 'Punjab',         lang: 'Punjabi',                    samples: 'ਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮਯਰਲਵਸ਼ਸਹ', sample: 'ਪ', era: 'XVI sec.', blurb: 'Scrittura del punjabi, chiamata tecnicamente Gurmukhi. Sviluppata per la liturgia sikh, ha la linea superiore come il devanagari ma forme piu’ squadrate.' },
 
   { id: 'arabic',     group: 'me',    nameIt: 'Arabo',        nameEn: 'Arabic',      region: 'Arabia',           regionEn: 'Arabia',         lang: 'Arabo, Persiano, Urdu',      samples: 'اببتثجحخدذرزسشصضطظعغفقكلمنهوي', sample: 'ش', era: 'IV sec. d.C.', blurb: 'Scrittura cursiva da destra a sinistra. Quasi tutte le lettere cambiano forma a seconda della posizione (iniziale/mediale/finale/isolata).' },
   { id: 'hebrew',     group: 'me',    nameIt: 'Ebraico',      nameEn: 'Hebrew',      region: 'Israele',          regionEn: 'Israel',         lang: 'Ebraico, Yiddish',           samples: 'אבגדהוזחטיכלמנסעפצקרשת', sample: 'א', era: '~III sec. a.C.', blurb: 'Da destra a sinistra. Lettere squadrate, alcune con forma diversa quando finali (es. מ / ם).' },

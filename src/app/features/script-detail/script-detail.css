@@ -39,6 +39,14 @@
   font-size: 13px;
 }
 
+/* Nome tecnico della scrittura (es. "Scrittura: Devanagari") sotto il titolo
+   "popolare" della lingua. Compare solo per le voci dove i due nomi divergono. */
+.sd-scriptname {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
+
 .sd-blurb {
   font-size: 14px;
   line-height: 1.55;
