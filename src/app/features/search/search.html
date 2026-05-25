@@ -1,0 +1,88 @@
+<div class="app-shell">
+  <app-bar [canBack]="true"
+           [title]="i18n.lang() === 'it' ? 'Cerca utenti' : 'Find users'"
+           (back)="goBack()"
+           (goHome)="goHome()" />
+
+  <div class="page search-page">
+    <!-- Input ricerca: autofocus per digitare subito, X interna per pulire. -->
+    <div class="search-input-wrap">
+      <span class="search-input-icon" aria-hidden="true">⌕</span>
+      <input
+        type="text"
+        class="search-input"
+        autofocus
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        [placeholder]="i18n.lang() === 'it'
+          ? 'Cerca per nickname...'
+          : 'Search by nickname...'"
+        [ngModel]="query()"
+        (ngModelChange)="setQuery($event)"
+        (keydown.enter)="submitSearch()"
+      />
+      @if (loading()) {
+        <span class="search-spinner" aria-label="loading"></span>
+      } @else if (query()) {
+        <button class="search-input-clear" type="button" (click)="clearQuery()"
+                [attr.aria-label]="i18n.lang() === 'it' ? 'Cancella' : 'Clear'">
+          ✕
+        </button>
+      }
+    </div>
+
+    @if (loading()) {
+      <!-- Spinner gia' nell'input: qui solo placeholder vuoto per evitare
+           shift di layout mentre arriva il risultato. -->
+      <div class="search-loading-placeholder" aria-hidden="true"></div>
+    } @else if (!hasSearched()) {
+      @if (query().trim().length >= 1 && query().trim().length < 2) {
+        <p class="muted search-status">
+          {{ i18n.lang() === 'it'
+            ? 'Scrivi almeno 2 caratteri per cercare.'
+            : 'Type at least 2 characters to search.' }}
+        </p>
+      } @else {
+        <div class="search-empty">
+          <span class="search-empty-glyph" aria-hidden="true">字</span>
+          <p class="muted">
+            {{ i18n.lang() === 'it'
+              ? 'Scrivi un nickname per trovare altri giocatori e vedere i loro progressi.'
+              : 'Type a nickname to find other players and see their progress.' }}
+          </p>
+        </div>
+      }
+    } @else if (results().length === 0) {
+      <div class="search-empty">
+        <span class="search-empty-glyph" aria-hidden="true">∅</span>
+        <h3 class="h3 search-empty-title">
+          {{ i18n.lang() === 'it' ? 'Nessun risultato' : 'No results' }}
+        </h3>
+        <p class="muted">
+          @if (i18n.lang() === 'it') {
+            Niente di simile a <span class="mono">{{ query() }}</span>.
+          } @else {
+            Nothing close to <span class="mono">{{ query() }}</span>.
+          }
+        </p>
+      </div>
+    } @else {
+      <div class="search-header">
+        <span class="eyebrow">{{ resultsLabel() }}</span>
+      </div>
+      <div class="search-results">
+        @for (r of results(); track r.uid) {
+          <button class="search-result" type="button" (click)="openProfile(r.nick)">
+            <span class="search-result-avatar">{{ r.nick.charAt(0).toUpperCase() }}</span>
+            <span class="search-result-nick">{{ r.nick }}</span>
+            @if (r.uid === myUid()) {
+              <span class="search-result-you">{{ i18n.lang() === 'it' ? 'tu' : 'you' }}</span>
+            }
+            <span class="search-result-arrow" aria-hidden="true">›</span>
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

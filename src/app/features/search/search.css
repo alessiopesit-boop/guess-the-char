@@ -1,0 +1,188 @@
+.search-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 32px;
+}
+
+/* Input con icona lente a sinistra e X a destra per pulire. */
+.search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-input-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 18px;
+  color: var(--text-mute);
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: 13px 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--hover-dur) ease;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input-clear {
+  position: absolute;
+  right: 10px;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--text-mute);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 12px;
+  transition: background var(--hover-dur) ease, color var(--hover-dur) ease;
+}
+.search-input-clear:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* Spinner che appare al posto della X durante la ricerca. Cerchio ambra che
+   ruota su sfondo surface-2, dimensioni allineate al bottone X (28px). */
+.search-spinner {
+  position: absolute;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--surface-2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: search-spin 0.7s linear infinite;
+}
+@keyframes search-spin {
+  to { transform: rotate(360deg); }
+}
+/* Con animazioni minimal disabilitiamo lo spin: lasciamo un cerchio statico
+   ambra per dare comunque feedback di attesa. */
+[data-motion="minimal"] .search-spinner {
+  animation: none;
+  border-top-color: var(--accent);
+  border-right-color: var(--accent);
+}
+
+/* Placeholder vuoto per evitare lo shift di layout quando i risultati
+   arrivano dopo che il loading se ne va. Stessa altezza dell'eyebrow header. */
+.search-loading-placeholder {
+  height: 24px;
+}
+
+/* Empty state: glifo grande accent + testo guida. Stile coerente col brand
+   (uso var(--font-glyph) per il glifo, stesso pattern di onboarding). */
+.search-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 40px 16px 24px;
+}
+.search-empty-glyph {
+  font-family: var(--font-glyph);
+  font-size: 56px;
+  color: var(--accent);
+  opacity: 0.5;
+  line-height: 1;
+}
+.search-empty-title {
+  margin: 0;
+}
+.search-empty p {
+  max-width: 320px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.search-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 4px;
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Riga risultato: avatar circolare con iniziale + nickname + arrow. La
+   pillola "tu" appare se si trova il proprio profilo nella lista. */
+.search-result {
+  appearance: none;
+  display: grid;
+  grid-template-columns: 36px 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 14px 10px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  transition:
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease,
+    transform var(--hover-dur) ease;
+}
+.search-result:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+.search-result-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1;
+}
+.search-result-nick {
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.search-result-you {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--accent-contrast);
+  background: var(--accent);
+  padding: 2px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  font-weight: 600;
+  line-height: 1;
+}
+.search-result-arrow {
+  font-size: 18px;
+  color: var(--text-mute);
+  line-height: 1;
+}
