@@ -48,3 +48,7 @@ Thumbs.db
 
 # Auto-generato a ogni npm install / start / build da scripts/write-build-sha.mjs
 src/app/core/build-sha.local.ts
+
+# Firebase tools cache locale (creata da firebase deploy / login / emulators)
+.firebase/
+firebase-debug.log

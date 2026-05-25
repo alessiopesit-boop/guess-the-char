@@ -1,0 +1,37 @@
+rules_version = '2';
+
+// Regole minime per la PR di setup. Da affinare quando aggiungeremo classifica
+// e profilo pubblico (probabilmente con una collezione /public/{uid} che ospita
+// solo i campi safe-to-read pubblicamente).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // /users/{uid}
+    // Documento personale dell'utente: stato di gioco sincronizzato + dati
+    // anagrafici (nickname, avatar). Per ora tutto leggibile da chiunque (in
+    // pratica solo dal proprietario, finche' non esiste UI per leggere altri),
+    // scrivibile solo dal proprietario.
+    match /users/{uid} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.auth.uid == uid
+                    && request.resource.data.nickname is string
+                    && request.resource.data.nickname.size() >= 2
+                    && request.resource.data.nickname.size() <= 24;
+      allow update: if request.auth != null && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    // /nicknames/{nicknameLowercased}
+    // Indice per garantire unicita' del nickname. Una transazione client crea
+    // l'entry quando l'utente sceglie/cambia nickname.
+    match /nicknames/{nick} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid;
+      allow update: if false;
+      allow delete: if request.auth != null
+                    && resource.data.uid == request.auth.uid;
+    }
+  }
+}

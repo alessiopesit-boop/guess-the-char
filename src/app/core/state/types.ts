@@ -1,10 +1,16 @@
 export type Lang = 'it' | 'en';
 
 export interface AccountInfo {
+  /** UID di Firebase Auth. Stabile per utente, non riassegnato anche dopo
+   *  sign-out + sign-in. Usato come chiave primaria nelle collezioni Firestore. */
+  uid: string;
   email: string;
   nickname: string;
   avatar: number;
-  provider: 'demo' | 'google' | 'apple' | 'email';
+  /** 'password' / 'google.com' / 'apple.com' = providerId di Firebase Auth.
+   *  'demo' resta per back-compat con il vecchio mock; sara' rimosso quando
+   *  tutti i client avranno migrato. */
+  provider: 'demo' | 'password' | 'google.com' | 'apple.com';
   joinedStamp: string;
 }
 
