@@ -1285,21 +1285,39 @@ button {
 
 /* ── Route transitions (View Transitions API) ───────────────────────
    Crossfade con un accenno di slide orizzontale al cambio route.
+   Direzione dinamica: il root <html> riceve data-nav-direction="forward"
+   o "back" da app.ts in base al navigationTrigger del Router (popstate =
+   indietro). Forward: la vecchia esce verso sinistra, la nuova entra da
+   destra. Back: invertiamo l'asse cosi' il movimento e' coerente con il
+   tasto Indietro del browser e con i pulsanti back nell'AppBar.
    Solo browser che supportano `document.startViewTransition` (Chrome,
    Edge moderni): gli altri vedono il cambio istantaneo, niente di rotto.
    In modalita' animazioni "minimal" la transizione e' istantanea. */
 @view-transition { navigation: auto; }
 ::view-transition-old(root) {
-  animation: tx-route-out 220ms var(--tx-ease) forwards;
+  animation: tx-route-out-fwd 220ms var(--tx-ease) forwards;
 }
 ::view-transition-new(root) {
-  animation: tx-route-in 220ms var(--tx-ease) forwards;
+  animation: tx-route-in-fwd 220ms var(--tx-ease) forwards;
 }
-@keyframes tx-route-out {
+[data-nav-direction='back']::view-transition-old(root) {
+  animation: tx-route-out-back 220ms var(--tx-ease) forwards;
+}
+[data-nav-direction='back']::view-transition-new(root) {
+  animation: tx-route-in-back 220ms var(--tx-ease) forwards;
+}
+@keyframes tx-route-out-fwd {
   to { opacity: 0; transform: translateX(-6%); }
 }
-@keyframes tx-route-in {
+@keyframes tx-route-in-fwd {
   from { opacity: 0; transform: translateX(6%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes tx-route-out-back {
+  to { opacity: 0; transform: translateX(6%); }
+}
+@keyframes tx-route-in-back {
+  from { opacity: 0; transform: translateX(-6%); }
   to { opacity: 1; transform: translateX(0); }
 }
 [data-motion='minimal'] ::view-transition-old(root),
