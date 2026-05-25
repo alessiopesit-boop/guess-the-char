@@ -1,0 +1,246 @@
+<div class="app-shell">
+  <app-bar [canBack]="true"
+           [title]="i18n.lang() === 'it' ? 'Profilo' : 'Profile'"
+           (back)="goBack()"
+           (goHome)="goHome()">
+    @if (account()) {
+      <button class="nav-btn account-logout" type="button" (click)="askSignOut()">
+        {{ i18n.t('logout') }}
+      </button>
+    }
+  </app-bar>
+
+  <div class="page profile-page">
+    <!-- Hero: avatar grande + nickname + email -->
+    <div class="profile-hero">
+      <button
+        type="button"
+        class="profile-avatar-btn"
+        [class.is-clickable]="account()"
+        (click)="account() ? openAvatarPicker() : goLogin()"
+        [attr.aria-label]="account()
+          ? (i18n.lang() === 'it' ? 'Cambia avatar' : 'Change avatar')
+          : i18n.t('login')"
+      >
+        <span class="profile-avatar accent">{{ currentAvatar().glyph }}</span>
+        @if (account()) {
+          <span class="profile-avatar-pencil" aria-hidden="true">✎</span>
+        }
+      </button>
+
+      @if (account(); as a) {
+        @if (editingNick()) {
+          <div class="profile-nick-edit">
+            <input
+              class="input-field"
+              type="text"
+              autofocus
+              [ngModel]="nickDraft()"
+              (ngModelChange)="nickDraft.set($event)"
+              (keydown.enter)="saveNick()"
+              (keydown.escape)="cancelEditNick()"
+              maxlength="24"
+              minlength="2"
+            />
+            <button class="btn btn-primary profile-nick-save" type="button" (click)="saveNick()">OK</button>
+          </div>
+        } @else {
+          <button
+            type="button"
+            class="profile-nick"
+            (click)="startEditNick()"
+            [attr.aria-label]="i18n.lang() === 'it' ? 'Modifica nickname' : 'Edit nickname'"
+          >
+            <span class="h2 profile-nick-text">{{ a.nickname }}</span>
+            <span class="profile-nick-pencil" aria-hidden="true">✎</span>
+          </button>
+        }
+        <p class="muted mono profile-email">{{ a.email }}</p>
+        @if (joinedLabel(); as j) {
+          <p class="muted profile-joined">
+            {{ i18n.lang() === 'it' ? 'Iscritto da' : 'Member since' }} {{ j }}
+          </p>
+        }
+      } @else {
+        <h2 class="h2">{{ i18n.lang() === 'it' ? 'Anonimo' : 'Guest' }}</h2>
+        <p class="muted profile-anon-hint">
+          {{ i18n.lang() === 'it'
+            ? 'Crea un profilo per salvare i progressi su tutti i dispositivi.'
+            : 'Sign in to sync your progress across devices.' }}
+        </p>
+        <button class="btn btn-primary profile-anon-cta" type="button" (click)="goLogin()">
+          {{ i18n.t('login') }}
+        </button>
+      }
+    </div>
+
+    @if (account()) {
+      <!-- Azione rapida: porta alla classifica (per ora ComingSoon). La chip
+           "Profilo pubblico" l'abbiamo tolta da qui: visitare la pagina del
+           proprio profilo pubblico dal proprio profilo era un giro a vuoto.
+           La pagina /u/:nickname esiste lo stesso per quando ti capita il link
+           del profilo di qualcun altro (dalla classifica futura). -->
+      <div class="profile-chips">
+        <button class="nav-btn" type="button" (click)="goLeaderboard()">
+          {{ i18n.t('leaderboard') }}
+        </button>
+      </div>
+    }
+
+    <!-- Stats 2x2 -->
+    <div class="profile-stats">
+      <div class="stat">
+        <span class="v">{{ state().streak }}</span>
+        <span class="l">{{ i18n.t('streak') }}</span>
+      </div>
+      <div class="stat">
+        <span class="v">{{ state().bestStreak }}</span>
+        <span class="l">{{ i18n.t('bestStreak') }}</span>
+      </div>
+      <div class="stat">
+        <span class="v">{{ state().accuracy }}%</span>
+        <span class="l">{{ i18n.t('accuracy') }}</span>
+      </div>
+      <div class="stat">
+        <span class="v">{{ state().played }}</span>
+        <span class="l">{{ i18n.t('played') }}</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3 class="h3 section-h">
+      {{ i18n.lang() === 'it' ? 'Per scrittura' : 'By script' }}
+    </h3>
+    @if (scriptStats().length === 0) {
+      <p class="muted">
+        {{ i18n.lang() === 'it'
+          ? 'Gioca qualche partita per vedere i progressi.'
+          : 'Play a few rounds to see your progress here.' }}
+      </p>
+    } @else {
+      <div class="profile-scripts">
+        @for (e of scriptStats(); track e.id) {
+          <button class="profile-script" type="button" (click)="openScript(e.id)">
+            <span class="profile-script-glyph">{{ e.script?.sample }}</span>
+            <div class="profile-script-body">
+              <span class="profile-script-name">
+                {{ i18n.lang() === 'it' ? e.script?.nameIt : e.script?.nameEn }}
+              </span>
+              <span class="profile-script-bar">
+                <i [style.width.%]="e.acc" [attr.data-acc]="accLevel(e.acc)"></i>
+              </span>
+            </div>
+            <span class="profile-script-pct mono">{{ e.acc }}%</span>
+          </button>
+        }
+      </div>
+    }
+
+    <div class="divider"></div>
+
+    <div class="section-head profile-section-head">
+      <h3 class="h3">{{ i18n.t('badges') }}</h3>
+      <button class="nav-btn small" type="button" (click)="goBadges()">
+        <span>{{ i18n.t('seeAll') }}</span>
+        <app-icon name="arrow-right" />
+      </button>
+    </div>
+    <button class="badges-teaser" type="button" (click)="goBadges()">
+      <div class="badges-teaser-text">
+        <div class="badges-teaser-title">
+          {{ i18n.t('badges') }}
+          <span class="sep" aria-hidden="true">·</span>
+          <span class="v">{{ badgeStats().unlocked }}</span>
+          <span class="l">/ {{ badgeStats().total }}</span>
+        </div>
+        <div class="badges-teaser-sub muted">
+          @if (badgeStats().unlocked === 0) {
+            {{ i18n.lang() === 'it'
+              ? 'Comincia a giocare per sbloccare il primo.'
+              : 'Start playing to unlock your first one.' }}
+          } @else if (!badgeStats().nextLocked) {
+            {{ i18n.lang() === 'it' ? 'Li hai sbloccati tutti.' : 'You unlocked them all.' }}
+          } @else if (i18n.lang() === 'it') {
+            {{ badgeStats().unlocked }} sbloccati. Prossimo: {{ nextLockedTitle() }}
+          } @else {
+            {{ badgeStats().unlocked }} unlocked. Next: {{ nextLockedTitle() }}
+          }
+        </div>
+      </div>
+      <div class="icons">
+        @for (b of badgeStats().preview; track b.id) {
+          <span [attr.data-on]="b.unlocked ? '1' : '0'" [attr.data-t]="b.tier">{{ b.icon }}</span>
+        }
+      </div>
+    </button>
+
+    <div class="divider"></div>
+
+    <h3 class="h3 section-h">
+      {{ i18n.lang() === 'it' ? 'Sfida giornaliera' : 'Daily challenge' }}
+    </h3>
+    @if (dailyHistory().length === 0) {
+      <p class="muted">
+        {{ i18n.lang() === 'it'
+          ? 'Ancora nessuna sfida giornaliera completata.'
+          : 'No daily challenges completed yet.' }}
+      </p>
+    } @else {
+      <div class="profile-daily-row">
+        @for (d of dailyHistory(); track d.day) {
+          <div class="profile-daily-cell" [attr.data-color]="daySquareColor(d.score)">
+            <span class="profile-daily-score">{{ d.score }}/5</span>
+            <span class="profile-daily-day mono">{{ formatDay(d.day) }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @if (pickingAvatar()) {
+    <div class="sheet-backdrop avatar-backdrop" (click)="closeAvatarPicker()">
+      <div class="sheet avatar-sheet" (click)="$event.stopPropagation()">
+        <div class="avatar-sheet-head">
+          <h2 class="h2">{{ i18n.lang() === 'it' ? 'Scegli un glifo' : 'Pick a glyph' }}</h2>
+          <button class="btn-icon" type="button" (click)="closeAvatarPicker()"
+                  [attr.aria-label]="i18n.lang() === 'it' ? 'Chiudi' : 'Close'">
+            <app-icon name="close" />
+          </button>
+        </div>
+        <p class="muted avatar-sheet-sub">
+          {{ i18n.lang() === 'it'
+            ? 'Tocca per selezionare, poi premi Salva.'
+            : 'Tap to select, then press Save.' }}
+        </p>
+        <div class="profile-avatar-grid">
+          @for (a of avatars; track a.id) {
+            <button class="profile-avatar-cell"
+                    [class.is-active]="pendingAvatar() === a.id"
+                    type="button"
+                    (click)="pickAvatar(a.id)"
+                    [attr.aria-label]="a.label">
+              {{ a.glyph }}
+            </button>
+          }
+        </div>
+        <button class="btn btn-primary btn-block avatar-save" type="button" (click)="saveAvatar()">
+          {{ i18n.lang() === 'it' ? 'Salva' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (signOutDialog()) {
+    <app-confirm-dialog
+      [title]="i18n.lang() === 'it' ? 'Sei sicuro di uscire?' : 'Are you sure you want to sign out?'"
+      [body]="i18n.lang() === 'it'
+        ? 'I progressi su questo dispositivo verranno azzerati. Restano salvati sul tuo profilo: li ritroverai al prossimo accesso.'
+        : 'Your progress on this device will be cleared. It stays saved on your profile: you\'ll find it again next time you sign in.'"
+      [confirmLabel]="i18n.t('logout')"
+      [cancelLabel]="i18n.lang() === 'it' ? 'Annulla' : 'Cancel'"
+      (confirmed)="confirmSignOut()"
+      (cancel)="cancelSignOut()"
+    />
+  }
+</div>

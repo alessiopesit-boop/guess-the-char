@@ -1,0 +1,372 @@
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 32px;
+}
+
+/* Hero: avatar grande centrato + nickname + email + chip azioni. */
+.profile-hero {
+  text-align: center;
+  padding: 12px 0 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-avatar-btn {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  position: relative;
+  display: inline-block;
+  cursor: default;
+}
+.profile-avatar-btn.is-clickable {
+  cursor: pointer;
+}
+.profile-avatar-btn.is-clickable:hover .profile-avatar {
+  filter: brightness(1.05);
+}
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  font-family: var(--font-glyph);
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+.profile-avatar.accent {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: transparent;
+}
+/* Pencil badge in basso a destra dell'avatar, segnale visivo che e' cliccabile. */
+.profile-avatar-pencil {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--bg);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* Nickname: bottone con tipografia h2. Click = passa in edit mode. */
+.profile-nick {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+.profile-nick:hover { opacity: 0.85; }
+.profile-nick-text {
+  margin: 0;
+}
+.profile-nick-pencil {
+  font-size: 14px;
+  color: var(--text-mute);
+}
+
+/* Edit mode: input largo come l'h2, bottone OK accanto. */
+.profile-nick-edit {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  max-width: 260px;
+  width: 100%;
+}
+.profile-nick-edit .input-field {
+  flex: 1;
+  width: auto;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--hover-dur) ease;
+}
+.profile-nick-edit .input-field:focus { border-color: var(--accent); }
+.profile-nick-save {
+  height: 38px;
+  padding: 0 14px;
+}
+
+.profile-email {
+  font-size: 11px;
+  margin: 0;
+}
+.profile-joined {
+  font-size: 12px;
+  margin: 0;
+}
+
+.profile-anon-hint {
+  max-width: 320px;
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.5;
+}
+.profile-anon-cta {
+  height: 40px;
+  padding: 0 18px;
+  margin-top: 4px;
+}
+
+/* Modale di scelta avatar (backdrop full screen, sheet centrata). La griglia
+   resta uguale a quella che era inline; le voci hanno una pendingAvatar
+   provvisoria che viene confermata solo al tasto Salva. */
+.avatar-backdrop {
+  align-items: center;
+  z-index: 80;
+}
+.avatar-sheet {
+  max-width: 380px;
+  border-radius: 20px;
+  padding: 20px 22px 22px;
+  animation: pop .18s ease;
+}
+.avatar-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.avatar-sheet-sub {
+  font-size: 12px;
+  margin: 4px 0 14px;
+}
+.avatar-save {
+  margin-top: 16px;
+}
+
+.profile-avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.profile-avatar-cell {
+  appearance: none;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-family: var(--font-glyph);
+  font-size: 22px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    transform var(--hover-dur) ease,
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease;
+}
+.profile-avatar-cell:hover {
+  transform: scale(1.05);
+}
+.profile-avatar-cell.is-active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+}
+
+/* Chip orizzontali sotto la hero (per ora portano alle pagine ComingSoon). */
+.profile-chips {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* Stats 2x2 (vs la home che e' 1x3): bestStreak + streak + accuracy + played. */
+.profile-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.section-h {
+  margin: 0 0 12px;
+}
+.profile-section-head {
+  margin-bottom: 12px;
+}
+
+/* Lista per-scrittura: griglia [glifo 36 | nome+barra | percentuale]. */
+.profile-scripts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.profile-script {
+  appearance: none;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  transition:
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease;
+}
+.profile-script:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.profile-script-glyph {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-family: var(--font-glyph);
+  font-size: 18px;
+}
+.profile-script-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.profile-script-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+.profile-script-bar {
+  display: block;
+  height: 4px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.profile-script-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 240ms var(--tx-ease);
+}
+/* Soglie colore allineate al mockup: >=75 verde, >=40 ambra, <40 rosso. */
+.profile-script-bar i[data-acc="good"] { background: var(--success); }
+.profile-script-bar i[data-acc="mid"]  { background: var(--warm); }
+.profile-script-bar i[data-acc="bad"]  { background: var(--danger); }
+.profile-script-pct {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bottone logout nell'app-bar: piu' compatto del default nav-btn. */
+.account-logout {
+  height: 30px;
+  font-size: 12px;
+  padding: 0 12px;
+}
+
+/* Storico daily: una riga di celle scrollabile orizzontalmente, ogni cella e'
+   un quadratino colorato in base al punteggio (gold per 5/5, verde per 4,
+   ambra per 3, dim per < 3). */
+.profile-daily-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 2px;
+}
+.profile-daily-cell {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.profile-daily-cell[data-color="gold"] {
+  background: rgba(251, 191, 36, 0.15);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+.profile-daily-cell[data-color="green"] {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.4);
+}
+.profile-daily-cell[data-color="warm"] {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+.profile-daily-cell[data-color="dim"] {
+  opacity: 0.6;
+}
+.profile-daily-score {
+  font-weight: 600;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.profile-daily-day {
+  font-size: 10px;
+  color: var(--text-mute);
+}
+
+/* Il container .badges-teaser e i suoi sotto-elementi (.badges-teaser-text,
+   .badges-teaser-title, .badges-teaser-sub) sono definiti in styles.css
+   globale e in home.css; qui sotto solo l'override del text-align del button
+   (i button hanno text-align: center di default). */
+.badges-teaser-text {
+  text-align: left;
+}
+.badges-teaser-title {
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.2;
+}
+.badges-teaser-title .sep {
+  color: var(--text-mute);
+  margin: 0 2px;
+}
+.badges-teaser-title .v {
+  color: var(--accent);
+  font-weight: 600;
+}
+.badges-teaser-title .l {
+  color: var(--text-mute);
+}
+.badges-teaser-sub {
+  font-size: 12px;
+  margin-top: 4px;
+  line-height: 1.4;
+}

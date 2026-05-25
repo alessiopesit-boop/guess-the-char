@@ -183,6 +183,17 @@
   font-size: 14px;
 }
 
+/* Quando il trigger contiene l'iniziale (utente loggato) togliamo il bordo
+   quadrato globale di .btn-icon: l'iniziale ha gia' il suo cerchio ambra,
+   un secondo riquadro fa rumore visivo. Quando non si e' loggati, il bordo
+   resta per dare il rettangolo dell'icona omino. */
+.account-trigger:has(.account-initial) {
+  border-color: transparent;
+}
+.account-trigger:has(.account-initial):hover {
+  background: transparent;
+}
+
 /* Popover account: sotto l'icona trigger, allineato a destra. Voci come
    pulsanti pieni, separatore prima del logout, "Esci" colorato danger. */
 .account-menu {

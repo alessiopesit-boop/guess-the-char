@@ -56,7 +56,29 @@ export class AppStateService {
       if (!u) {
         const hadAccount = untracked(() => this._state().account);
         if (hadAccount) {
-          this._state.update((s) => ({ ...s, account: null }));
+          // Logout esplicito: oltre ad azzerare l'account, puliamo i progressi
+          // del gioco da questo dispositivo. Restano salvati sul profilo cloud
+          // (PR #49), quindi al re-login li ritrovi via max-merge.
+          // Preserviamo le preferenze UI (accent, motion, audio, ecc.) e i
+          // flag di setup (onboarded, selected) perche' sono scelte
+          // per-dispositivo, non collegate all'account.
+          this._state.update((s) => ({
+            ...s,
+            account: null,
+            streak: 0,
+            bestStreak: 0,
+            played: 0,
+            correctAnswers: 0,
+            accuracy: 0,
+            perScript: {},
+            dailyDone: false,
+            dailyDoneStamp: null,
+            dailyScore: 0,
+            dailyStreak: 0,
+            dailyHistory: [],
+            hintsLeft: DEFAULT_STATE.hintsLeft,
+            shownFirstWrong: false,
+          }));
         }
         return;
       }

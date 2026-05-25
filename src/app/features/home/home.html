@@ -245,6 +245,9 @@
   @if (signOutDialog()) {
     <app-confirm-dialog
       [title]="i18n.lang() === 'it' ? 'Sei sicuro di uscire?' : 'Are you sure you want to sign out?'"
+      [body]="i18n.lang() === 'it'
+        ? 'I progressi su questo dispositivo verranno azzerati. Restano salvati sul tuo profilo: li ritroverai al prossimo accesso.'
+        : 'Your progress on this device will be cleared. It stays saved on your profile: you\'ll find it again next time you sign in.'"
       [confirmLabel]="i18n.t('logout')"
       [cancelLabel]="i18n.lang() === 'it' ? 'Annulla' : 'Cancel'"
       (confirmed)="confirmSignOut()"

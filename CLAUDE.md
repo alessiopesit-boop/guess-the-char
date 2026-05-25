@@ -62,6 +62,7 @@ src/
       home/
       login/
       onboarding/
+      profile/
       script-detail/
       selection/
       session-result/
@@ -317,8 +318,8 @@ Le scritture successive durante la sessione fanno **full overwrite** del documen
 
 ### Cosa NON e' ancora collegato
 
-- Le route `/profile`, `/leaderboard`, `/u/:nickname` sono ancora `ComingSoon`. Le PR che le accendono usano gia' lo stato Auth (`AuthService.user()`) come fonte di verita' e i progressi cloud da `/users/{uid}`.
-- Unicita' del nickname via `/nicknames/{nick}` non ancora applicata: il nickname viene seedato e basta, niente UI per cambiarlo (la pagina /profile vera lo permettera').
+- Le route `/leaderboard`, `/u/:nickname` sono ancora `ComingSoon`. Le PR che le accendono usano gia' lo stato Auth (`AuthService.user()`) come fonte di verita' e i progressi cloud da `/users/{uid}`. `/profile` invece e' diventata reale: hero con avatar editabile in modale (12 glifi predefiniti in `AVATARS`), nickname inline edit (Enter salva, Esc annulla), stats 2x2, lista per-scrittura con barre colorate (verde >=75%, ambra >=40%, rosso <40%), badges teaser, storico daily.
+- Unicita' del nickname via `/nicknames/{nick}` non ancora applicata: il nickname si edita ma due utenti possono avere lo stesso. Verra' attivata con la pagina /u/:nickname pubblica vera.
 
 ### Convenzioni
 
