@@ -2,17 +2,20 @@
   <app-bar [canBack]="true" [title]="i18n.t('settings')" (back)="goBack()" (goHome)="goHome()" />
 
   <div class="page settings-page">
-    <!-- Card account: stato connesso vs anonimo. Per ora solo il caso "non
-         connesso" e' realmente raggiungibile (la pagina /login viene aggiunta
-         in PR 3). Quando ci sara' un account vero, la card mostra avatar,
-         nickname e link al profilo. -->
+    <!-- Card account: stato connesso vs anonimo. Quando sei loggato, l'area
+         avatar + nickname + email e' un bottone cliccabile che porta al
+         profilo; il tasto Esci resta separato sulla destra cosi' non si
+         attiva per sbaglio. -->
     <div class="card account-card">
       @if (state().account; as a) {
-        <span class="account-avatar accent">{{ a.nickname.charAt(0).toUpperCase() }}</span>
-        <div class="account-meta">
-          <span class="account-name">{{ a.nickname }}</span>
-          <span class="account-sub mono">{{ a.email }}</span>
-        </div>
+        <button class="account-card-trigger" type="button" (click)="goProfile()"
+                [attr.aria-label]="i18n.lang() === 'it' ? 'Vai al profilo' : 'Open profile'">
+          <span class="account-avatar accent">{{ a.nickname.charAt(0).toUpperCase() }}</span>
+          <div class="account-meta">
+            <span class="account-name">{{ a.nickname }}</span>
+            <span class="account-sub mono">{{ a.email }}</span>
+          </div>
+        </button>
         <button class="nav-btn account-logout" type="button" (click)="signOut()">
           {{ i18n.t('logout') }}
         </button>
@@ -139,14 +142,12 @@
     <h3 class="h3 section-h">{{ i18n.lang() === 'it' ? 'Aiuto' : 'Help' }}</h3>
     <div class="settings-section">
       <button class="help-btn" type="button" (click)="goFeedback()">
-        <span class="help-emoji">💬</span>
         <span class="help-label">
           {{ i18n.lang() === 'it' ? 'Segnala bug o suggerisci un’idea' : 'Report a bug or suggest an idea' }}
         </span>
         <app-icon name="chev" />
       </button>
       <button class="help-btn" type="button" (click)="replayOnboarding()">
-        <span class="help-emoji">🎬</span>
         <span class="help-label">
           {{ i18n.lang() === 'it' ? 'Rivedi la presentazione' : 'Replay the intro' }}
         </span>
@@ -169,22 +170,6 @@
             : 'Your progress is stored on this device only.' }}
         }
       </p>
-
-      @if (!showSync()) {
-        <button class="btn btn-ghost btn-block" type="button" (click)="revealSync()">
-          {{ i18n.lang() === 'it' ? 'Mostra codice di sincronizzazione' : 'Show sync code' }}
-        </button>
-      } @else {
-        <div class="card sync-card">
-          <span class="eyebrow">
-            {{ i18n.lang() === 'it' ? 'CODICE DI SINCRONIZZAZIONE' : 'SYNC CODE' }}
-          </span>
-          <div class="sync-code mono">{{ syncCode() }}</div>
-          <p class="muted sync-foot">
-            {{ i18n.lang() === 'it' ? 'Funzione in arrivo · placeholder' : 'Coming soon · placeholder' }}
-          </p>
-        </div>
-      }
 
       <button class="btn btn-ghost btn-block reset-btn" type="button" (click)="resetProgress()">
         {{ i18n.lang() === 'it' ? 'Azzera progressi' : 'Reset progress' }}
