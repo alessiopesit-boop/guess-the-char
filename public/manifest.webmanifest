@@ -1,0 +1,17 @@
+{
+  "name": "Indovina il carattere",
+  "short_name": "Indovina",
+  "description": "Quiz interattivo per riconoscere i sistemi di scrittura del mondo.",
+  "lang": "it",
+  "categories": ["games", "education"],
+  "start_url": "/guess-the-char/",
+  "scope": "/guess-the-char/",
+  "display": "standalone",
+  "background_color": "#0b0f14",
+  "theme_color": "#0b0f14",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
