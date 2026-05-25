@@ -1,42 +1,36 @@
 .badges-page {
   display: flex;
   flex-direction: column;
-  gap: 18px;
   padding-bottom: 32px;
 }
 
+/* Riepilogo: numero molto grande "X/Y" (Y in text-mute), label "sbloccati"
+   accanto alla baseline, e barra sottile a tutta larghezza sotto. Niente card,
+   come nel mockup. */
 .badges-summary {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px 18px;
-}
-
-.badges-count {
-  display: flex;
   align-items: baseline;
-  gap: 6px;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 4px;
+}
+.badges-count {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .badges-count .v {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 32px;
-  color: var(--accent);
-  line-height: 1;
+  color: var(--text);
 }
 .badges-count .l {
-  font-size: 14px;
-  color: var(--text-dim);
+  color: var(--text-mute);
 }
-
-.badges-progress {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.badges-count-label {
+  font-size: 13px;
 }
 
 .badges-bar {
@@ -45,6 +39,7 @@
   background: var(--border);
   border-radius: 999px;
   overflow: hidden;
+  margin-top: 14px;
 }
 .badges-bar i {
   display: block;
@@ -53,14 +48,14 @@
   transition: width 240ms var(--tx-ease);
 }
 
-.badges-progress-label {
-  font-size: 12px;
+.badges-section-title {
+  margin: 22px 0 10px;
 }
 
 .badges-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 
 /* Le classi .badge-card, .badge-icon, .badge-title e .badge-prog vivono in styles.css
@@ -73,22 +68,18 @@
   z-index: 80;
 }
 .badge-sheet {
-  max-width: 380px;
-  border-radius: 20px;
-  padding: 22px;
-  animation: pop .18s ease;
+  max-width: 400px;
+  border-radius: 24px;
+  padding: 24px 24px 28px;
+  animation: pop .2s ease;
   text-align: center;
   position: relative;
 }
-.badge-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-}
 
 /* Sheet dettaglio traguardo: hero stacked (icona sopra, status sotto, tutto
-   centrato), titolo e descrizione centrati, card "come sbloccarlo" allineata
-   a sinistra, barra di progresso con etichetta sotto. */
+   centrato), titolo e descrizione centrati. La card "come sbloccarlo" e'
+   visibile solo per i traguardi locked. In fondo c'e' sempre il bottone primary
+   "Chiudi" (al posto della X in alto del vecchio design). */
 .badge-sheet-hero {
   display: flex;
   flex-direction: column;
@@ -125,11 +116,16 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 14px 16px;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
+}
+/* L'eyebrow "COME SBLOCCARLO" e' warm (ambra), per dare urgenza visiva
+   all'azione da compiere. Solo qui dentro, altri eyebrow restano text-mute. */
+.badge-sheet-quest .quest-eyebrow {
+  color: var(--warm);
 }
 .badge-sheet-quest p {
-  margin: 8px 0 0;
-  font-size: 13px;
+  margin: 8px 0 12px;
+  font-size: 14px;
   line-height: 1.5;
   color: var(--text);
 }
@@ -153,8 +149,12 @@
   transition: width 240ms var(--tx-ease);
 }
 .badge-bar-label {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
+  text-align: right;
+  font-family: var(--font-mono);
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.badge-sheet-close {
+  margin-top: 4px;
 }

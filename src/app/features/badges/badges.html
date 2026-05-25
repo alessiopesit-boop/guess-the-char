@@ -4,16 +4,17 @@
   <div class="page badges-page">
     <div class="badges-summary">
       <div class="badges-count">
-        <span class="v">{{ unlocked() }}</span>
-        <span class="l">/ {{ total() }}</span>
+        <span class="v">{{ unlocked() }}</span><span class="l">/{{ total() }}</span>
       </div>
-      <div class="badges-progress">
-        <div class="badges-bar"><i [style.width.%]="progress() * 100"></i></div>
-        <span class="muted badges-progress-label">
-          {{ i18n.lang() === 'it' ? 'Traguardi sbloccati' : 'Badges unlocked' }}
-        </span>
-      </div>
+      <span class="muted badges-count-label">
+        {{ i18n.lang() === 'it' ? 'sbloccati' : 'unlocked' }}
+      </span>
     </div>
+    <div class="badges-bar"><i [style.width.%]="progress() * 100"></i></div>
+
+    <h3 class="h3 badges-section-title">
+      {{ i18n.lang() === 'it' ? 'Tutti i traguardi' : 'All achievements' }}
+    </h3>
 
     <div class="badges-grid">
       @for (b of badges(); track b.id) {
@@ -37,10 +38,6 @@
   @if (detail(); as d) {
     <div class="sheet-backdrop badge-backdrop" (click)="closeDetail()">
       <div class="sheet badge-sheet" (click)="$event.stopPropagation()">
-        <button class="btn-icon badge-close" type="button" (click)="closeDetail()" aria-label="Close">
-          <app-icon name="close" />
-        </button>
-
         <div class="badge-sheet-hero">
           <div class="badge-icon-lg" [attr.data-unlocked]="d.unlocked ? '1' : '0'" [attr.data-tier]="d.tier">
             {{ d.icon }}
@@ -55,18 +52,24 @@
         <h2 class="h2 badge-sheet-title">{{ titleOf(d) }}</h2>
         <p class="muted badge-sheet-desc">{{ descOf(d) }}</p>
 
-        <div class="badge-sheet-quest">
-          <span class="eyebrow">{{ i18n.lang() === 'it' ? 'COME SBLOCCARLO' : 'HOW TO UNLOCK' }}</span>
-          <p>{{ questOf(d) }}</p>
-        </div>
-
-        <div class="badge-sheet-progress">
-          <div class="badge-bar"><i [style.width.%]="progressPct(d)"></i></div>
-          <div class="badge-bar-label muted">
-            <span>{{ d.valueOf(state()) }}</span>
-            <span>/ {{ d.target }}</span>
+        @if (!d.unlocked) {
+          <div class="badge-sheet-quest">
+            <span class="eyebrow quest-eyebrow">
+              {{ i18n.lang() === 'it' ? 'COME SBLOCCARLO' : 'HOW TO UNLOCK' }}
+            </span>
+            <p>{{ questOf(d) }}</p>
+            <div class="badge-sheet-progress">
+              <div class="badge-bar"><i [style.width.%]="progressPct(d)"></i></div>
+              <div class="badge-bar-label muted">
+                <span>{{ d.valueOf(state()) }} / {{ d.target }}</span>
+              </div>
+            </div>
           </div>
-        </div>
+        }
+
+        <button class="btn btn-primary btn-block badge-sheet-close" type="button" (click)="closeDetail()">
+          {{ i18n.lang() === 'it' ? 'Chiudi' : 'Close' }}
+        </button>
       </div>
     </div>
   }

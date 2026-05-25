@@ -115,9 +115,23 @@ export class Home {
 
   protected readonly badgeStats = computed(() => {
     const list = computeBadges(this.state());
-    const unlocked = list.filter((b) => b.unlocked).length;
-    return { total: list.length, unlocked, preview: list.slice(0, 4) };
+    const unlocked = list.filter((b) => b.unlocked);
+    const locked = list
+      .filter((b) => !b.unlocked)
+      .sort((a, b) => b.progress - a.progress);
+    const preview = [
+      ...unlocked.slice(0, 2),
+      ...locked.slice(0, 4 - Math.min(unlocked.length, 2)),
+    ].slice(0, 4);
+    const nextLocked = locked[0] ?? null;
+    return { total: list.length, unlocked: unlocked.length, preview, nextLocked };
   });
+
+  protected nextLockedTitle(): string {
+    const next = this.badgeStats().nextLocked;
+    if (!next) return '';
+    return this.i18n.lang() === 'en' ? next.titleEn : next.titleIt;
+  }
 
   protected goSelection(mode: 'training' | 'timed' | 'survival'): void {
     this.router.navigate(['/selection'], { queryParams: { mode } });
