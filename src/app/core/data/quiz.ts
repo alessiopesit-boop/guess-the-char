@@ -33,15 +33,23 @@ export function seedFromDate(d: Date = new Date()): number {
 }
 
 /**
- * Build a quiz question. `selectedIds` is the pool the correct answer is drawn
- * from; distractors prefer the same pool but fall back to the full catalog.
- * `prevId` is avoided as the correct answer when possible (no two in a row).
+ * Build a quiz question. `selectedIds` e' il pool da cui peschiamo SIA la
+ * risposta corretta SIA i distrattori: niente fallback ai SCRIPTS globali se
+ * il pool e' piccolo. Cosi' se hai selezionato 2 sole scritture, vedi 2 sole
+ * opzioni; se 3, ne vedi 3; se 4+, sempre 4 (cap massimo). L'idea: il quiz
+ * non deve mai mostrare scritture che l'utente ha esplicitamente escluso.
+ *
+ * `prevId` viene evitato come risposta corretta quando possibile, per non
+ * mostrare due domande di fila sulla stessa scrittura.
  */
 export function buildQuestion(
   rng: Rng,
   selectedIds: ReadonlyArray<string>,
   prevId: string | null,
 ): Question {
+  // Safety net: se il pool e' degenerato (0 o 1 scrittura) cadiamo sul
+  // catalogo completo, altrimenti non c'e' una domanda da costruire. UI dovrebbe
+  // impedirlo con la regola "almeno 2 scritture" sulla selezione.
   let pool = selectedIds.slice();
   if (pool.length < 2) {
     pool = SCRIPTS.map((s) => s.id);
@@ -59,19 +67,14 @@ export function buildQuestion(
   }
   const glyph = correct.samples[Math.floor(rng() * correct.samples.length)];
 
+  // Distrattori: massimo 3, solo dalla stessa pool selezionata. Se la pool ha
+  // 2 scritture, distrattori = 1; se 3, distrattori = 2; se 4+, distrattori = 3.
   const others = pool.filter((id) => id !== correctId);
   const shuffled = others.slice().sort(() => rng() - 0.5);
   const distractors: ScriptInfo[] = shuffled
     .slice(0, 3)
     .map((id) => scriptById(id))
     .filter((s): s is ScriptInfo => !!s);
-
-  while (distractors.length < 3) {
-    const candidate = SCRIPTS[Math.floor(rng() * SCRIPTS.length)];
-    if (candidate.id !== correctId && !distractors.find((d) => d.id === candidate.id)) {
-      distractors.push(candidate);
-    }
-  }
 
   const options = [correct, ...distractors].sort(() => rng() - 0.5);
   const cp = (glyph.codePointAt(0) ?? 0).toString(16).toUpperCase().padStart(4, '0');

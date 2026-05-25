@@ -62,10 +62,15 @@
   margin-bottom: 8px;
 }
 
+/* Griglia auto-fill cosi' il numero di colonne si adatta alla larghezza
+   disponibile e i glifi vanno a capo invece di sforare a destra. min-width:0
+   sul container e' la cintura: rompe il comportamento default min-content
+   dei flex/grid children che impediva il wrap. */
 .sd-grid {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
   gap: 6px;
+  min-width: 0;
 }
 
 .sd-cell {
