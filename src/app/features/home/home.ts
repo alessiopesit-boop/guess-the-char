@@ -175,6 +175,10 @@ export class Home {
     this.router.navigate(['/feedback']);
   }
 
+  protected goSearch(): void {
+    this.router.navigate(['/search']);
+  }
+
   /** Toggle del popover account; chiude se aperto, apre se chiuso. Lo
    *  stopPropagation evita che il click-outside listener lo richiuda subito. */
   protected toggleAccountMenu(e: Event): void {

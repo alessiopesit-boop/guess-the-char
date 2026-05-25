@@ -78,6 +78,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
   },
 
+  {
+    path: 'search',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/search/search').then((m) => m.Search),
+  },
+
   // Aree social ancora stub: classifica, sfide tra amici.
   { path: 'leaderboard',       canActivate: [onboardedGuard], loadComponent: comingSoon },
 

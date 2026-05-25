@@ -65,6 +65,7 @@ src/
       profile/
       public-profile/
       script-detail/
+      search/
       selection/
       session-result/
       settings/
@@ -299,6 +300,7 @@ L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del p
 - `src/app/core/firebase/auth.service.ts`: `AuthService` con signal `user` (`User | null | 'loading'`), `enabled` (boolean), metodi `signInEmail/signUpEmail/signInGoogle/signOut`. Quando `enabled === false` i metodi rigettano con `AuthDisabledError`.
 - `src/app/core/firebase/user-doc.service.ts`: `UserDocService` che sincronizza lo stato di gioco con `/users/{uid}` su Firestore quando l'utente e' loggato. Bootstrap-attivato (inject dummy in `App`). All'auth.user che diventa autenticato fa max-merge tra locale e cloud; al primo signup chiama `NicknameService.findAvailable` per claimare un nickname unico. Ad ogni cambio di state mentre loggato, push debounced di 1s. Usa `firebase/firestore/lite` (no real-time, no offline persistence) per tenere il bundle sotto i 500kB.
 - `src/app/core/firebase/nickname.service.ts`: `NicknameService` gestisce la collezione `/nicknames/{nick_lowercased}` per garantire l'unicita' del nickname. Metodi: `claim(nick, uid)` atomica via runTransaction, `change(oldNick, newNick, uid)` swap atomico (release vecchio + claim nuovo + update `/users/{uid}.nickname` in una sola transazione), `findAvailable(seed, uid)` cerca varianti seed/seed2/seed3/.../seed-rnd, `getUserByNickname(nick)` per il profilo pubblico.
+- `src/app/core/firebase/user-search.service.ts`: `UserSearchService` cerca utenti per nickname con tolleranza fuzzy (Levenshtein <=2). Carica la collezione `/nicknames` intera in cache (TTL 5 min) e fa filtering/ranking client-side: match esatto > prefisso > sottostringa > distanza 1 > distanza 2. Strategia OK fino a ~2000 utenti; oltre, conviene un indice esterno tipo Algolia.
 - `AppStateService` si abbona al signal `auth.user` via `effect`: a ogni cambio di stato Auth, riflette in `state.account` (uid, email, nickname seedato da `displayName` per Google, avatar 0 di default).
 - `firestore.rules`, `firebase.json`, `.firebaserc` alla root: config per `firebase deploy`. Schema corrente: `/users/{uid}` (stato gioco + anagrafica) e `/nicknames/{nick}` (indice unicita', non ancora popolato).
 
@@ -322,7 +324,8 @@ Le scritture successive durante la sessione fanno **full overwrite** del documen
 
 - La route `/leaderboard` e' ancora `ComingSoon`. La PR che la accendera' usera' gia' lo stato Auth (`AuthService.user()`) come fonte di verita' e i progressi cloud da `/users/{uid}`.
 - `/profile` reale: hero con avatar editabile in modale (12 glifi predefiniti in `AVATARS`), nickname inline edit (Enter salva, Esc annulla, errore "gia' preso" via transazione `NicknameService.change`), stats 2x2, lista per-scrittura con barre colorate (verde >=75%, ambra >=40%, rosso <40%), badges teaser, storico daily.
-- `/u/:nickname` profilo pubblico reale: faux URL bar in cima, avatar 96px, "Membro da MMMM YYYY", stats 2x2 (best, accuracy, played, dailyStreak), griglia 4-col dei badge sbloccati. CTA in fondo cambia in base a "tu / altri": se sei tu mostra "Condividi profilo", altrimenti "Vuoi battere X? Gioca anche tu". Read pubblica via `NicknameService.getUserByNickname` (no auth richiesta, le regole Firestore permettono read pubblica su `/users` e `/nicknames`).
+- `/u/:nickname` profilo pubblico reale: pillola "TU" accanto al nome se sei tu, avatar 96px, "Membro da MMMM YYYY", stats 2x2 (best, accuracy, played, dailyStreak), lista per-scrittura con barre colorate, griglia 4-col dei badge sbloccati. CTA in fondo cambia in base a "tu / altri": se sei tu mostra "Condividi profilo", altrimenti "Vuoi battere X? Gioca anche tu". Read pubblica via `NicknameService.getUserByNickname`.
+- `/search` ricerca utenti: input con debounce 250ms, fuzzy fino a 2 errori, "X utenti trovati", risultati cliccabili che portano a `/u/:nickname`. Accessibile dal menu account della home, voce "Cerca utenti".
 
 ### Convenzioni
 
