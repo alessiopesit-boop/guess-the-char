@@ -313,7 +313,7 @@ button {
   font-size: clamp(140px, 32vw, 200px);
   line-height: 1;
   letter-spacing: 0;
-  /* Container metrics fixed — glyph is allowed to overflow visually but not push layout */
+  /* Container fissato a 1em quadro: il glifo deve poter strabordare visivamente, mai spostare il layout. */
   width: 1em;
   height: 1em;
   display: grid;
@@ -321,8 +321,14 @@ button {
   text-align: center;
   position: relative;
   z-index: 1;
-  /* avoid baseline-driven jitter when scripts have different ascenders/descenders */
+  /* Evita jitter sulla baseline quando le scritture hanno ascendenti/discendenti diversi. */
   font-feature-settings: "ss01";
+  /* Trimma il leading tipografico del font (ascender/descender vuoti) cosi' il
+     bounding box del glifo coincide con il box CSS e la centratura su grid
+     riflette la massa visiva, non le metriche del font. Progressive
+     enhancement: i browser che non lo supportano cadono sul comportamento
+     precedente. */
+  text-box: trim-both cap alphabetic;
 }
 .glyph-codepoint {
   position: absolute;
