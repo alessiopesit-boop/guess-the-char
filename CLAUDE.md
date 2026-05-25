@@ -295,13 +295,30 @@ L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del p
 - `src/app/core/firebase/firebase.config.ts`: oggetto config pubblico (committato come placeholder, da riempire).
 - `src/app/core/firebase/firebase.ts`: `ensureFirebaseApp()` inizializza l'app idempotente; ritorna `null` se config = PLACEHOLDER (modalita' offline-only).
 - `src/app/core/firebase/auth.service.ts`: `AuthService` con signal `user` (`User | null | 'loading'`), `enabled` (boolean), metodi `signInEmail/signUpEmail/signInGoogle/signOut`. Quando `enabled === false` i metodi rigettano con `AuthDisabledError`.
+- `src/app/core/firebase/user-doc.service.ts`: `UserDocService` che sincronizza lo stato di gioco con `/users/{uid}` su Firestore quando l'utente e' loggato. Bootstrap-attivato (inject dummy in `App`). All'auth.user che diventa autenticato fa max-merge tra locale e cloud; ad ogni cambio di state mentre loggato, push debounced di 1s. Usa `firebase/firestore/lite` (no real-time, no offline persistence) per tenere il bundle sotto i 500kB.
 - `AppStateService` si abbona al signal `auth.user` via `effect`: a ogni cambio di stato Auth, riflette in `state.account` (uid, email, nickname seedato da `displayName` per Google, avatar 0 di default).
-- `firestore.rules`, `firebase.json`, `.firebaserc` alla root: config per `firebase deploy`. Schema corrente: `/users/{uid}` (stato gioco + anagrafica) e `/nicknames/{nick}` (indice unicita').
+- `firestore.rules`, `firebase.json`, `.firebaserc` alla root: config per `firebase deploy`. Schema corrente: `/users/{uid}` (stato gioco + anagrafica) e `/nicknames/{nick}` (indice unicita', non ancora popolato).
+
+### Cosa viene sincronizzato in cloud
+
+Quando l'utente e' loggato, `/users/{uid}` ospita:
+- `nickname`, `avatar`, `email`, `provider`, `joinedAt`, `updatedAt`
+- Contatori cumulativi: `streak`, `bestStreak`, `played`, `correctAnswers`, `accuracy`
+- `perScript: {[scriptId]: {tries, correct}}` (max-merge per scrittura tra device)
+- Sfida giornaliera: `dailyDone`, `dailyDoneStamp`, `dailyScore`, `dailyStreak`, `dailyHistory[]`
+
+NON sincronizzato (resta per device in `localStorage`): tutte le preferenze UI (`accent`, `motion`, `colorblind`, `sound`, `haptics`, `showCodepoint`), la selezione delle scritture (`selected`), e i flag di sessione (`hintsLeft`, `shownFirstWrong`, `onboarded`). Idea: ti ritrovi i progressi su un altro telefono, ma puoi avere un tema diverso senza che si propaghi.
+
+### Conflict resolution
+
+Al login iniziale, `UserDocService` legge il doc cloud e fa **max-merge** per i contatori cumulativi: cosi' se hai giocato su due device offline, accumuli i progressi su entrambi senza perderli. Per la giornaliera vince lo stamp piu' recente; `dailyHistory` viene unita per `day` (preferisce score piu' alto). Per `nickname`/`avatar` vince il cloud (sono scelte esplicite dell'utente).
+
+Le scritture successive durante la sessione fanno **full overwrite** del documento (con `setDoc({merge: true})` ma a livello field-shallow), perche' dopo il merge iniziale lo stato locale e' la fonte di verita' fino al prossimo login.
 
 ### Cosa NON e' ancora collegato
 
-- La sincronizzazione di `state` (campi gioco: streak, played, perScript, ecc.) con Firestore al cambio di `auth.user` non e' ancora implementata. Verra' in una PR dedicata. Per ora `state.account` viene popolato dall'Auth ma i progressi restano in `localStorage`.
-- Le route `/profile`, `/leaderboard`, `/u/:nickname` sono ancora `ComingSoon`. Le PR che le accendono usano gia' lo stato Auth (`AuthService.user()`) come fonte di verita'.
+- Le route `/profile`, `/leaderboard`, `/u/:nickname` sono ancora `ComingSoon`. Le PR che le accendono usano gia' lo stato Auth (`AuthService.user()`) come fonte di verita' e i progressi cloud da `/users/{uid}`.
+- Unicita' del nickname via `/nicknames/{nick}` non ancora applicata: il nickname viene seedato e basta, niente UI per cambiarlo (la pagina /profile vera lo permettera').
 
 ### Convenzioni
 

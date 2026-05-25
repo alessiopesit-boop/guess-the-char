@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/cor
 import { Title } from '@angular/platform-browser';
 import { NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { AppStateService } from './core/state/app-state.service';
+import { UserDocService } from './core/firebase/user-doc.service';
 import { ACCENT_PALETTES } from './core/state/types';
 import { BUILD_CONTEXT } from './core/build-info';
 
@@ -16,6 +17,9 @@ export class App {
   private readonly appState = inject(AppStateService);
   private readonly title = inject(Title);
   private readonly router = inject(Router);
+  /** Inject solo per bootstrap: il servizio si auto-attiva via effect su
+   *  auth.user e su state. Non lo usiamo direttamente qui. */
+  private readonly userDoc = inject(UserDocService);
 
   constructor() {
 
