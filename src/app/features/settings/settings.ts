@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
@@ -37,12 +37,6 @@ export class Settings {
   protected readonly cbModes: ReadonlyArray<ColorblindMode> = ['none', 'redgreen', 'blueyellow'];
   protected readonly langs: ReadonlyArray<Lang> = ['it', 'en'];
 
-  /** La card del codice di sincronizzazione e' chiusa per default; il tasto
-   *  "Mostra codice di sincronizzazione" la rivela. Una volta rivelata, il
-   *  codice viene generato in localStorage e resta stabile tra sessioni. */
-  protected readonly showSync = signal(false);
-  protected readonly syncCode = computed(() => (this.showSync() ? ensureSyncCode() : ''));
-
   /** Footer in fondo: in dev include l'hash, in release no. */
   protected readonly buildLabel =
     BUILD_CONTEXT === 'release' ? `v${APP_VERSION}` : `v${APP_VERSION} · dev · ${BUILD_SHA}`;
@@ -68,10 +62,6 @@ export class Settings {
   }
   protected toggleShowCodepoint(): void {
     this.appState.update({ showCodepoint: !this.state().showCodepoint });
-  }
-
-  protected revealSync(): void {
-    this.showSync.set(true);
   }
 
   protected goFeedback(): void {
@@ -140,28 +130,5 @@ export class Settings {
 
   protected goHome(): void {
     this.router.navigate(['/home']);
-  }
-}
-
-/**
- * Codice di sincronizzazione "mock" (8 caratteri, divisi 4-4, alfabeto safe
- * senza I/O/0/1). Persistito in localStorage cosi' che, una volta generato,
- * resta stabile tra sessioni come si comporterebbe un vero codice di pairing.
- * Sara' rimpiazzato dal vero meccanismo quando integreremo il BaaS.
- */
-function ensureSyncCode(): string {
-  try {
-    const cached = localStorage.getItem('gtc.sync');
-    if (cached) return cached;
-    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let raw = '';
-    for (let i = 0; i < 8; i++) {
-      raw += alphabet[Math.floor(Math.random() * alphabet.length)];
-    }
-    const code = `${raw.slice(0, 4)}-${raw.slice(4)}`;
-    localStorage.setItem('gtc.sync', code);
-    return code;
-  } catch {
-    return 'XXXX-XXXX';
   }
 }
