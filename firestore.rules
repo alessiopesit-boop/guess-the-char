@@ -33,5 +33,24 @@ service cloud.firestore {
       allow delete: if request.auth != null
                     && resource.data.uid == request.auth.uid;
     }
+
+    // /feedback/{auto-id}
+    // Write-only collection: chiunque (anche anonimo) puo' creare un
+    // documento di feedback, ma solo il proprietario del progetto puo'
+    // leggerlo (via Firebase Console). Validazione shape/lunghezza nei
+    // constraint sotto: titolo 3-80 char, corpo 8-600 char, kind in
+    // {bug, idea}. Niente update/delete dal client.
+    match /feedback/{id} {
+      allow read: if false;
+      allow create: if request.resource.data.kind in ['bug', 'idea']
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() >= 3
+                    && request.resource.data.title.size() <= 80
+                    && request.resource.data.body is string
+                    && request.resource.data.body.size() >= 8
+                    && request.resource.data.body.size() <= 600;
+      allow update: if false;
+      allow delete: if false;
+    }
   }
 }

@@ -62,7 +62,11 @@ export const routes: Routes = [
     canActivate: [onboardedGuard],
     loadComponent: () => import('./features/glyph-detail/glyph-detail').then((m) => m.GlyphDetail),
   },
-  { path: 'feedback',          canActivate: [onboardedGuard], loadComponent: comingSoon },
+  {
+    path: 'feedback',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/feedback/feedback').then((m) => m.Feedback),
+  },
 
   // Pagina di login vera, collegata a Firebase Auth. NO onboardedGuard:
   // deve essere accessibile anche prima dell'onboarding (es. dal banner della

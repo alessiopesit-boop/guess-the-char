@@ -57,6 +57,7 @@ src/
     features/               # una cartella per ogni schermata
       badges/
       daily-result/
+      feedback/
       game/
       glyph-detail/
       home/
@@ -303,8 +304,9 @@ L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del p
 - `src/app/core/firebase/nickname.service.ts`: `NicknameService` gestisce la collezione `/nicknames/{nick_lowercased}` per garantire l'unicita' del nickname. Metodi: `claim(nick, uid)` atomica via runTransaction, `change(oldNick, newNick, uid)` swap atomico (release vecchio + claim nuovo + update `/users/{uid}.nickname` in una sola transazione), `findAvailable(seed, uid)` cerca varianti seed/seed2/seed3/.../seed-rnd, `getUserByNickname(nick)` per il profilo pubblico.
 - `src/app/core/firebase/user-search.service.ts`: `UserSearchService` cerca utenti per nickname con tolleranza fuzzy (Levenshtein <=2). Carica la collezione `/nicknames` intera in cache (TTL 5 min) e fa filtering/ranking client-side: match esatto > prefisso > sottostringa > distanza 1 > distanza 2. Strategia OK fino a ~2000 utenti; oltre, conviene un indice esterno tipo Algolia.
 - `src/app/core/firebase/leaderboard.service.ts`: `LeaderboardService` legge la classifica da `/users`. Due viste: `daily` (filtra per `dailyDoneStamp == today`, sort `dailyScore` desc) e `alltime` (sort `correctAnswers` desc). Paginazione cursor-based via `startAfter`, page size 30. Niente cache: ogni cambio tab e ogni "Mostra altri" e' una fetch fresca.
+- `src/app/core/firebase/feedback.service.ts`: `FeedbackService` scrive nella collezione `/feedback`. Rate limit lato client via localStorage (`gtc.feedback.history`), massimo 3 submission nelle ultime 24h. Le regole Firestore impongono shape e lunghezza dei campi (titolo 3-80, corpo 8-600, kind in bug/idea). Le submission sono read-only dal client: le leggi tu dalla Firebase Console.
 - `AppStateService` si abbona al signal `auth.user` via `effect`: a ogni cambio di stato Auth, riflette in `state.account` (uid, email, nickname seedato da `displayName` per Google, avatar 0 di default).
-- `firestore.rules`, `firebase.json`, `.firebaserc` alla root: config per `firebase deploy`. Schema corrente: `/users/{uid}` (stato gioco + anagrafica) e `/nicknames/{nick}` (indice unicita', non ancora popolato).
+- `firestore.rules`, `firebase.json`, `.firebaserc` alla root: config per `firebase deploy`. Schema corrente: `/users/{uid}` (stato gioco + anagrafica), `/nicknames/{nick}` (indice unicita'), `/feedback/{auto-id}` (write-only feedback dei giocatori).
 
 ### Cosa viene sincronizzato in cloud
 

@@ -1,0 +1,145 @@
+<div class="app-shell">
+  <app-bar [canBack]="true"
+           [title]="i18n.lang() === 'it' ? 'Feedback' : 'Feedback'"
+           (back)="goBack()"
+           (goHome)="goHome()" />
+
+  <div class="page fb-page">
+    @if (submitted()) {
+      <!-- Stato di successo: tick verde grande + titolo + bottoni. -->
+      <div class="fb-success">
+        <div class="fb-success-tick" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12l5 5L20 7"/>
+          </svg>
+        </div>
+        <h2 class="h2">{{ i18n.lang() === 'it' ? 'Grazie!' : 'Thanks!' }}</h2>
+        <p class="muted">
+          {{ i18n.lang() === 'it'
+            ? 'Il tuo feedback e\' arrivato. Lo leggero\' presto.'
+            : 'Your feedback has arrived. I\'ll read it soon.' }}
+        </p>
+        <div class="fb-success-actions">
+          @if (remaining() > 0) {
+            <button class="btn btn-ghost" type="button" (click)="sendAnother()">
+              {{ i18n.lang() === 'it' ? 'Mandane un altro' : 'Send another' }}
+            </button>
+          }
+          <button class="btn btn-primary" type="button" (click)="goHome()">
+            {{ i18n.lang() === 'it' ? 'Torna alla home' : 'Back to home' }}
+          </button>
+        </div>
+      </div>
+    } @else {
+      <h2 class="h2 fb-title">
+        {{ i18n.lang() === 'it' ? 'Aiuta a migliorare' : 'Help me improve' }}
+      </h2>
+      <p class="muted fb-sub">
+        {{ i18n.lang() === 'it'
+          ? 'Trovi un bug o hai un\'idea? Mandala qui sotto.'
+          : 'Found a bug or have an idea? Send it below.' }}
+      </p>
+
+      <!-- Switch bug / idea: identico al pattern .seg degli altri toggle. -->
+      <div class="seg fb-kind">
+        <button type="button" class="seg-btn"
+                [class.is-active]="kind() === 'bug'"
+                (click)="setKind('bug')">
+          <span aria-hidden="true">🐞</span>
+          {{ i18n.lang() === 'it' ? 'Segnala bug' : 'Report bug' }}
+        </button>
+        <button type="button" class="seg-btn"
+                [class.is-active]="kind() === 'idea'"
+                (click)="setKind('idea')">
+          <span aria-hidden="true">💡</span>
+          {{ i18n.lang() === 'it' ? 'Suggerisci idea' : 'Suggest idea' }}
+        </button>
+      </div>
+
+      <form class="fb-form" (ngSubmit)="submit()">
+        <label class="fb-field">
+          <span class="fb-field-label">
+            @if (kind() === 'bug') {
+              {{ i18n.lang() === 'it' ? 'Cosa e\' andato storto?' : 'What went wrong?' }}
+            } @else {
+              {{ i18n.lang() === 'it' ? 'In una riga, qual e\' l\'idea?' : 'In one line, what\'s the idea?' }}
+            }
+          </span>
+          <input class="input-field"
+                 type="text"
+                 [ngModel]="title()"
+                 (ngModelChange)="setTitle($event)"
+                 maxlength="80"
+                 minlength="3"
+                 name="fbTitle"
+                 [placeholder]="titlePlaceholder()" />
+        </label>
+
+        <label class="fb-field">
+          <span class="fb-field-label">
+            {{ i18n.lang() === 'it' ? 'Dettagli' : 'Details' }}
+          </span>
+          <textarea class="input-field fb-textarea"
+                    rows="5"
+                    maxlength="600"
+                    minlength="8"
+                    [ngModel]="body()"
+                    (ngModelChange)="setBody($event)"
+                    name="fbBody"
+                    [placeholder]="bodyPlaceholder()"></textarea>
+          <span class="fb-counter mono">{{ body().length }}/600</span>
+        </label>
+
+        @if (!appState.state().account) {
+          <label class="fb-field">
+            <span class="fb-field-label">
+              {{ i18n.lang() === 'it' ? 'Email (opzionale, per ricontatto)' : 'Email (optional, for follow-up)' }}
+            </span>
+            <input class="input-field"
+                   type="email"
+                   [ngModel]="email()"
+                   (ngModelChange)="setEmail($event)"
+                   name="fbEmail"
+                   placeholder="tu@esempio.it" />
+          </label>
+        }
+
+        <!-- Cosa includo: metadata tecnica raccolta in automatico. -->
+        <details class="fb-meta">
+          <summary>
+            {{ i18n.lang() === 'it' ? 'Cosa includo' : 'What I include' }}
+          </summary>
+          <pre class="mono fb-meta-pre">{{ metaPreview() }}</pre>
+        </details>
+
+        @if (error(); as e) {
+          <p class="fb-error" role="alert">{{ e }}</p>
+        }
+
+        @if (remaining() === 0) {
+          <p class="muted fb-rate-warning">
+            {{ i18n.lang() === 'it'
+              ? 'Hai esaurito le 3 segnalazioni giornaliere. Riprova domani.'
+              : 'You\'ve used your 3 daily reports. Try again tomorrow.' }}
+          </p>
+        } @else {
+          <p class="muted fb-rate-hint">
+            {{ i18n.lang() === 'it'
+              ? 'Puoi inviare ancora ' + remaining() + ' feedback oggi.'
+              : 'You can send ' + remaining() + ' more feedback today.' }}
+          </p>
+        }
+
+        <button class="btn btn-primary btn-block fb-submit"
+                type="submit"
+                [disabled]="!canSubmit()">
+          @if (busy()) {
+            {{ i18n.lang() === 'it' ? 'Invio...' : 'Sending...' }}
+          } @else {
+            {{ i18n.lang() === 'it' ? 'Invia' : 'Send' }}
+          }
+        </button>
+      </form>
+    }
+  </div>
+</div>
