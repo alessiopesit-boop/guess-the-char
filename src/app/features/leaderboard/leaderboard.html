@@ -1,0 +1,114 @@
+<div class="app-shell">
+  <app-bar [canBack]="true"
+           [title]="i18n.t('leaderboard')"
+           (back)="goBack()"
+           (goHome)="goHome()" />
+
+  <div class="page lb-page">
+    <!-- Tab switch: solo Daily e Alltime per ora. Weekly/Monthly verra' quando
+         tracceremo i contatori a finestra temporale. -->
+    <div class="lb-tabs">
+      <button class="lb-tab" type="button"
+              [class.is-active]="period() === 'daily'"
+              (click)="setPeriod('daily')">
+        {{ i18n.lang() === 'it' ? 'Giornaliera' : 'Daily' }}
+      </button>
+      <button class="lb-tab" type="button"
+              [class.is-active]="period() === 'alltime'"
+              (click)="setPeriod('alltime')">
+        {{ i18n.lang() === 'it' ? 'Tutti i tempi' : 'All time' }}
+      </button>
+    </div>
+
+    @if (!appState.state().account) {
+      <div class="card lb-signin-card">
+        <div class="lb-signin-text">
+          {{ i18n.lang() === 'it'
+            ? 'Accedi per comparire in classifica.'
+            : 'Sign in to appear on the leaderboard.' }}
+        </div>
+        <button class="btn btn-primary lb-signin-btn" type="button" (click)="goLogin()">
+          {{ i18n.t('login') }}
+        </button>
+      </div>
+    }
+
+    <div class="lb-head">
+      <span class="lb-head-rank">#</span>
+      <span class="lb-head-player">
+        {{ i18n.lang() === 'it' ? 'Giocatore' : 'Player' }}
+      </span>
+      <span class="lb-head-score">
+        {{ i18n.lang() === 'it' ? 'Punti' : 'Score' }}
+      </span>
+    </div>
+
+    @if (loading()) {
+      <div class="lb-loading">
+        <span class="lb-spinner" aria-label="loading"></span>
+      </div>
+    } @else if (error(); as e) {
+      <div class="lb-error">
+        <p class="muted">{{ e }}</p>
+        <button class="btn btn-ghost" type="button" (click)="retry()">
+          {{ i18n.lang() === 'it' ? 'Riprova' : 'Retry' }}
+        </button>
+      </div>
+    } @else if (rows().length === 0) {
+      <div class="lb-empty">
+        <span class="lb-empty-glyph" aria-hidden="true">∅</span>
+        <p class="muted">
+          @if (period() === 'daily') {
+            {{ i18n.lang() === 'it'
+              ? 'Nessuno ha ancora completato la sfida di oggi. Sii il primo!'
+              : 'No one has completed today\'s challenge yet. Be the first!' }}
+          } @else {
+            {{ i18n.lang() === 'it'
+              ? 'Nessuna classifica ancora. I primi giocatori la stanno costruendo.'
+              : 'No leaderboard yet. The first players are building it.' }}
+          }
+        </p>
+      </div>
+    } @else {
+      <div class="lb-rows">
+        @for (r of rows(); track r.uid; let i = $index) {
+          <button class="lb-row"
+                  [class.is-self]="r.uid === myUid()"
+                  type="button"
+                  (click)="openProfile(r.nickname)">
+            <span class="lb-row-rank">
+              @if (medal(i + 1); as m) {
+                <span class="lb-row-medal">{{ m }}</span>
+              } @else {
+                {{ i + 1 }}
+              }
+            </span>
+            <span class="lb-row-player">
+              <span class="lb-row-avatar" [class.accent]="r.uid === myUid()">
+                {{ (r.nickname || '?').charAt(0).toUpperCase() }}
+              </span>
+              <span class="lb-row-nick">{{ r.nickname }}</span>
+              @if (r.uid === myUid()) {
+                <span class="lb-row-you">{{ i18n.lang() === 'it' ? 'tu' : 'you' }}</span>
+              }
+            </span>
+            <span class="lb-row-score mono">{{ formatScore(r.score, period()) }}</span>
+          </button>
+        }
+      </div>
+
+      @if (hasMore()) {
+        <button class="btn btn-ghost btn-block lb-more"
+                type="button"
+                [disabled]="loadingMore()"
+                (click)="loadMore()">
+          @if (loadingMore()) {
+            <span class="lb-spinner lb-spinner-inline" aria-label="loading"></span>
+          } @else {
+            {{ i18n.lang() === 'it' ? 'Mostra altri' : 'Show more' }}
+          }
+        </button>
+      }
+    }
+  </div>
+</div>

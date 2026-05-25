@@ -60,13 +60,17 @@
           }
         }
       </span>
-      <button
-        class="hint-btn"
-        type="button"
-        [disabled]="chosen() !== null || hintsLeft() <= 0"
-        (click)="useHint()"
-        aria-label="Use hint"
-      >💡<span class="mono tabnum hint-count">{{ hintsLeft() }}</span></button>
+      @if ((question()?.options?.length ?? 0) >= 3) {
+        <!-- Nascosto se opzioni < 3: l'hint nasconde 1 distrattore, e con sole
+             2 opzioni rivelerebbe la risposta (inutile). -->
+        <button
+          class="hint-btn"
+          type="button"
+          [disabled]="chosen() !== null || hintsLeft() <= 0"
+          (click)="useHint()"
+          aria-label="Use hint"
+        >💡<span class="mono tabnum hint-count">{{ hintsLeft() }}</span></button>
+      }
     </div>
 
     @if (question(); as q) {

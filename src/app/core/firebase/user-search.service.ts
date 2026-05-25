@@ -83,25 +83,37 @@ export interface NicknameEntry {
 
 /**
  * Calcola uno score di rilevanza tra query e nickname. Score piu' basso = match
- * migliore.
- *   0  - match esatto
- *   1  - nickname inizia con la query
- *   2  - nickname contiene la query come sottostringa
- *   3+ - distanza Levenshtein (3 = 1 errore, 4 = 2 errori)
- * Tutto oltre 2 errori viene scartato.
+ * migliore. Cerchiamo SOLO match dall'inizio del nickname (start-with), con
+ * tolleranza fuzzy crescente al crescere della query:
+ *   - query 2 char: solo prefisso esatto (fuzzy a 2 errori su 2 char e' troppo
+ *     lassa, "im" troverebbe "ab" che ha 2 errori)
+ *   - query 3 char: prefisso esatto o 1 errore di battitura sui primi 3 char
+ *   - query 4+ char: prefisso esatto o fino a 2 errori di battitura
+ *
+ * Score:
+ *   0 - match esatto sull'intero nickname
+ *   1 - prefisso esatto (nickname inizia con la query alla lettera)
+ *   2 - prefisso con 1 errore
+ *   3 - prefisso con 2 errori
  */
 function rankMatches(all: NicknameEntry[], q: string): NicknameEntry[] {
+  const maxErrors = Math.max(0, q.length - 2);
   const scored: Array<{ entry: NicknameEntry; score: number }> = [];
   for (const e of all) {
     const n = e.nick; // gia' lowercased (e' la doc ID)
     let score: number;
-    if (n === q) score = 0;
-    else if (n.startsWith(q)) score = 1;
-    else if (n.includes(q)) score = 2;
-    else {
-      const d = levenshtein(q, n);
-      if (d > 2) continue;
-      score = 2 + d;
+    if (n === q) {
+      score = 0;
+    } else if (n.startsWith(q)) {
+      score = 1;
+    } else if (n.length >= q.length && maxErrors > 0) {
+      // Confronta solo i primi q.length caratteri di n con q: l'utente sta
+      // digitando l'inizio del nickname.
+      const d = levenshtein(q, n.slice(0, q.length));
+      if (d > maxErrors) continue;
+      score = 1 + d;
+    } else {
+      continue;
     }
     scored.push({ entry: e, score });
   }
