@@ -2,62 +2,119 @@
   <app-bar [canBack]="true" [title]="i18n.t('settings')" (back)="goBack()" (goHome)="goHome()" />
 
   <div class="page settings-page">
-    <section class="settings-section">
-      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Lingua' : 'Language' }}</h3>
-      <div class="seg">
-        @for (l of langs; track l) {
-          <button class="seg-btn" type="button" [class.is-active]="i18n.lang() === l" (click)="setLang(l)">
-            {{ l === 'it' ? 'Italiano' : 'English' }}
-          </button>
-        }
-      </div>
-    </section>
+    <!-- Card account: stato connesso vs anonimo. Per ora solo il caso "non
+         connesso" e' realmente raggiungibile (la pagina /login viene aggiunta
+         in PR 3). Quando ci sara' un account vero, la card mostra avatar,
+         nickname e link al profilo. -->
+    <div class="card account-card">
+      @if (state().account; as a) {
+        <span class="account-avatar accent">{{ a.nickname.charAt(0).toUpperCase() }}</span>
+        <div class="account-meta">
+          <span class="account-name">{{ a.nickname }}</span>
+          <span class="account-sub mono">{{ a.email }}</span>
+        </div>
+        <button class="nav-btn" type="button" (click)="goProfile()">
+          {{ i18n.t('profile') }}
+        </button>
+      } @else {
+        <span class="account-avatar">
+          <app-icon name="user" />
+        </span>
+        <div class="account-meta">
+          <span class="account-name">
+            {{ i18n.lang() === 'it' ? 'Non connesso' : 'Not signed in' }}
+          </span>
+          <span class="account-sub">
+            {{ i18n.lang() === 'it' ? 'I dati restano su questo dispositivo' : 'Data stays on this device' }}
+          </span>
+        </div>
+        <button class="btn btn-primary account-cta" type="button" (click)="goLogin()">
+          {{ i18n.t('login') }}
+        </button>
+      }
+    </div>
 
-    <section class="settings-section">
-      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Colore accent' : 'Accent color' }}</h3>
-      <div class="swatches">
-        @for (a of accents; track a.accent) {
-          <button
-            class="swatch"
-            type="button"
-            [class.is-active]="state().accent === a.accent"
-            [style.background]="a.accent"
-            [attr.aria-label]="a.name"
-            (click)="setAccent(a.accent)"
-          >
-            @if (state().accent === a.accent) {
-              <app-icon name="check" />
-            }
-          </button>
-        }
+    <h3 class="h3 section-h">{{ i18n.lang() === 'it' ? 'Aspetto' : 'Appearance' }}</h3>
+    <div class="settings-section">
+      <div class="setting-row">
+        <div class="setting-row-head">
+          <div class="setting-row-label">{{ i18n.lang() === 'it' ? 'Colore di accento' : 'Accent color' }}</div>
+          <div class="setting-row-sub muted">
+            {{ i18n.lang() === 'it' ? 'Tinta principale usata su pulsanti, pillole e dettagli.' : 'Main hue used across buttons, pills and highlights.' }}
+          </div>
+        </div>
+        <div class="swatches">
+          @for (a of accents; track a.accent) {
+            <button
+              class="swatch"
+              type="button"
+              [class.is-active]="state().accent === a.accent"
+              [style.background]="a.accent"
+              [attr.aria-label]="a.name"
+              (click)="setAccent(a.accent)"
+            >
+              @if (state().accent === a.accent) {
+                <app-icon name="check" />
+              }
+            </button>
+          }
+        </div>
       </div>
-    </section>
 
-    <section class="settings-section">
-      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Animazioni' : 'Motion' }}</h3>
-      <div class="seg">
-        @for (m of motions; track m) {
-          <button class="seg-btn" type="button" [class.is-active]="state().motion === m" (click)="setMotion(m)">
-            {{ motionLabel(m) }}
-          </button>
-        }
+      <div class="setting-row">
+        <div class="setting-row-head">
+          <div class="setting-row-label">{{ i18n.lang() === 'it' ? 'Animazioni' : 'Motion' }}</div>
+          <div class="setting-row-sub muted">
+            {{ i18n.lang() === 'it' ? 'Quantita’ di animazioni in tutta l’app.' : 'How much movement across the app.' }}
+          </div>
+        </div>
+        <div class="seg">
+          @for (m of motions; track m) {
+            <button class="seg-btn" type="button" [class.is-active]="state().motion === m" (click)="setMotion(m)">
+              {{ motionLabel(m) }}
+            </button>
+          }
+        </div>
+        <p class="muted motion-hint">{{ motionHint(state().motion) }}</p>
       </div>
-      <p class="muted motion-hint">{{ motionHint(state().motion) }}</p>
-    </section>
+    </div>
 
-    <section class="settings-section">
-      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Accessibilita' : 'Accessibility' }}</h3>
-      <div class="seg">
-        @for (m of cbModes; track m) {
-          <button class="seg-btn" type="button" [class.is-active]="state().colorblind === m" (click)="setColorblind(m)">
-            {{ cbLabel(m) }}
-          </button>
-        }
+    <h3 class="h3 section-h">{{ i18n.lang() === 'it' ? 'Accessibilita’' : 'Accessibility' }}</h3>
+    <div class="settings-section">
+      <div class="setting-row">
+        <div class="setting-row-head">
+          <div class="setting-row-label">{{ i18n.lang() === 'it' ? 'Visione a colori' : 'Color vision' }}</div>
+          <div class="setting-row-sub muted">
+            {{ i18n.lang() === 'it'
+              ? 'Adatta i colori di feedback per chi e’ daltonico.'
+              : 'Adjusts feedback colors for color-blind users.' }}
+          </div>
+        </div>
+        <div class="seg">
+          @for (m of cbModes; track m) {
+            <button class="seg-btn" type="button" [class.is-active]="state().colorblind === m" (click)="setColorblind(m)">
+              {{ cbLabel(m) }}
+            </button>
+          }
+        </div>
       </div>
-    </section>
+    </div>
 
-    <section class="settings-section">
-      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Audio e feedback' : 'Audio and feedback' }}</h3>
+    <h3 class="h3 section-h">{{ i18n.lang() === 'it' ? 'Preferenze' : 'Preferences' }}</h3>
+    <div class="settings-section">
+      <div class="setting-row">
+        <div class="setting-row-head">
+          <div class="setting-row-label">{{ i18n.lang() === 'it' ? 'Lingua' : 'Language' }}</div>
+        </div>
+        <div class="seg">
+          @for (l of langs; track l) {
+            <button class="seg-btn" type="button" [class.is-active]="i18n.lang() === l" (click)="setLang(l)">
+              {{ l === 'it' ? 'Italiano' : 'English' }}
+            </button>
+          }
+        </div>
+      </div>
+
       <label class="toggle-row">
         <span class="toggle-label">{{ i18n.lang() === 'it' ? 'Suoni' : 'Sounds' }}</span>
         <input type="checkbox" class="toggle-input" [checked]="state().sound" (change)="toggleSound()" />
@@ -67,28 +124,73 @@
         <input type="checkbox" class="toggle-input" [checked]="state().haptics" (change)="toggleHaptics()" />
       </label>
       <label class="toggle-row">
-        <span>
-          <span class="toggle-label">{{ i18n.lang() === 'it' ? 'Mostra codice Unicode' : 'Show Unicode codepoint' }}</span>
+        <span class="toggle-text">
+          <span class="toggle-label">{{ i18n.lang() === 'it' ? 'Mostra Unicode' : 'Show Unicode' }}</span>
           <span class="toggle-sub muted">
-            {{ i18n.lang() === 'it' ? 'Sotto al glifo del quiz appare sempre il codice U+XXXX.' : 'The U+XXXX codepoint appears under each quiz glyph.' }}
+            {{ i18n.lang() === 'it' ? 'Codepoint sotto il glifo durante il gioco.' : 'Codepoint under the glyph during play.' }}
           </span>
         </span>
         <input type="checkbox" class="toggle-input" [checked]="state().showCodepoint" (change)="toggleShowCodepoint()" />
       </label>
-    </section>
+    </div>
 
-    <section class="settings-section">
-      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Aiuto' : 'Help' }}</h3>
-      <button class="btn btn-ghost btn-block" type="button" (click)="replayOnboarding()">
-        {{ i18n.lang() === 'it' ? 'Rivedi la presentazione' : 'Replay the intro' }}
+    <hr class="settings-divider" />
+
+    <h3 class="h3 section-h">{{ i18n.lang() === 'it' ? 'Aiuto' : 'Help' }}</h3>
+    <div class="settings-section">
+      <button class="help-btn" type="button" (click)="goFeedback()">
+        <span class="help-emoji">💬</span>
+        <span class="help-label">
+          {{ i18n.lang() === 'it' ? 'Segnala bug o suggerisci un’idea' : 'Report a bug or suggest an idea' }}
+        </span>
+        <app-icon name="chev" />
       </button>
-    </section>
+      <button class="help-btn" type="button" (click)="replayOnboarding()">
+        <span class="help-emoji">🎬</span>
+        <span class="help-label">
+          {{ i18n.lang() === 'it' ? 'Rivedi la presentazione' : 'Replay the intro' }}
+        </span>
+        <app-icon name="chev" />
+      </button>
+    </div>
 
-    <section class="settings-section">
-      <h3 class="h3">{{ i18n.lang() === 'it' ? 'Dati' : 'Data' }}</h3>
+    <hr class="settings-divider" />
+
+    <h3 class="h3 section-h">{{ i18n.lang() === 'it' ? 'Dati' : 'Data' }}</h3>
+    <div class="settings-section">
+      <p class="muted data-blurb">
+        @if (state().account) {
+          {{ i18n.lang() === 'it'
+            ? 'I tuoi dati vengono sincronizzati col tuo account.'
+            : 'Your data syncs with your account.' }}
+        } @else {
+          {{ i18n.lang() === 'it'
+            ? 'I tuoi progressi sono salvati solo su questo dispositivo.'
+            : 'Your progress is stored on this device only.' }}
+        }
+      </p>
+
+      @if (!showSync()) {
+        <button class="btn btn-ghost btn-block" type="button" (click)="revealSync()">
+          {{ i18n.lang() === 'it' ? 'Mostra codice di sincronizzazione' : 'Show sync code' }}
+        </button>
+      } @else {
+        <div class="card sync-card">
+          <span class="eyebrow">
+            {{ i18n.lang() === 'it' ? 'CODICE DI SINCRONIZZAZIONE' : 'SYNC CODE' }}
+          </span>
+          <div class="sync-code mono">{{ syncCode() }}</div>
+          <p class="muted sync-foot">
+            {{ i18n.lang() === 'it' ? 'Funzione in arrivo · placeholder' : 'Coming soon · placeholder' }}
+          </p>
+        </div>
+      }
+
       <button class="btn btn-ghost btn-block reset-btn" type="button" (click)="resetProgress()">
-        {{ i18n.lang() === 'it' ? 'Resetta tutti i progressi' : 'Reset all progress' }}
+        {{ i18n.lang() === 'it' ? 'Azzera progressi' : 'Reset progress' }}
       </button>
-    </section>
+    </div>
+
+    <p class="settings-footer mono">{{ buildLabel }} · static · offline-ready</p>
   </div>
 </div>
