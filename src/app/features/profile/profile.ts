@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
 import { AuthService } from '../../core/firebase/auth.service';
+import { NicknameService } from '../../core/firebase/nickname.service';
 import { AVATARS, avatarById } from '../../core/data/avatars';
 import { scriptById } from '../../core/data/scripts';
 import { computeBadges } from '../../core/data/badges';
@@ -25,6 +26,7 @@ export class Profile {
   protected readonly i18n = inject(I18nService);
   protected readonly appState = inject(AppStateService);
   private readonly authSvc = inject(AuthService);
+  private readonly nicknames = inject(NicknameService);
 
   protected readonly state = this.appState.state;
   protected readonly avatars = AVATARS;
@@ -35,6 +37,8 @@ export class Profile {
   /** Editor inline del nickname: input + tasto OK. */
   protected readonly editingNick = signal(false);
   protected readonly nickDraft = signal('');
+  /** Stato del salvataggio nickname: 'idle' | 'saving' | 'taken'. */
+  protected readonly nickStatus = signal<'idle' | 'saving' | 'taken'>('idle');
 
   /** Modale di scelta avatar. `pendingAvatar` tiene la selezione provvisoria
    *  mentre la modale e' aperta: l'utente puo' cliccare avatar diversi per
@@ -100,18 +104,49 @@ export class Profile {
     const a = this.account();
     if (!a) return;
     this.nickDraft.set(a.nickname);
+    this.nickStatus.set('idle');
     this.editingNick.set(true);
   }
 
-  protected saveNick(): void {
+  /** Salva il nuovo nickname: lo claima atomicamente su Firestore via
+   *  NicknameService. Se gia' preso, mostra "taken" come stato e l'utente puo'
+   *  cambiarne uno diverso senza chiudere l'editor. */
+  protected async saveNick(): Promise<void> {
     const v = this.nickDraft().trim();
-    if (v.length < 2 || v.length > 24) return;
-    this.appState.updateAccount({ nickname: v });
-    this.editingNick.set(false);
+    const a = this.account();
+    if (!a || v.length < 2 || v.length > 24) return;
+    if (v === a.nickname) {
+      this.editingNick.set(false);
+      return;
+    }
+    this.nickStatus.set('saving');
+    try {
+      const r = await this.nicknames.change(a.nickname, v, a.uid);
+      if (r === 'taken') {
+        this.nickStatus.set('taken');
+        return;
+      }
+      // OK: la transazione ha gia' aggiornato /users/{uid}.nickname su cloud.
+      // Aggiorniamo anche lo stato locale per la UI immediata.
+      this.appState.updateAccount({ nickname: v });
+      this.nickStatus.set('idle');
+      this.editingNick.set(false);
+    } catch (e) {
+      console.warn('[nickname] change error:', e);
+      this.nickStatus.set('idle');
+    }
   }
 
   protected cancelEditNick(): void {
     this.editingNick.set(false);
+    this.nickStatus.set('idle');
+  }
+
+  /** Quando l'utente edita il draft dopo un "taken", torniamo a 'idle' per
+   *  rimuovere il messaggio d'errore e permettere un nuovo salva. */
+  protected setNickDraft(v: string): void {
+    this.nickDraft.set(v);
+    if (this.nickStatus() === 'taken') this.nickStatus.set('idle');
   }
 
   protected openAvatarPicker(): void {

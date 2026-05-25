@@ -1,0 +1,213 @@
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { Location } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs/operators';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { AppStateService } from '../../core/state/app-state.service';
+import { NicknameService } from '../../core/firebase/nickname.service';
+import { avatarById } from '../../core/data/avatars';
+import { BadgeWithProgress, computeBadges } from '../../core/data/badges';
+import { ScriptInfo, scriptById } from '../../core/data/scripts';
+import { AppBar } from '../../shared/app-bar';
+import { AppState, DEFAULT_STATE } from '../../core/state/types';
+
+/**
+ * Profilo pubblico mostrato a `/u/:nickname`. Funziona sia per il proprio
+ * profilo (mostra "tu" + tasto Condividi) sia per quello di altri utenti
+ * (mostra CTA "Gioca anche tu"). Legge da Firestore via NicknameService;
+ * niente real-time, una sola fetch all'ingresso (e su cambio param).
+ */
+@Component({
+  selector: 'app-public-profile',
+  imports: [AppBar],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './public-profile.html',
+  styleUrl: './public-profile.css',
+})
+export class PublicProfile {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly location = inject(Location);
+  protected readonly i18n = inject(I18nService);
+  protected readonly appState = inject(AppStateService);
+  private readonly nicknames = inject(NicknameService);
+
+  /** Param `:nickname` dalla rotta, in formato URL-encoded come arriva. */
+  protected readonly nickname = toSignal(
+    this.route.paramMap.pipe(map((p) => p.get('nickname') ?? '')),
+    { initialValue: '' },
+  );
+
+  protected readonly loading = signal(false);
+  protected readonly notFound = signal(false);
+  protected readonly profile = signal<PublicProfileData | null>(null);
+  protected readonly copyFlash = signal(false);
+
+  protected readonly isSelf = computed(() => {
+    const p = this.profile();
+    const me = this.appState.state().account?.uid;
+    return !!(p && me && p.uid === me);
+  });
+
+  protected readonly profileUrl = computed(() => {
+    if (typeof window === 'undefined') return '';
+    return `${window.location.origin}${window.location.pathname.replace(/\/u\/.*$/, '')}/u/${this.nickname()}`;
+  });
+
+  protected readonly avatarGlyph = computed(() => {
+    return avatarById(this.profile()?.avatar ?? 0).glyph;
+  });
+
+  protected readonly joinedLabel = computed(() => {
+    const ts = this.profile()?.joinedAt;
+    if (!ts) return '';
+    // Firestore Timestamp ha .toDate(); fallback a stringa ISO.
+    let d: Date;
+    if (typeof (ts as { toDate?: () => Date })?.toDate === 'function') {
+      d = (ts as { toDate: () => Date }).toDate();
+    } else if (typeof ts === 'string') {
+      d = new Date(ts);
+    } else {
+      return '';
+    }
+    if (Number.isNaN(d.getTime())) return '';
+    const locale = this.i18n.lang() === 'it' ? 'it-IT' : 'en-GB';
+    return d.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+  });
+
+  constructor() {
+    // Quando cambia il nickname nell'URL (o al primo entry) facciamo fetch.
+    effect(() => {
+      const n = this.nickname();
+      if (!n) return;
+      this.loading.set(true);
+      this.notFound.set(false);
+      this.profile.set(null);
+      void this.fetch(n);
+    });
+  }
+
+  private async fetch(nick: string): Promise<void> {
+    try {
+      const doc = await this.nicknames.getUserByNickname(nick);
+      if (!doc) {
+        this.notFound.set(true);
+        return;
+      }
+      // Ricostruisce un AppState parziale per usare computeBadges sui dati cloud.
+      const stateForBadges: AppState = {
+        ...DEFAULT_STATE,
+        streak: (doc as Record<string, number>)['streak'] ?? 0,
+        bestStreak: (doc as Record<string, number>)['bestStreak'] ?? 0,
+        played: (doc as Record<string, number>)['played'] ?? 0,
+        correctAnswers: (doc as Record<string, number>)['correctAnswers'] ?? 0,
+        accuracy: (doc as Record<string, number>)['accuracy'] ?? 0,
+        perScript: (doc as Record<string, AppState['perScript']>)['perScript'] ?? {},
+        dailyDone: (doc as Record<string, boolean>)['dailyDone'] ?? false,
+        dailyDoneStamp: (doc as Record<string, string | null>)['dailyDoneStamp'] ?? null,
+        dailyScore: (doc as Record<string, number>)['dailyScore'] ?? 0,
+        dailyStreak: (doc as Record<string, number>)['dailyStreak'] ?? 0,
+        dailyHistory: (doc as Record<string, AppState['dailyHistory']>)['dailyHistory'] ?? [],
+      };
+      const allBadges = computeBadges(stateForBadges);
+      const unlockedBadges = allBadges.filter((b) => b.unlocked);
+      // Stats per-scrittura calcolate dai perScript cloud, ordinate per
+      // accuratezza desc (come nella propria pagina /profilo).
+      const scriptStats = Object.entries(stateForBadges.perScript)
+        .map(([id, v]) => ({
+          id,
+          tries: v.tries,
+          correct: v.correct,
+          acc: v.tries > 0 ? Math.round((100 * v.correct) / v.tries) : 0,
+          script: scriptById(id),
+        }))
+        .filter((e): e is typeof e & { script: ScriptInfo } =>
+          e.tries >= 1 && e.script != null,
+        )
+        .sort((a, b) => b.acc - a.acc);
+      this.profile.set({
+        uid: doc.uid,
+        nickname: (doc as Record<string, string>)['nickname'] ?? nick,
+        avatar: (doc as Record<string, number>)['avatar'] ?? 0,
+        joinedAt: doc['joinedAt'],
+        bestStreak: stateForBadges.bestStreak,
+        accuracy: stateForBadges.accuracy,
+        played: stateForBadges.played,
+        dailyStreak: stateForBadges.dailyStreak,
+        unlockedBadges,
+        totalBadges: allBadges.length,
+        scriptStats,
+      });
+    } catch (e) {
+      console.warn('[public-profile] fetch error:', e);
+      this.notFound.set(true);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  protected async share(): Promise<void> {
+    const url = this.profileUrl();
+    const p = this.profile();
+    if (!url || !p) return;
+    const text =
+      this.i18n.lang() === 'it'
+        ? `${p.nickname} su Indovina il carattere`
+        : `${p.nickname} on Guess the Char`;
+    try {
+      if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+        await navigator.share({ url, text });
+        return;
+      }
+    } catch {
+      // Utente ha annullato lo share sheet: ignoriamo silenziosamente.
+    }
+    // Fallback: copia negli appunti.
+    try {
+      await navigator.clipboard.writeText(url);
+      this.copyFlash.set(true);
+      setTimeout(() => this.copyFlash.set(false), 1600);
+    } catch {
+      // ignore
+    }
+  }
+
+  protected goPlay(): void {
+    this.router.navigate(['/home']);
+  }
+
+  protected accLevel(pct: number): 'good' | 'mid' | 'bad' {
+    if (pct >= 75) return 'good';
+    if (pct >= 40) return 'mid';
+    return 'bad';
+  }
+
+  protected goBack(): void {
+    this.location.back();
+  }
+
+  protected goHome(): void {
+    this.router.navigate(['/home']);
+  }
+}
+
+interface PublicProfileData {
+  uid: string;
+  nickname: string;
+  avatar: number;
+  joinedAt: unknown;
+  bestStreak: number;
+  accuracy: number;
+  played: number;
+  dailyStreak: number;
+  unlockedBadges: BadgeWithProgress[];
+  totalBadges: number;
+  scriptStats: Array<{
+    id: string;
+    tries: number;
+    correct: number;
+    acc: number;
+    script: ScriptInfo;
+  }>;
+}

@@ -1,0 +1,196 @@
+.pub-page {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 32px;
+}
+
+.pub-loading {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.pub-notfound {
+  text-align: center;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.pub-notfound .muted {
+  max-width: 320px;
+  font-size: 14px;
+}
+
+/* Hero: avatar grande 96px + nickname + joined date, centrati. */
+.pub-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+.pub-avatar {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  font-family: var(--font-glyph);
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+.pub-avatar.accent {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: transparent;
+}
+.pub-nick {
+  margin: 6px 0 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* Pillola "tu" accanto al nickname quando l'utente sta guardando il proprio
+   profilo pubblico (in sostituzione della indicazione che prima vivendo
+   sulla URL bar). */
+.pub-you-pill {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--accent-contrast);
+  background: var(--accent);
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  font-weight: 600;
+  line-height: 1;
+}
+.pub-joined {
+  font-size: 13px;
+  margin: 0;
+}
+
+.pub-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.pub-badges-count {
+  font-size: 11px;
+  color: var(--text-mute);
+}
+
+.pub-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.pub-section-h {
+  margin: 0 0 12px;
+}
+
+/* Lista per-scrittura: stesso pattern della pagina /profilo, non cliccabile
+   pero' (sono dati altrui, non rinviamo a /script/:id che e' il dettaglio
+   della scrittura, non del giocatore). */
+.pub-scripts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pub-script {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.pub-script-glyph {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-family: var(--font-glyph);
+  font-size: 18px;
+}
+.pub-script-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pub-script-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+.pub-script-bar {
+  display: block;
+  height: 4px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.pub-script-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 240ms var(--tx-ease);
+}
+.pub-script-bar i[data-acc="good"] { background: var(--success); }
+.pub-script-bar i[data-acc="mid"]  { background: var(--warm); }
+.pub-script-bar i[data-acc="bad"]  { background: var(--danger); }
+.pub-script-pct {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Card "Vuoi battere X?" + bottone Gioca anche tu, visibile sui profili altrui. */
+.pub-beatme {
+  margin-top: 22px;
+  padding: 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.pub-beatme-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.pub-beatme-nick {
+  color: var(--accent);
+  font-weight: 600;
+}
+.pub-beatme-cta {
+  height: 40px;
+  padding: 0 18px;
+}
+
+/* CTA per il proprio profilo: "Condividi profilo" a tutta larghezza. */
+.pub-cta {
+  margin-top: 22px;
+}
+
+/* Tasto condividi nell'app-bar: piu' compatto. */
+.pub-share-btn {
+  height: 30px;
+  font-size: 12px;
+  padding: 0 12px;
+}

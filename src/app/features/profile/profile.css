@@ -4,14 +4,25 @@
   padding-bottom: 32px;
 }
 
-/* Hero: avatar grande centrato + nickname + email + chip azioni. */
+/* Hero: avatar grande centrato + nickname + email + iscritto.
+   Gap aumentato per dare aria tra avatar, nickname, email, data di
+   iscrizione: prima era 12px e i quattro elementi sembravano impilati. */
 .profile-hero {
   text-align: center;
-  padding: 12px 0 8px;
+  padding: 14px 0 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+}
+/* Sotto al nickname (h2) email + joined sono due righe affini, le teniamo
+   piu' vicine fra loro (margin top negativo che compensa il gap della hero)
+   per leggerle come "metadata" di una stessa cosa. */
+.profile-email {
+  margin-top: -10px;
+}
+.profile-joined {
+  margin-top: -10px;
 }
 
 .profile-avatar-btn {
@@ -87,12 +98,27 @@
 }
 
 /* Edit mode: input largo come l'h2, bottone OK accanto. */
+.profile-nick-edit-wrap {
+  width: 100%;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 auto;
+}
 .profile-nick-edit {
   display: flex;
   align-items: stretch;
   gap: 8px;
-  max-width: 260px;
   width: 100%;
+}
+/* Errore "gia' preso": testo danger sotto l'input. */
+.profile-nick-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--danger);
+  text-align: left;
+  line-height: 1.4;
 }
 .profile-nick-edit .input-field {
   flex: 1;
@@ -116,11 +142,9 @@
 
 .profile-email {
   font-size: 11px;
-  margin: 0;
 }
 .profile-joined {
   font-size: 12px;
-  margin: 0;
 }
 
 .profile-anon-hint {
@@ -192,13 +216,13 @@
   border-color: var(--accent);
 }
 
-/* Chip orizzontali sotto la hero (per ora portano alle pagine ComingSoon). */
+/* Chip orizzontali sotto la hero, centrate e separate da quest'ultima. */
 .profile-chips {
   display: flex;
   gap: 8px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: 4px;
+  margin-top: 18px;
 }
 
 /* Stats 2x2 (vs la home che e' 1x3): bestStreak + streak + accuracy + played. */
