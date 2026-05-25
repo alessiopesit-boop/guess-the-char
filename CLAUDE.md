@@ -62,6 +62,7 @@ src/
       home/
       login/
       onboarding/
+      profile/
       script-detail/
       selection/
       session-result/
@@ -301,7 +302,7 @@ L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del p
 ### Cosa NON e' ancora collegato
 
 - La sincronizzazione di `state` (campi gioco: streak, played, perScript, ecc.) con Firestore al cambio di `auth.user` non e' ancora implementata. Verra' in una PR dedicata. Per ora `state.account` viene popolato dall'Auth ma i progressi restano in `localStorage`.
-- Le route `/profile`, `/leaderboard`, `/u/:nickname` sono ancora `ComingSoon`. Le PR che le accendono usano gia' lo stato Auth (`AuthService.user()`) come fonte di verita'.
+- Le route `/leaderboard`, `/u/:nickname` sono ancora `ComingSoon`. Le PR che le accendono usano gia' lo stato Auth (`AuthService.user()`) come fonte di verita'. `/profile` invece e' diventata reale: hero con avatar editabile (12 glifi predefiniti in `AVATARS`), nickname inline edit (Enter salva, Esc annulla), stats 2x2, lista per-scrittura con barre colorate (verde >=75%, ambra >=40%, rosso <40%), badges teaser, storico daily.
 
 ### Convenzioni
 

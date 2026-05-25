@@ -72,8 +72,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/login/login').then((m) => m.Login),
   },
 
+  {
+    path: 'profile',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
+  },
+
   // Aree social ancora stub: profilo pubblico, classifica, sfide tra amici.
-  { path: 'profile',           canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'leaderboard',       canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'u/:nickname',       loadComponent: comingSoon },
 
