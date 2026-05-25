@@ -57,6 +57,7 @@ src/
     features/               # una cartella per ogni schermata
       badges/
       daily-result/
+      feedback/
       game/
       glyph-detail/
       home/
@@ -301,8 +302,9 @@ L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del p
 - `src/app/core/firebase/user-doc.service.ts`: `UserDocService` che sincronizza lo stato di gioco con `/users/{uid}` su Firestore quando l'utente e' loggato. Bootstrap-attivato (inject dummy in `App`). All'auth.user che diventa autenticato fa max-merge tra locale e cloud; al primo signup chiama `NicknameService.findAvailable` per claimare un nickname unico. Ad ogni cambio di state mentre loggato, push debounced di 1s. Usa `firebase/firestore/lite` (no real-time, no offline persistence) per tenere il bundle sotto i 500kB.
 - `src/app/core/firebase/nickname.service.ts`: `NicknameService` gestisce la collezione `/nicknames/{nick_lowercased}` per garantire l'unicita' del nickname. Metodi: `claim(nick, uid)` atomica via runTransaction, `change(oldNick, newNick, uid)` swap atomico (release vecchio + claim nuovo + update `/users/{uid}.nickname` in una sola transazione), `findAvailable(seed, uid)` cerca varianti seed/seed2/seed3/.../seed-rnd, `getUserByNickname(nick)` per il profilo pubblico.
 - `src/app/core/firebase/user-search.service.ts`: `UserSearchService` cerca utenti per nickname con tolleranza fuzzy (Levenshtein <=2). Carica la collezione `/nicknames` intera in cache (TTL 5 min) e fa filtering/ranking client-side: match esatto > prefisso > sottostringa > distanza 1 > distanza 2. Strategia OK fino a ~2000 utenti; oltre, conviene un indice esterno tipo Algolia.
+- `src/app/core/firebase/feedback.service.ts`: `FeedbackService` scrive nella collezione `/feedback`. Rate limit lato client via localStorage (`gtc.feedback.history`), massimo 3 submission nelle ultime 24h. Le regole Firestore impongono shape e lunghezza dei campi (titolo 3-80, corpo 8-600, kind in bug/idea). Le submission sono read-only dal client: le leggi tu dalla Firebase Console.
 - `AppStateService` si abbona al signal `auth.user` via `effect`: a ogni cambio di stato Auth, riflette in `state.account` (uid, email, nickname seedato da `displayName` per Google, avatar 0 di default).
-- `firestore.rules`, `firebase.json`, `.firebaserc` alla root: config per `firebase deploy`. Schema corrente: `/users/{uid}` (stato gioco + anagrafica) e `/nicknames/{nick}` (indice unicita', non ancora popolato).
+- `firestore.rules`, `firebase.json`, `.firebaserc` alla root: config per `firebase deploy`. Schema corrente: `/users/{uid}` (stato gioco + anagrafica), `/nicknames/{nick}` (indice unicita'), `/feedback/{auto-id}` (write-only feedback dei giocatori).
 
 ### Cosa viene sincronizzato in cloud
 

@@ -1,0 +1,163 @@
+.fb-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 32px;
+}
+
+.fb-title {
+  margin: 0;
+}
+.fb-sub {
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Switch bug/idea: riusa .seg globale ma aggiungiamo emoji-spacing. */
+.fb-kind {
+  margin-top: 4px;
+}
+.fb-kind .seg-btn {
+  gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fb-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+.fb-field-label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Riusa .input-field globale, gia' definito in login.css come scoped:
+   qui ridefiniamo nel contesto della pagina feedback. */
+.input-field {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--hover-dur) ease;
+}
+.input-field:focus { border-color: var(--accent); }
+.fb-textarea {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.45;
+}
+
+.fb-counter {
+  position: absolute;
+  right: 4px;
+  bottom: -16px;
+  font-size: 11px;
+  color: var(--text-mute);
+}
+
+/* "Cosa includo": expandable col preview del metadata tecnico in mono. */
+.fb-meta {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.fb-meta summary {
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+}
+.fb-meta-pre {
+  margin: 8px 0 0;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 11px;
+  overflow-x: auto;
+  color: var(--text-mute);
+  line-height: 1.55;
+  white-space: pre;
+}
+
+.fb-error {
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(251, 113, 133, 0.08);
+  border: 1px solid rgba(251, 113, 133, 0.35);
+  color: var(--danger);
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.fb-rate-hint,
+.fb-rate-warning {
+  font-size: 11px;
+  text-align: center;
+  margin: 0;
+}
+.fb-rate-warning {
+  color: var(--warm);
+}
+
+.fb-submit {
+  margin-top: 4px;
+}
+
+/* Stato di successo: tick verde grande + titolo + bottoni. */
+.fb-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 40px 16px 24px;
+}
+.fb-success-tick {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: var(--success);
+  display: grid;
+  place-items: center;
+  animation: fb-pop 0.3s ease;
+}
+@keyframes fb-pop {
+  0%   { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+[data-motion="minimal"] .fb-success-tick {
+  animation: none;
+}
+.fb-success p {
+  max-width: 320px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+.fb-success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 280px;
+  margin-top: 8px;
+}
