@@ -84,8 +84,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/search/search').then((m) => m.Search),
   },
 
-  // Aree social ancora stub: classifica, sfide tra amici.
-  { path: 'leaderboard',       canActivate: [onboardedGuard], loadComponent: comingSoon },
+  {
+    path: 'leaderboard',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/leaderboard/leaderboard').then((m) => m.Leaderboard),
+  },
 
   // Profilo pubblico di un utente qualunque. NO onboardedGuard: deve essere
   // raggiungibile anche da link condiviso fuori dall'app prima di essere

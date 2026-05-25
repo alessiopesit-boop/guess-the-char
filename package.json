@@ -8,6 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "deploy:rules": "npx firebase deploy --only firestore:rules",
+    "deploy:indexes": "npx firebase deploy --only firestore:indexes",
+    "deploy:firestore": "npx firebase deploy --only firestore",
     "prestart": "node scripts/write-build-sha.mjs",
     "prebuild": "node scripts/write-build-sha.mjs",
     "postinstall": "node scripts/write-build-sha.mjs"

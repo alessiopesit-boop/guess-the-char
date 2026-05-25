@@ -1,0 +1,247 @@
+.lb-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 32px;
+}
+
+/* Tab switch Daily/Alltime: stile pillola (riusa idea di .lb-tabs del mockup
+   ma scoped qui perche' non ha altri usi nel resto dell'app). */
+.lb-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 4px;
+}
+.lb-tab {
+  appearance: none;
+  flex: 1;
+  height: 36px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background var(--hover-dur) ease,
+    color var(--hover-dur) ease;
+}
+.lb-tab:hover:not(.is-active) {
+  background: var(--surface-2);
+}
+.lb-tab.is-active {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+/* Card "Accedi per comparire in classifica" visibile solo se anonimo. */
+.lb-signin-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+}
+.lb-signin-text {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.lb-signin-btn {
+  height: 36px;
+  font-size: 13px;
+  padding: 0 14px;
+}
+
+/* Header colonna sulla tabella della classifica: piccoli eyebrow grigi. */
+.lb-head {
+  display: grid;
+  grid-template-columns: 40px 1fr 80px;
+  gap: 8px;
+  padding: 14px 12px 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+.lb-head-rank { text-align: right; }
+.lb-head-score { text-align: right; }
+
+.lb-loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}
+
+/* Spinner ambra. Stessa estetica usata in /cerca, ma piu' grande qui. */
+.lb-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--surface-2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: lb-spin 0.7s linear infinite;
+}
+.lb-spinner-inline {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+@keyframes lb-spin {
+  to { transform: rotate(360deg); }
+}
+[data-motion="minimal"] .lb-spinner {
+  animation: none;
+}
+
+.lb-error {
+  text-align: center;
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.lb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 40px 16px 24px;
+}
+.lb-empty-glyph {
+  font-family: var(--font-glyph);
+  font-size: 56px;
+  color: var(--accent);
+  opacity: 0.5;
+  line-height: 1;
+}
+.lb-empty p {
+  max-width: 320px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.lb-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Riga della classifica: rank | (avatar + nick + pillola TU) | score.
+   Highlight ambra quando e' la riga dell'utente loggato (is-self). */
+.lb-row {
+  appearance: none;
+  display: grid;
+  grid-template-columns: 40px 1fr 80px;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  transition:
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease;
+}
+.lb-row:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.lb-row.is-self {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.lb-row-rank {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+.lb-row.is-self .lb-row-rank {
+  color: var(--warm);
+  font-weight: 600;
+}
+.lb-row-medal {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.lb-row-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.lb-row-avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+}
+.lb-row-avatar.accent {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: transparent;
+}
+.lb-row-nick {
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+.lb-row.is-self .lb-row-nick {
+  font-weight: 600;
+}
+.lb-row-you {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--accent-contrast);
+  background: var(--accent);
+  padding: 2px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  font-weight: 600;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.lb-row-score {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.lb-row.is-self .lb-row-score {
+  color: var(--warm);
+}
+
+.lb-more {
+  margin-top: 12px;
+}
