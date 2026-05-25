@@ -156,10 +156,26 @@
       </button>
     </div>
     <button class="badges-teaser" type="button" (click)="goBadges()">
-      <div class="badges-teaser-meta">
-        <span class="v">{{ badgeStats().unlocked }}</span>
-        <span class="l">/ {{ badgeStats().total }}</span>
-        <span class="muted badges-teaser-label">{{ i18n.lang() === 'it' ? 'sbloccati' : 'unlocked' }}</span>
+      <div class="badges-teaser-text">
+        <div class="badges-teaser-title">
+          {{ i18n.t('badges') }}
+          <span class="sep" aria-hidden="true">·</span>
+          <span class="v">{{ badgeStats().unlocked }}</span>
+          <span class="l">/ {{ badgeStats().total }}</span>
+        </div>
+        <div class="badges-teaser-sub muted">
+          @if (badgeStats().unlocked === 0) {
+            {{ i18n.lang() === 'it'
+              ? 'Comincia a giocare per sbloccare il primo.'
+              : 'Start playing to unlock your first one.' }}
+          } @else if (!badgeStats().nextLocked) {
+            {{ i18n.lang() === 'it' ? 'Li hai sbloccati tutti.' : 'You unlocked them all.' }}
+          } @else if (i18n.lang() === 'it') {
+            {{ badgeStats().unlocked }} sbloccati. Prossimo: {{ nextLockedTitle() }}
+          } @else {
+            {{ badgeStats().unlocked }} unlocked. Next: {{ nextLockedTitle() }}
+          }
+        </div>
       </div>
       <div class="icons">
         @for (b of badgeStats().preview; track b.id) {

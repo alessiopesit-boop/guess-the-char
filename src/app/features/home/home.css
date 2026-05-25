@@ -95,35 +95,38 @@
 .stats-grid > .stat:hover { background: var(--surface-2); }
 .stats-grid > .stat:active { transform: translateY(1px); }
 
-/* Il container .badges-teaser e i cerchi `.icons > span[data-on][data-t]` sono
-   stylati in styles.css globale, identici al prototipo. Qui forziamo la
-   larghezza al 100% (il button HTML e' inline di default), riduciamo
-   leggermente il padding verticale e mettiamo numero / totale / label tutto
-   su una riga sola, centrata verticalmente. */
+/* La card .badges-teaser e' definita in styles.css globale (grid 1fr auto,
+   border, hover). Qui sovrascriviamo solo il contenuto della colonna di
+   sinistra: titolo "Traguardi · 3 / 10" con il numero in accent + sottotitolo
+   informativo che cambia in base allo stato ("Comincia a giocare..." oppure
+   "X sbloccati. Prossimo: Y"). Match al mockup, non al layout meta+icons
+   compatto di prima. */
 .badges-teaser {
   width: 100%;
-  padding-top: 10px;
-  padding-bottom: 10px;
 }
-.badges-teaser-meta {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  line-height: 1;
+.badges-teaser-text {
+  min-width: 0;
 }
-.badges-teaser-meta .v {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 17px;
+.badges-teaser-title {
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.2;
+}
+.badges-teaser-title .sep {
+  color: var(--text-mute);
+  margin: 0 2px;
+}
+.badges-teaser-title .v {
   color: var(--accent);
+  font-weight: 600;
 }
-.badges-teaser-meta .l {
-  font-size: 13px;
-  color: var(--text-dim);
+.badges-teaser-title .l {
+  color: var(--text-mute);
 }
-.badges-teaser-label {
+.badges-teaser-sub {
   font-size: 12px;
-  margin-left: 6px;
+  margin-top: 4px;
+  line-height: 1.4;
 }
 
 /* Le icone di modalita' (emoji ∞ / ⏱ / ♥) restano centrate nel quadratino

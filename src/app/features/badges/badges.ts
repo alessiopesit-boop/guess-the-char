@@ -5,11 +5,10 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
 import { BadgeWithProgress, computeBadges } from '../../core/data/badges';
 import { AppBar } from '../../shared/app-bar';
-import { Icon } from '../../shared/icon';
 
 @Component({
   selector: 'app-badges',
-  imports: [AppBar, Icon],
+  imports: [AppBar],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './badges.html',
   styleUrl: './badges.css',
