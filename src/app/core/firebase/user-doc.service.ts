@@ -161,6 +161,38 @@ export class UserDocService {
         { ...toCloudShape(merged, user), updatedAt: serverTimestamp() },
         { merge: true },
       );
+      // Migrazione utenti legacy: alcuni account creati prima che la
+      // collezione /nicknames esistesse (o per cui il claim e' fallito
+      // silenziosamente all'epoca) hanno una entry in /users ma niente in
+      // /nicknames. Senza entry, search e profilo pubblico non li trovano.
+      // findAvailable e' idempotente: se gia' possiedi il nickname, no-op;
+      // se non esiste, lo claim ora; se qualcun altro lo ha rubato nel
+      // frattempo, ti assegna una variante (es. nick2). In quest'ultimo caso
+      // aggiorniamo state.account.nickname per restare consistenti.
+      try {
+        const currentNick = merged.account?.nickname ?? user.displayName ?? '';
+        if (currentNick) {
+          const owned = await this.nicknames.findAvailable(currentNick, user.uid);
+          if (owned !== currentNick) {
+            // Era stato preso da qualcun altro; passiamo alla variante.
+            this.applyingMerge = true;
+            try {
+              this.appState.updateAccount({ nickname: owned });
+            } finally {
+              queueMicrotask(() => {
+                this.applyingMerge = false;
+              });
+            }
+            await setDoc(
+              ref,
+              { nickname: owned, updatedAt: serverTimestamp() },
+              { merge: true },
+            );
+          }
+        }
+      } catch (e) {
+        console.warn('[firestore] legacy nickname claim failed:', e);
+      }
     } catch (e) {
       console.warn('[firestore] sync merge error:', e);
     }
