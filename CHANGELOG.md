@@ -5,6 +5,27 @@ Tutte le modifiche rilevanti a questo progetto sono documentate qui.
 Il formato si basa su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/),
 e il progetto segue il [Semantic Versioning](https://semver.org/lang/it/).
 
+## [1.3.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.2.2...v1.3.0) (2026-05-25)
+
+
+### Features
+
+* **auth:** pagina di login + logout + menu account ([#48](https://github.com/alessiopesit-boop/guess-the-char/issues/48)) ([007d954](https://github.com/alessiopesit-boop/guess-the-char/commit/007d9546333128ca482aa05f29f9f671eb4bb608))
+* **badges:** allinea teaser, pagina e modale al mockup ([#44](https://github.com/alessiopesit-boop/guess-the-char/issues/44)) ([8bfea1a](https://github.com/alessiopesit-boop/guess-the-char/commit/8bfea1a9687a16b4192cf824a7bc7c1a44c0eacd))
+* **chrome:** direzione delle transizioni di schermata coerente con avanti/indietro ([#41](https://github.com/alessiopesit-boop/guess-the-char/issues/41)) ([d777810](https://github.com/alessiopesit-boop/guess-the-char/commit/d7778104c67d14c0453433fe2c05e0e4cf59f4a4))
+* **firebase:** setup Auth e Firestore (config placeholder) ([#46](https://github.com/alessiopesit-boop/guess-the-char/issues/46)) ([a2a5415](https://github.com/alessiopesit-boop/guess-the-char/commit/a2a5415faf326b1ffd92f58b0b2c61b6c721623c))
+* **firebase:** sincronizza i progressi in cloud quando sei loggato ([#49](https://github.com/alessiopesit-boop/guess-the-char/issues/49)) ([be36c5c](https://github.com/alessiopesit-boop/guess-the-char/commit/be36c5cb75de3b44223ff5079a7336cdd46acc37))
+* **game:** conferma sull'uscita partita e centratura visiva dei glifi ([#39](https://github.com/alessiopesit-boop/guess-the-char/issues/39)) ([fc9ce80](https://github.com/alessiopesit-boop/guess-the-char/commit/fc9ce802d0c8117dc9e1eede50299676b3f20624))
+* **profile:** pagina profilo vera + avatar in modale + logout azzera i progressi ([#50](https://github.com/alessiopesit-boop/guess-the-char/issues/50)) ([56cbd30](https://github.com/alessiopesit-boop/guess-the-char/commit/56cbd30f0f157b47a25f03eaef6ea973058dfa77))
+* **scripts:** nomi piu' familiari per devanagari e gurmukhi ([#42](https://github.com/alessiopesit-boop/guess-the-char/issues/42)) ([d1107cc](https://github.com/alessiopesit-boop/guess-the-char/commit/d1107cc138ae6ceee7aaba9ebe0e7517a383f0d6))
+* **seo:** favicon PNG raster, apple-touch-icon, manifest e titolo chiaro ([#38](https://github.com/alessiopesit-boop/guess-the-char/issues/38)) ([cbf6560](https://github.com/alessiopesit-boop/guess-the-char/commit/cbf6560918e97feb46f29c08f7b41455cbba80c6))
+* **settings:** allinea impostazioni al mockup ([#45](https://github.com/alessiopesit-boop/guess-the-char/issues/45)) ([cc1fdd2](https://github.com/alessiopesit-boop/guess-the-char/commit/cc1fdd2278fd8574e620d688a8e5e0a4b43e6512))
+
+
+### Bug Fixes
+
+* **ui:** typo Modalita, spiegazione livello animazioni e contatore traguardo ([#40](https://github.com/alessiopesit-boop/guess-the-char/issues/40)) ([f33f0cf](https://github.com/alessiopesit-boop/guess-the-char/commit/f33f0cf48ef1823b6faab40bb2ce4ece43ef538c))
+
 ## [1.2.2](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.2.1...v1.2.2) (2026-05-23)
 
 
