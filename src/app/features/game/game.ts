@@ -206,7 +206,11 @@ export class Game implements OnDestroy {
     if (!q) return;
     this.sound.playTick();
     const wrongs = q.options.filter((o) => o.id !== q.correct.id).map((o) => o.id);
-    const elim = wrongs.sort(() => 0.5 - Math.random()).slice(0, 2);
+    // Quanti distrattori togliere: al massimo 2 (comportamento storico con 4
+    // opzioni), ma sempre lasciandone almeno uno visibile oltre alla corretta.
+    // Cosi' con 3 opzioni totali (2 distrattori) ne togliamo 1, non 2.
+    const toRemove = Math.min(2, Math.max(0, wrongs.length - 1));
+    const elim = wrongs.sort(() => 0.5 - Math.random()).slice(0, toRemove);
     this.eliminated.set(elim);
     this.hintsLeft.update((n) => n - 1);
   }
