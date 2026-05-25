@@ -89,36 +89,8 @@
   line-height: 1.4;
 }
 
-.seg {
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-.seg-btn {
-  flex: 1;
-  height: 36px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text-dim);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background var(--hover-dur) ease,
-    color var(--hover-dur) ease;
-}
-.seg-btn:hover:not(.is-active) {
-  background: var(--surface-2);
-}
-.seg-btn.is-active {
-  background: var(--surface-3);
-  color: var(--text);
-}
+/* .seg + .seg-btn ora vivono in src/styles.css globale, riusabili da settings e
+   login (toggle Accedi/Crea account). Qui niente. */
 
 .swatches {
   display: flex;

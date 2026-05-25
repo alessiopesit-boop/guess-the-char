@@ -64,8 +64,15 @@ export const routes: Routes = [
   },
   { path: 'feedback',          canActivate: [onboardedGuard], loadComponent: comingSoon },
 
-  // Aree social: stub fino alla 1.1.0 con Firebase.
-  { path: 'login',             loadComponent: comingSoon },
+  // Pagina di login vera, collegata a Firebase Auth. NO onboardedGuard:
+  // deve essere accessibile anche prima dell'onboarding (es. dal banner della
+  // sezione Impostazioni).
+  {
+    path: 'login',
+    loadComponent: () => import('./features/login/login').then((m) => m.Login),
+  },
+
+  // Aree social ancora stub: profilo pubblico, classifica, sfide tra amici.
   { path: 'profile',           canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'leaderboard',       canActivate: [onboardedGuard], loadComponent: comingSoon },
   { path: 'u/:nickname',       loadComponent: comingSoon },

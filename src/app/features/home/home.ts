@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
+import { AuthService } from '../../core/firebase/auth.service';
 import { ALL_SCRIPT_IDS } from '../../core/data/scripts';
 import { buildQuestion, mulberry32, seedFromDate } from '../../core/data/quiz';
 import { computeBadges } from '../../core/data/badges';
 import { AppBar } from '../../shared/app-bar';
+import { ConfirmDialog } from '../../shared/confirm-dialog';
 import { Icon } from '../../shared/icon';
 import { InfoSheet } from '../../shared/info-sheet';
 import { LangSwitch } from '../../shared/lang-switch';
@@ -15,7 +17,7 @@ type InfoKind = 'streak' | 'accuracy' | 'played' | 'dailyStreak';
 
 @Component({
   selector: 'app-home',
-  imports: [AppBar, Icon, InfoSheet, LangSwitch],
+  imports: [AppBar, ConfirmDialog, Icon, InfoSheet, LangSwitch],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -24,8 +26,16 @@ export class Home {
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
   protected readonly appState = inject(AppStateService);
+  private readonly authSvc = inject(AuthService);
 
   protected readonly state = this.appState.state;
+
+  /** Apertura del menu account (popover sotto l'icona in alto a destra). */
+  protected readonly accountMenuOpen = signal(false);
+
+  /** Dialog di conferma logout: aperto dopo aver cliccato "Esci" nel menu,
+   *  evita disconnessioni accidentali. */
+  protected readonly signOutDialog = signal(false);
 
   /** Versione mostrata in fondo alla home. In dev include "dev" e l'hash di commit. */
   protected readonly buildLabel =
@@ -163,5 +173,52 @@ export class Home {
 
   protected goFeedback(): void {
     this.router.navigate(['/feedback']);
+  }
+
+  /** Toggle del popover account; chiude se aperto, apre se chiuso. Lo
+   *  stopPropagation evita che il click-outside listener lo richiuda subito. */
+  protected toggleAccountMenu(e: Event): void {
+    e.stopPropagation();
+    this.accountMenuOpen.update((v) => !v);
+  }
+
+  protected closeAccountMenu(): void {
+    this.accountMenuOpen.set(false);
+  }
+
+  /** Apre il dialog di conferma logout. Chiude il menu in modo che la modale
+   *  resti l'unico elemento in primo piano. */
+  protected askSignOut(): void {
+    this.closeAccountMenu();
+    this.signOutDialog.set(true);
+  }
+
+  protected cancelSignOut(): void {
+    this.signOutDialog.set(false);
+  }
+
+  /** Conferma logout: Firebase signOut, l'effect in AppStateService azzera
+   *  state.account in automatico. Restiamo sulla home con la modale chiusa. */
+  protected async confirmSignOut(): Promise<void> {
+    this.signOutDialog.set(false);
+    try {
+      await this.authSvc.signOut();
+    } catch {
+      // Fallimenti rari (es. rete offline durante la revoca): sessione locale
+      // viene comunque rimossa.
+    }
+  }
+
+  /** Click ovunque sul documento chiude il popover. Il bottone trigger ha
+   *  stopPropagation quindi non si auto-richiude. */
+  @HostListener('document:click')
+  protected onDocClick(): void {
+    if (this.accountMenuOpen()) this.closeAccountMenu();
+  }
+
+  /** Escape chiude il popover (accessibilita'). */
+  @HostListener('window:keydown.escape')
+  protected onEscape(): void {
+    if (this.accountMenuOpen()) this.closeAccountMenu();
   }
 }

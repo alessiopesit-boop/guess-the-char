@@ -1,4 +1,4 @@
-import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { AccountInfo, AppState, DEFAULT_STATE } from './types';
 import { AuthService } from '../firebase/auth.service';
 
@@ -45,16 +45,22 @@ export class AppStateService {
     // I campi nickname/avatar restano i valori locali precedenti se l'utente
     // li ha gia' scelti; al primo login da provider OAuth li seedeiamo da
     // displayName / valori default.
+    //
+    // IMPORTANTE: tutte le letture di _state qui dentro devono essere in
+    // untracked(): se le tracciassimo, ogni write a _state rilancerebbe
+    // l'effect, e ogni write nasce dallo spread di un nuovo oggetto, quindi
+    // l'effect si auto-rilancerebbe all'infinito (loop che blocca il tab).
     effect(() => {
       const u = this.auth.user();
       if (u === 'loading') return;
       if (!u) {
-        if (this._state().account) {
+        const hadAccount = untracked(() => this._state().account);
+        if (hadAccount) {
           this._state.update((s) => ({ ...s, account: null }));
         }
         return;
       }
-      const existing = this._state().account;
+      const existing = untracked(() => this._state().account);
       // Se esiste gia' un account locale con lo stesso uid, manteniamo i
       // valori scelti dall'utente (nickname/avatar) e aggiorniamo solo i
       // campi che vengono dall'Auth.

@@ -1,13 +1,53 @@
 <div class="app-shell">
   <app-bar>
     <app-lang-switch />
-    <button
-      class="btn-icon"
-      [attr.aria-label]="state().account ? 'Account' : i18n.t('profile')"
-      (click)="state().account ? goProfile() : goLogin()"
-    >
-      <app-icon name="user" />
-    </button>
+    <!-- Trigger del menu account in alto a destra. Per gli utenti loggati
+         mostriamo l'iniziale del nickname su sfondo ambra; per gli anonimi
+         l'icona generica user. Il click apre/chiude il popover qui sotto. -->
+    <div class="account-wrap">
+      <button
+        type="button"
+        class="btn-icon account-trigger"
+        [attr.aria-label]="state().account ? 'Account' : i18n.t('profile')"
+        [attr.aria-expanded]="accountMenuOpen()"
+        (click)="toggleAccountMenu($event)"
+      >
+        @if (state().account; as a) {
+          <span class="account-initial">{{ a.nickname.charAt(0).toUpperCase() }}</span>
+        } @else {
+          <app-icon name="user" />
+        }
+      </button>
+
+      @if (accountMenuOpen()) {
+        <div class="account-menu" (click)="$event.stopPropagation()" role="menu">
+          @if (state().account) {
+            <button type="button" class="account-menu-item" role="menuitem"
+                    (click)="closeAccountMenu(); goProfile()">
+              {{ i18n.t('profile') }}
+            </button>
+            <button type="button" class="account-menu-item" role="menuitem"
+                    (click)="closeAccountMenu(); goSettings()">
+              {{ i18n.t('settings') }}
+            </button>
+            <div class="account-menu-sep"></div>
+            <button type="button" class="account-menu-item is-danger" role="menuitem"
+                    (click)="askSignOut()">
+              {{ i18n.t('logout') }}
+            </button>
+          } @else {
+            <button type="button" class="account-menu-item" role="menuitem"
+                    (click)="closeAccountMenu(); goLogin()">
+              {{ i18n.t('login') }}
+            </button>
+            <button type="button" class="account-menu-item" role="menuitem"
+                    (click)="closeAccountMenu(); goSettings()">
+              {{ i18n.t('settings') }}
+            </button>
+          }
+        </div>
+      }
+    </div>
   </app-bar>
 
   <div class="page">
@@ -15,7 +55,7 @@
       <span class="eyebrow">{{ todayLabel() }}</span>
       <h1 class="h1">
         @if (state().account; as a) {
-          {{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }} <span class="home-name">{{ a.nickname }}.</span>
+          {{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }} <span class="home-name">{{ a.nickname }}</span>
         } @else {
           {{ i18n.lang() === 'it' ? 'Ciao,' : 'Hi,' }} <span class="home-name">{{ i18n.lang() === 'it' ? 'lettore.' : 'reader.' }}</span>
         }
@@ -200,5 +240,15 @@
 
   @if (infoOverlay()) {
     <app-info-sheet [title]="infoTitle()" [body]="infoBody()" (close)="closeInfo()" />
+  }
+
+  @if (signOutDialog()) {
+    <app-confirm-dialog
+      [title]="i18n.lang() === 'it' ? 'Sei sicuro di uscire?' : 'Are you sure you want to sign out?'"
+      [confirmLabel]="i18n.t('logout')"
+      [cancelLabel]="i18n.lang() === 'it' ? 'Annulla' : 'Cancel'"
+      (confirmed)="confirmSignOut()"
+      (cancel)="cancelSignOut()"
+    />
   }
 </div>

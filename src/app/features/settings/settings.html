@@ -13,8 +13,8 @@
           <span class="account-name">{{ a.nickname }}</span>
           <span class="account-sub mono">{{ a.email }}</span>
         </div>
-        <button class="nav-btn" type="button" (click)="goProfile()">
-          {{ i18n.t('profile') }}
+        <button class="nav-btn account-logout" type="button" (click)="signOut()">
+          {{ i18n.t('logout') }}
         </button>
       } @else {
         <span class="account-avatar">
