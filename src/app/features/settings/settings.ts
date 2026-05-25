@@ -77,6 +77,17 @@ export class Settings {
     if (isIt) return m === 'minimal' ? 'Minimo' : m === 'playful' ? 'Giocoso' : 'Ricco';
     return m === 'minimal' ? 'Minimal' : m === 'playful' ? 'Playful' : 'Rich';
   }
+  protected motionHint(m: MotionLevel): string {
+    const isIt = this.i18n.lang() === 'it';
+    if (isIt) {
+      if (m === 'minimal') return 'Quasi nessuna animazione: schermate e pulsanti rispondono in modo istantaneo.';
+      if (m === 'playful') return 'Transizioni morbide tra le schermate e feedback animati sui glifi.';
+      return 'Tutte le animazioni attive, inclusi micro-effetti su pulsanti, glifi e transizioni.';
+    }
+    if (m === 'minimal') return 'Almost no animation: screens and buttons respond instantly.';
+    if (m === 'playful') return 'Smooth screen transitions and animated feedback on glyphs.';
+    return 'All animations on, including micro-effects on buttons, glyphs and transitions.';
+  }
   protected cbLabel(m: ColorblindMode): string {
     const isIt = this.i18n.lang() === 'it';
     if (isIt) return m === 'none' ? 'Standard' : m === 'redgreen' ? 'Rosso e verde' : 'Blu e giallo';

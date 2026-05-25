@@ -154,6 +154,7 @@
 }
 .badge-bar-label {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 4px;
   font-size: 12px;
 }
