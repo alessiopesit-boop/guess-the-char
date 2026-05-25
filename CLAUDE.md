@@ -33,6 +33,7 @@ Niente backend per ora: tutto in-memory, persistenza via `localStorage` per stat
 - **Styling**: un singolo `src/styles.css` globale (importato dal prototipo Claude Design as-is, classi `.btn`, `.card`, `.pill`, `.glyph-stage`, ecc., ~42KB) + CSS scoped per i componenti che hanno bisogno di layout o animazioni specifiche.
 - **Build/test**: nuovo builder `@angular/build` (esbuild + vite dev server). Vitest e' presente come devDep ma non sono ancora configurati test; `tsconfig.spec.json` resta come placeholder.
 - **Niente lint configurato**, Prettier presente come devDep ma non invocato da CI (usato come default dell'editor). Editor config in `.editorconfig`.
+- **Backend**: pacchetto `firebase` v12 (Auth + Firestore). Wiring sotto `src/app/core/firebase/`. Finche' `firebase.config.ts` ha valori PLACEHOLDER l'app funziona "solo locale" (login disabilitato), vedi sezione "Firebase" piu' sotto per i passi di setup console.
 
 ## Struttura
 
@@ -273,6 +274,39 @@ Cose da sapere se lo modifichi:
 - `.nojekyll` (vuoto, presente alla root) impedisce a Pages di processare i file via Jekyll. Lo step del workflow lo copia automaticamente in `_site/`.
 - Prima pubblicazione: in *Settings > Pages* del repo va scelto "Source: GitHub Actions" una volta sola.
 - Anche l'environment `github-pages` (creato in automatico la prima volta che Pages e' attivato) va sbloccato per i tag: di default consente deploy solo dal branch `main`, ma il nostro workflow parte dal tag `vX.Y.Z`. Una sola volta, aggiungere una "deployment branch policy" con `name: v*` e `type: tag` (via *Settings > Environments > github-pages > Deployment branches and tags*, oppure via `gh api -X POST repos/<owner>/<repo>/environments/github-pages/deployment-branch-policies -f name='v*' -f type='tag'`). Senza questo, il job `deploy` fallisce con "Tag X.Y.Z is not allowed to deploy to github-pages due to environment protection rules".
+
+## Firebase (Auth + Firestore)
+
+L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del progresso tra dispositivi. La configurazione lato console e' una-tantum, lato codice tutto e' gia' cablato.
+
+### Setup console (una sola volta, manuale)
+
+1. **Crea progetto** su [console.firebase.google.com](https://console.firebase.google.com): nome `guess-the-char` (o quello che preferisci), disabilita Google Analytics.
+2. **Aggiungi web app** (icona `</>`): nickname libero, **non** abilitare Hosting (siamo su Pages). Ti restituisce un config object con 6 stringhe (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId).
+3. **Incolla il config** in `src/app/core/firebase/firebase.config.ts` al posto dei placeholder. E aggiorna `.firebaserc` mettendo il `projectId` reale al posto di `PLACEHOLDER_PROJECT_ID`.
+4. **Restringi la apiKey** (importante per non farsi rubare quota): su [console.cloud.google.com](https://console.cloud.google.com) -> APIs & Services -> Credentials -> click sulla "Browser key (auto created by Firebase)" -> Application restrictions = "HTTP referrers", aggiungi `localhost:4200/*` e `alessiopesit-boop.github.io/*`.
+5. **Auth providers**: Firebase Console -> Authentication -> Sign-in method, abilita Email/Password e Google (per Apple serve un Apple Developer a $99/anno, salta finche' non serve davvero).
+6. **Firestore**: Firebase Console -> Firestore Database -> Create database -> **Production mode** (non test, le test rules scadono). Regione: `eur3` per latenze migliori da IT.
+7. **Deploy delle rules**: dalla root del repo, `npx firebase login` (una sola volta), poi `npm run deploy:rules`. Pubblica `firestore.rules` sul tuo progetto. Da ripetere ogni volta che le rules cambiano.
+
+### Codice
+
+- `src/app/core/firebase/firebase.config.ts`: oggetto config pubblico (committato come placeholder, da riempire).
+- `src/app/core/firebase/firebase.ts`: `ensureFirebaseApp()` inizializza l'app idempotente; ritorna `null` se config = PLACEHOLDER (modalita' offline-only).
+- `src/app/core/firebase/auth.service.ts`: `AuthService` con signal `user` (`User | null | 'loading'`), `enabled` (boolean), metodi `signInEmail/signUpEmail/signInGoogle/signOut`. Quando `enabled === false` i metodi rigettano con `AuthDisabledError`.
+- `AppStateService` si abbona al signal `auth.user` via `effect`: a ogni cambio di stato Auth, riflette in `state.account` (uid, email, nickname seedato da `displayName` per Google, avatar 0 di default).
+- `firestore.rules`, `firebase.json`, `.firebaserc` alla root: config per `firebase deploy`. Schema corrente: `/users/{uid}` (stato gioco + anagrafica) e `/nicknames/{nick}` (indice unicita').
+
+### Cosa NON e' ancora collegato
+
+- La pagina `/login` e' ancora `ComingSoon` placeholder. Verra' sostituita da una pagina vera in una PR successiva, che chiamera' `AuthService.signInEmail/signInGoogle`.
+- La sincronizzazione di `state` (campi gioco: streak, played, perScript, ecc.) con Firestore al cambio di `auth.user` non e' ancora implementata. Verra' in una PR dedicata. Per ora `state.account` viene popolato ma i progressi restano in `localStorage`.
+
+### Convenzioni
+
+- **Niente segreti committati**: il config Firebase NON e' un segreto, vive in chiaro. Le credenziali Apple Sign-In (quando arriveranno) e qualunque service account JSON vanno in `.gitignore`.
+- **Provider IDs Firebase**: `password` / `google.com` / `apple.com`. Mappati 1:1 nel campo `AccountInfo.provider`. `'demo'` resta come back-compat per chi aveva il vecchio mock; verra' rimosso quando la 1.3.x avra' circolato.
+- **localhost vs prod**: lo stesso progetto Firebase serve dev e prod. Va bene per la nostra scala. Se in futuro vuoi separare, crea un secondo progetto e fai fileReplacement su `firebase.config.ts` come gia' facciamo con `build-info.ts`.
 
 ## Vincoli e cose da non fare
 
