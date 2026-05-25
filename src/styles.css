@@ -1170,6 +1170,40 @@ button {
   100% { transform: scale(1) rotate(0); }
 }
 
+/* Segmented control globale: una row di pulsanti che fa da toggle (3-state in
+   Settings per Animazioni / Accessibilita' / Lingua, 2-state in Login per
+   Accedi/Crea account). Tutti i toggle dell'app condividono questo look. */
+.seg {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.seg-btn {
+  flex: 1;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background var(--hover-dur) ease,
+    color var(--hover-dur) ease;
+}
+.seg-btn:hover:not(.is-active) {
+  background: var(--surface-2);
+}
+.seg-btn.is-active {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
 /* Home: badges teaser card */
 .badges-teaser {
   display: grid;

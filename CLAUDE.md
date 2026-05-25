@@ -23,7 +23,7 @@ Aggiornare significa: modificare la sezione gia' esistente che descrive l'area t
 
 Quiz interattivo single-page per imparare a riconoscere a colpo d'occhio i sistemi di scrittura del mondo: appare un glifo (hiragana, devanagari, arabo, greco, ecc.) e l'utente sceglie tra quattro opzioni. Quattro modalita': Allenamento libero, Sfida a tempo, Survival, Sfida giornaliera deterministica con griglia emoji condivisibile. Tono estetico: gioco-quiz, dark, palette ambra di default.
 
-Niente backend per ora: tutto in-memory, persistenza via `localStorage` per stato di gioco, lingua UI e preferenze visive. Le aree social (login, profilo pubblico, leaderboard, sfide tra amici) sono stub "In arrivo" in attesa della 1.1.0 con Firebase Auth + Firestore.
+Persistenza dei progressi via `localStorage` per stato di gioco, lingua UI e preferenze visive. Login via Firebase Auth (Email/Password + Google) gia' attivo: l'utente puo' creare un account o continuare in modo anonimo. La sincronizzazione dei progressi nel cloud, profilo pubblico, classifica e sfide tra amici sono ancora stub "In arrivo".
 
 ## Stack
 
@@ -60,6 +60,7 @@ src/
       game/
       glyph-detail/
       home/
+      login/
       onboarding/
       script-detail/
       selection/
@@ -299,8 +300,8 @@ L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del p
 
 ### Cosa NON e' ancora collegato
 
-- La pagina `/login` e' ancora `ComingSoon` placeholder. Verra' sostituita da una pagina vera in una PR successiva, che chiamera' `AuthService.signInEmail/signInGoogle`.
-- La sincronizzazione di `state` (campi gioco: streak, played, perScript, ecc.) con Firestore al cambio di `auth.user` non e' ancora implementata. Verra' in una PR dedicata. Per ora `state.account` viene popolato ma i progressi restano in `localStorage`.
+- La sincronizzazione di `state` (campi gioco: streak, played, perScript, ecc.) con Firestore al cambio di `auth.user` non e' ancora implementata. Verra' in una PR dedicata. Per ora `state.account` viene popolato dall'Auth ma i progressi restano in `localStorage`.
+- Le route `/profile`, `/leaderboard`, `/u/:nickname` sono ancora `ComingSoon`. Le PR che le accendono usano gia' lo stato Auth (`AuthService.user()`) come fonte di verita'.
 
 ### Convenzioni
 

@@ -14,6 +14,7 @@ import {
 import { AppBar } from '../../shared/app-bar';
 import { Icon } from '../../shared/icon';
 import { APP_VERSION, BUILD_CONTEXT, BUILD_SHA } from '../../core/build-info';
+import { AuthService } from '../../core/firebase/auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -27,6 +28,7 @@ export class Settings {
   private readonly location = inject(Location);
   protected readonly i18n = inject(I18nService);
   protected readonly appState = inject(AppStateService);
+  private readonly authSvc = inject(AuthService);
 
   protected readonly state = this.appState.state;
 
@@ -83,6 +85,20 @@ export class Settings {
   }
   protected replayOnboarding(): void {
     this.router.navigate(['/onboarding']);
+  }
+
+  /** Logout: Firebase signOut + l'effect in AppStateService azzera state.account
+   *  in automatico. Dopo il signOut, redirige a /home perche' la pagina
+   *  impostazioni e' un posto un po' tecnico in cui restare: con la sessione
+   *  chiusa ha piu' senso atterrare nel posto neutro principale. */
+  protected async signOut(): Promise<void> {
+    try {
+      await this.authSvc.signOut();
+    } catch {
+      // Fallimenti rari (es. rete offline durante la revoca del token): la
+      // sessione lato client viene rimossa comunque, va bene cosi'.
+    }
+    this.router.navigate(['/home']);
   }
 
   protected resetProgress(): void {

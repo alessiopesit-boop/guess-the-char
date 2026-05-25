@@ -163,3 +163,87 @@
   color: var(--text-mute);
   opacity: 0.7;
 }
+
+/* Wrapper relativo per ancorare il popover account sotto l'icona trigger. */
+.account-wrap {
+  position: relative;
+}
+
+/* Iniziale del nickname per utente loggato: cerchio accent dentro la btn-icon. */
+.account-initial {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Popover account: sotto l'icona trigger, allineato a destra. Voci come
+   pulsanti pieni, separatore prima del logout, "Esci" colorato danger. */
+.account-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  /* Larghezza adattiva al contenuto: la voce piu' lunga determina la
+     larghezza del popover. min-width per evitare popover troppo stretti
+     quando le voci sono cortissime (es. solo "Esci"). */
+  width: max-content;
+  min-width: 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 16px 40px -16px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+  z-index: 50;
+  animation: account-menu-pop 140ms var(--tx-ease);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+@keyframes account-menu-pop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+[data-motion="minimal"] .account-menu {
+  animation: none;
+}
+
+/* Voci del menu: niente icone, solo testo allineato a destra dentro la voce.
+   Risultato: lista snella di azioni, cliccabile su tutta la larghezza. */
+.account-menu-item {
+  appearance: none;
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: right;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background var(--hover-dur) ease;
+}
+.account-menu-item:hover {
+  background: var(--surface-2);
+}
+
+.account-menu-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 6px;
+}
+
+/* "Esci" e' destructive: testo danger, hover con sfondo rosato lieve. */
+.account-menu-item.is-danger {
+  color: var(--danger);
+}
+.account-menu-item.is-danger:hover {
+  background: rgba(251, 113, 133, 0.08);
+}

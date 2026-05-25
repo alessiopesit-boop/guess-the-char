@@ -1,0 +1,195 @@
+/* La pagina /login si presenta come una colonna stretta centrata
+   verticalmente, simil-modal. La AppBar in alto serve solo da chrome con il
+   tasto Indietro: non c'e' titolo, il titolo vero ("Crea il tuo profilo")
+   sta dentro la hero della card. */
+.login-page {
+  min-height: calc(100dvh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-hero {
+  text-align: center;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.login-title {
+  margin-top: 18px;
+}
+.login-sub {
+  font-size: 14px;
+  margin-top: 8px;
+  max-width: 320px;
+}
+
+/* Banner visibile solo se firebase.config.ts e' ancora a PLACEHOLDER. Aiuta a
+   capire perche' i bottoni di login non funzionano in build di sviluppo
+   non configurate. */
+.login-disabled-banner {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  color: var(--warm);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Stato "gia' loggato": l'app-level effect ti porta in home, ma in attesa
+   mostriamo conferma esplicita + bottone fallback. Card centrata. */
+.login-already-in {
+  background: rgba(52, 211, 153, 0.06);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.login-already-in-title {
+  font-size: 16px;
+  font-weight: 500;
+}
+.login-already-in-nick {
+  color: var(--accent);
+  font-weight: 600;
+}
+.login-already-in-sub {
+  font-size: 13px;
+  margin: 0 0 6px;
+}
+
+/* Bottone provider Google in stile "white card on dark". L'icona e' un SVG
+   inline con i colori Google ufficiali, non un'icona del nostro set. */
+.provider-btn {
+  gap: 10px;
+  font-weight: 500;
+}
+.provider-google {
+  background: #ffffff;
+  color: #18181b;
+  border: 1px solid var(--border);
+}
+.provider-google:hover:not(:disabled) {
+  background: #f4f4f5;
+}
+.provider-google:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 2px;
+  color: var(--text-mute);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+}
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.login-field-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.login-field-hint {
+  font-size: 11px;
+}
+
+/* Input di testo riusabile per form di questa pagina. Le altre pagine
+   dell'app non hanno form, quindi per ora questa classe vive scoped qui. Se
+   in futuro nasce un secondo form (impostazioni nickname, feedback), la si
+   promuove a styles.css globale. */
+.input-field {
+  width: 100%;
+  padding: 13px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--hover-dur) ease;
+}
+.input-field:focus {
+  border-color: var(--accent);
+}
+
+.login-error {
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(251, 113, 133, 0.08);
+  border: 1px solid rgba(251, 113, 133, 0.35);
+  color: var(--danger);
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.login-submit {
+  margin-top: 4px;
+}
+
+.login-hint {
+  font-size: 11px;
+  text-align: center;
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
+
+/* Link "Continua senza account" in fondo, stile testuale come una nav-btn ma
+   centrato e senza bordo. */
+.login-anon {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 13px;
+  margin: 14px auto 0;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color var(--hover-dur) ease, background var(--hover-dur) ease;
+}
+.login-anon:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}

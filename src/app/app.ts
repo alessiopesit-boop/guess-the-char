@@ -18,6 +18,7 @@ export class App {
   private readonly router = inject(Router);
 
   constructor() {
+
     // Direzione della navigazione corrente, usata dal CSS delle view transitions:
     // se l'utente ha premuto Indietro (browser o app), e' 'back' e il CSS inverte
     // l'asse dello slide; in tutti gli altri casi (link, push imperativo) e' 'forward'.

@@ -56,6 +56,14 @@ export class AuthService {
     return cred.user;
   }
 
+  /**
+   * Flow OAuth Google via popup. Avevamo provato signInWithRedirect per
+   * aggirare i problemi di Cross-Origin-Opener-Policy, ma Firebase non riusciva
+   * a finalizzare il return del redirect su localhost (getRedirectResult
+   * tornava "no redirect pending" anche dopo un'autenticazione riuscita lato
+   * server). Il popup invece e' un flow piu' diretto: signInWithPopup risolve
+   * con il User quando l'utente completa il flow Google.
+   */
   async signInGoogle(): Promise<User> {
     const auth = this.requireAuth();
     const provider = new GoogleAuthProvider();
