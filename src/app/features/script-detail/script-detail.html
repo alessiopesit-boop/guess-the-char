@@ -8,6 +8,11 @@
         <div class="sd-titles">
           <span class="eyebrow">{{ groupName().toUpperCase() }}</span>
           <h1 class="h1">{{ nameOf() }}</h1>
+          @if (s.scriptName; as sn) {
+            <span class="muted sd-scriptname">
+              {{ i18n.lang() === 'it' ? 'Scrittura' : 'Script' }}: {{ sn }}
+            </span>
+          }
           <span class="muted sd-meta">
             <span>{{ s.region }}</span>
             <span>·</span>
