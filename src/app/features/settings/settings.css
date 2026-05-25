@@ -135,3 +135,10 @@
 .reset-btn:hover {
   background: rgba(251, 113, 133, 0.08);
 }
+
+/* Spiegazione del livello di animazioni attivo: cambia in base alla scelta corrente. */
+.motion-hint {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 6px 2px 0;
+}
