@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore/lite';
 import { ensureFirebaseApp } from './firebase';
 import { AuthService } from './auth.service';
+import { NicknameService } from './nickname.service';
 import { AppStateService } from '../state/app-state.service';
 import { AppState, DailyHistoryEntry, PerScriptStat } from '../state/types';
 
@@ -38,6 +39,7 @@ import { AppState, DailyHistoryEntry, PerScriptStat } from '../state/types';
 export class UserDocService {
   private readonly auth = inject(AuthService);
   private readonly appState = inject(AppStateService);
+  private readonly nicknames = inject(NicknameService);
   private readonly db: Firestore | null;
 
   /** Uid della sessione attualmente in sync. Quando cambia (login / logout)
@@ -96,12 +98,39 @@ export class UserDocService {
       const snap = await getDoc(ref);
       if (!snap.exists()) {
         // Primo accesso assoluto per questo account: cloud non sa niente,
-        // scriviamo lo stato locale corrente come "punto zero".
+        // scriviamo lo stato locale corrente come "punto zero". Prima pero'
+        // claimiamo un nickname libero: il seed e' quello tentativo gia'
+        // settato da AppStateService (displayName Google o email-prefix);
+        // se occupato, findAvailable trova alessio.pes2, ...3, o un suffix
+        // random.
         const local = this.appState.state();
+        const seed = local.account?.nickname ?? user.displayName ?? 'lettore';
+        let claimedNick = seed;
+        try {
+          claimedNick = await this.nicknames.findAvailable(seed, user.uid);
+        } catch (e) {
+          console.warn('[firestore] nickname claim failed, using seed as-is:', e);
+        }
+        if (claimedNick !== local.account?.nickname) {
+          // Aggiorna lo stato locale prima di scrivere su /users, cosi' i due
+          // resteranno consistenti.
+          this.applyingMerge = true;
+          try {
+            this.appState.updateAccount({ nickname: claimedNick });
+          } finally {
+            queueMicrotask(() => {
+              this.applyingMerge = false;
+            });
+          }
+        }
+        const updatedLocal = {
+          ...local,
+          account: local.account ? { ...local.account, nickname: claimedNick } : local.account,
+        };
         await setDoc(
           ref,
           {
-            ...toCloudShape(local, user),
+            ...toCloudShape(updatedLocal, user),
             joinedAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
           },

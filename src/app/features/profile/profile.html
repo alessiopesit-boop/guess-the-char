@@ -30,19 +30,38 @@
 
       @if (account(); as a) {
         @if (editingNick()) {
-          <div class="profile-nick-edit">
-            <input
-              class="input-field"
-              type="text"
-              autofocus
-              [ngModel]="nickDraft()"
-              (ngModelChange)="nickDraft.set($event)"
-              (keydown.enter)="saveNick()"
-              (keydown.escape)="cancelEditNick()"
-              maxlength="24"
-              minlength="2"
-            />
-            <button class="btn btn-primary profile-nick-save" type="button" (click)="saveNick()">OK</button>
+          <div class="profile-nick-edit-wrap">
+            <div class="profile-nick-edit">
+              <input
+                class="input-field"
+                type="text"
+                autofocus
+                [ngModel]="nickDraft()"
+                (ngModelChange)="setNickDraft($event)"
+                (keydown.enter)="saveNick()"
+                (keydown.escape)="cancelEditNick()"
+                maxlength="24"
+                minlength="2"
+                [disabled]="nickStatus() === 'saving'"
+              />
+              <button class="btn btn-primary profile-nick-save"
+                      type="button"
+                      [disabled]="nickStatus() === 'saving' || nickDraft().trim().length < 2"
+                      (click)="saveNick()">
+                @if (nickStatus() === 'saving') {
+                  {{ i18n.lang() === 'it' ? '...' : '...' }}
+                } @else {
+                  OK
+                }
+              </button>
+            </div>
+            @if (nickStatus() === 'taken') {
+              <p class="profile-nick-error" role="alert">
+                {{ i18n.lang() === 'it'
+                  ? 'Questo nickname e\' gia\' preso, sceglierne un altro.'
+                  : 'This nickname is already taken, please pick another.' }}
+              </p>
+            }
           </div>
         } @else {
           <button
@@ -75,12 +94,12 @@
     </div>
 
     @if (account()) {
-      <!-- Azione rapida: porta alla classifica (per ora ComingSoon). La chip
-           "Profilo pubblico" l'abbiamo tolta da qui: visitare la pagina del
-           proprio profilo pubblico dal proprio profilo era un giro a vuoto.
-           La pagina /u/:nickname esiste lo stesso per quando ti capita il link
-           del profilo di qualcun altro (dalla classifica futura). -->
+      <!-- Azioni rapide affiancate: profilo pubblico (la pagina che vedono
+           gli altri) e classifica (ancora ComingSoon). -->
       <div class="profile-chips">
+        <button class="nav-btn" type="button" (click)="goPublicProfile()">
+          {{ i18n.lang() === 'it' ? 'Profilo pubblico' : 'Public profile' }}
+        </button>
         <button class="nav-btn" type="button" (click)="goLeaderboard()">
           {{ i18n.t('leaderboard') }}
         </button>

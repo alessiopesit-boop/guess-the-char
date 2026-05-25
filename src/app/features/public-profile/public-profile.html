@@ -1,0 +1,147 @@
+<div class="app-shell">
+  <app-bar [canBack]="true"
+           (back)="goBack()"
+           (goHome)="goHome()">
+    @if (profile() && !loading()) {
+      <button class="nav-btn pub-share-btn" type="button" (click)="share()">
+        @if (copyFlash()) {
+          ✓ {{ i18n.lang() === 'it' ? 'Copiato' : 'Copied' }}
+        } @else {
+          {{ i18n.lang() === 'it' ? 'Condividi' : 'Share' }}
+        }
+      </button>
+    }
+  </app-bar>
+
+  <div class="page pub-page">
+    @if (loading()) {
+      <p class="muted pub-loading">
+        {{ i18n.lang() === 'it' ? 'Caricamento…' : 'Loading…' }}
+      </p>
+    } @else if (notFound()) {
+      <div class="pub-notfound">
+        <h2 class="h2">{{ i18n.lang() === 'it' ? 'Profilo non trovato' : 'Profile not found' }}</h2>
+        <p class="muted">
+          {{ i18n.lang() === 'it'
+            ? 'Il nickname che hai aperto non esiste, oppure l\'utente l\'ha cambiato.'
+            : 'The nickname you opened doesn\'t exist, or the user has changed it.' }}
+        </p>
+        <button class="btn btn-primary" type="button" (click)="goHome()">
+          {{ i18n.t('goHome') }}
+        </button>
+      </div>
+    } @else if (profile(); as p) {
+      <div class="pub-hero">
+        <span class="pub-avatar accent">{{ avatarGlyph() }}</span>
+        <h1 class="h1 pub-nick">
+          {{ p.nickname }}
+          @if (isSelf()) {
+            <span class="pub-you-pill">{{ i18n.lang() === 'it' ? 'tu' : 'you' }}</span>
+          }
+        </h1>
+        @if (joinedLabel(); as j) {
+          <p class="muted pub-joined">
+            {{ i18n.lang() === 'it' ? 'Membro da' : 'Member since' }} {{ j }}
+          </p>
+        }
+      </div>
+
+      <!-- Stats 2x2 (best, accuracy, played, dailyStreak) -->
+      <div class="pub-stats">
+        <div class="stat">
+          <span class="v">{{ p.bestStreak }}</span>
+          <span class="l">{{ i18n.t('bestStreak') }}</span>
+        </div>
+        <div class="stat">
+          <span class="v">{{ p.accuracy }}%</span>
+          <span class="l">{{ i18n.t('accuracy') }}</span>
+        </div>
+        <div class="stat">
+          <span class="v">{{ p.played }}</span>
+          <span class="l">{{ i18n.t('played') }}</span>
+        </div>
+        <div class="stat">
+          <span class="v">{{ p.dailyStreak }}</span>
+          <span class="l">{{ i18n.lang() === 'it' ? 'Giorni di fila' : 'Daily streak' }}</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3 class="h3 pub-section-h">
+        {{ i18n.lang() === 'it' ? 'Per scrittura' : 'By script' }}
+      </h3>
+      @if (p.scriptStats.length === 0) {
+        <p class="muted">
+          {{ i18n.lang() === 'it'
+            ? 'Nessun progresso ancora su nessuna scrittura.'
+            : 'No progress on any script yet.' }}
+        </p>
+      } @else {
+        <div class="pub-scripts">
+          @for (e of p.scriptStats; track e.id) {
+            <div class="pub-script">
+              <span class="pub-script-glyph">{{ e.script.sample }}</span>
+              <div class="pub-script-body">
+                <span class="pub-script-name">
+                  {{ i18n.lang() === 'it' ? e.script.nameIt : e.script.nameEn }}
+                </span>
+                <span class="pub-script-bar">
+                  <i [style.width.%]="e.acc" [attr.data-acc]="accLevel(e.acc)"></i>
+                </span>
+              </div>
+              <span class="pub-script-pct mono">{{ e.acc }}%</span>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="divider"></div>
+
+      <div class="section-head">
+        <h3 class="h3">
+          {{ i18n.lang() === 'it' ? 'Traguardi sbloccati' : 'Unlocked badges' }}
+        </h3>
+        <span class="mono pub-badges-count">
+          {{ p.unlockedBadges.length }}/{{ p.totalBadges }}
+        </span>
+      </div>
+      @if (p.unlockedBadges.length === 0) {
+        <p class="muted">
+          {{ i18n.lang() === 'it' ? 'Nessun traguardo ancora.' : 'No badges yet.' }}
+        </p>
+      } @else {
+        <div class="pub-badges-grid">
+          @for (b of p.unlockedBadges; track b.id) {
+            <div class="badge-card" data-unlocked="1" [attr.data-tier]="b.tier"
+                 [attr.aria-label]="i18n.lang() === 'it' ? b.titleIt : b.titleEn">
+              <span class="badge-icon">{{ b.icon }}</span>
+              <span class="badge-title">{{ i18n.lang() === 'it' ? b.titleIt : b.titleEn }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- CTA in fondo: "Condividi profilo" se tu, "Gioca anche tu" se altri. -->
+      @if (isSelf()) {
+        <button class="btn btn-primary btn-block pub-cta" type="button" (click)="share()">
+          @if (copyFlash()) {
+            ✓ {{ i18n.lang() === 'it' ? 'Link copiato' : 'Link copied' }}
+          } @else {
+            {{ i18n.lang() === 'it' ? 'Condividi profilo' : 'Share profile' }}
+          }
+        </button>
+      } @else {
+        <div class="card pub-beatme">
+          <p class="pub-beatme-text">
+            {{ i18n.lang() === 'it' ? 'Vuoi battere' : 'Want to beat' }}
+            <span class="pub-beatme-nick">{{ p.nickname }}</span>?
+          </p>
+          <button class="btn btn-primary pub-beatme-cta" type="button" (click)="goPlay()">
+            {{ i18n.lang() === 'it' ? 'Gioca anche tu' : 'Play too' }}
+          </button>
+        </div>
+      }
+    }
+  </div>
+</div>
