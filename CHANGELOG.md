@@ -5,6 +5,24 @@ Tutte le modifiche rilevanti a questo progetto sono documentate qui.
 Il formato si basa su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/),
 e il progetto segue il [Semantic Versioning](https://semver.org/lang/it/).
 
+## [1.4.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.3.0...v1.4.0) (2026-05-25)
+
+
+### Features
+
+* **feedback:** pagina feedback con Firestore + rate limit 3/giorno ([#58](https://github.com/alessiopesit-boop/guess-the-char/issues/58)) ([6febe9a](https://github.com/alessiopesit-boop/guess-the-char/commit/6febe9af6997eb6497a5696d40627c471f69c6c7))
+* **leaderboard:** pagina classifica con tab Daily / Tutti i tempi ([#55](https://github.com/alessiopesit-boop/guess-the-char/issues/55)) ([f10ce90](https://github.com/alessiopesit-boop/guess-the-char/commit/f10ce907cb231221cb008038e829b7650208c624))
+* **profile:** nickname unico via Firestore + pagina profilo pubblico ([#51](https://github.com/alessiopesit-boop/guess-the-char/issues/51)) ([f046196](https://github.com/alessiopesit-boop/guess-the-char/commit/f046196621b14957de3e9ab43c5b454ce4bfce4b))
+* **search:** pagina cerca utenti con fuzzy matching ([#54](https://github.com/alessiopesit-boop/guess-the-char/issues/54)) ([491498c](https://github.com/alessiopesit-boop/guess-the-char/commit/491498c6a9f14e0cf7bfba36a9c7b2da9455f1f4))
+
+
+### Bug Fixes
+
+* **firebase:** migrazione automatica del nickname per utenti legacy ([#59](https://github.com/alessiopesit-boop/guess-the-char/issues/59)) ([d3de3d8](https://github.com/alessiopesit-boop/guess-the-char/commit/d3de3d8b9ea0be075b23510dff4f234734af9e71))
+* **quiz,script-detail:** opzioni dalla pool selezionata + griglia caratteri responsive ([#56](https://github.com/alessiopesit-boop/guess-the-char/issues/56)) ([921e574](https://github.com/alessiopesit-boop/guess-the-char/commit/921e5746da20bff3c2168e21ac9a0c7d28bca1cf))
+* **search:** solo nickname che iniziano con la query ([#57](https://github.com/alessiopesit-boop/guess-the-char/issues/57)) ([20a6c69](https://github.com/alessiopesit-boop/guess-the-char/commit/20a6c69f8904520ff55da87a229d7174ae918e01))
+* **settings:** card profilo cliccabile + pulizia placeholder e emoji ([#53](https://github.com/alessiopesit-boop/guess-the-char/issues/53)) ([9ee0ce7](https://github.com/alessiopesit-boop/guess-the-char/commit/9ee0ce72476b765e446768f1c86b6559a695f981))
+
 ## [1.3.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.2.2...v1.3.0) (2026-05-25)
 
 
