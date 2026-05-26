@@ -190,6 +190,10 @@ export class Home {
     this.router.navigate(['/badges']);
   }
 
+  protected goLeaderboard(): void {
+    this.router.navigate(['/leaderboard']);
+  }
+
   protected goSettings(): void {
     this.router.navigate(['/settings']);
   }

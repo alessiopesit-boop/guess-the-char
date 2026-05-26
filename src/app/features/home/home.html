@@ -210,6 +210,26 @@
       </button>
     </div>
 
+    <!-- Card classifica: porta a /leaderboard. Visibile sempre, anche per
+         utenti anonimi (la pagina classifica ha la sua CTA per loggarsi). -->
+    <div class="section-head">
+      <h3 class="h3">{{ i18n.t('leaderboard') }}</h3>
+    </div>
+    <button class="lb-teaser" type="button" (click)="goLeaderboard()">
+      <span class="lb-teaser-emoji" aria-hidden="true">🏆</span>
+      <div class="lb-teaser-text">
+        <div class="lb-teaser-title">
+          {{ i18n.lang() === 'it' ? 'Vedi chi e\' in testa' : 'See who\'s on top' }}
+        </div>
+        <div class="lb-teaser-sub muted">
+          {{ i18n.lang() === 'it'
+            ? 'Sfida giornaliera + classifica generale di sempre.'
+            : 'Daily challenge + all-time leaderboard.' }}
+        </div>
+      </div>
+      <app-icon name="chev" />
+    </button>
+
     <div class="section-head">
       <h3 class="h3">{{ i18n.t('badges') }}</h3>
       <button class="nav-btn small" type="button" (click)="goBadges()">

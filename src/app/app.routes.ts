@@ -114,6 +114,7 @@ export const routes: Routes = [
       import('./features/challenge-play/challenge-play').then((m) => m.ChallengePlay),
   },
 
+
   {
     path: 'leaderboard',
     canActivate: [onboardedGuard],

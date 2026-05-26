@@ -12,10 +12,11 @@ import { computeBadges } from '../../core/data/badges';
 import { AppBar } from '../../shared/app-bar';
 import { ConfirmDialog } from '../../shared/confirm-dialog';
 import { Icon } from '../../shared/icon';
+import { InfoSheet } from '../../shared/info-sheet';
 
 @Component({
   selector: 'app-profile',
-  imports: [AppBar, ConfirmDialog, Icon, FormsModule],
+  imports: [AppBar, ConfirmDialog, Icon, InfoSheet, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './profile.html',
   styleUrl: './profile.css',
@@ -48,6 +49,18 @@ export class Profile {
 
   /** Dialog di conferma logout. */
   protected readonly signOutDialog = signal(false);
+
+  /** Modale che spiega come si calcola il punteggio (tap sulla card Punti). */
+  protected readonly scoreInfoOpen = signal(false);
+
+  protected readonly scoreInfoTitle = computed(() =>
+    this.i18n.lang() === 'it' ? 'Come si calcolano i punti' : 'How points work',
+  );
+  protected readonly scoreInfoBody = computed(() =>
+    this.i18n.lang() === 'it'
+      ? 'Il tuo punteggio in classifica si forma da due contributi: 1 punto per ogni risposta corretta che hai dato, piu\' 10 punti per ogni passo del tuo migliore streak personale di sempre. Formula: corrette + (migliore streak × 10) = punti totali. Cosi\' premia sia chi gioca tanto sia chi ha picchi di precisione.'
+      : 'Your leaderboard points come from two contributors: 1 point per correct answer you gave, plus 10 points for each step of your personal best streak. Formula: correct + (best streak × 10) = total points. This rewards both volume and your peak skill.',
+  );
 
   /** Per-scrittura, ordinate dalla migliore alla peggiore accuratezza. */
   protected readonly scriptStats = computed(() => {
@@ -83,6 +96,22 @@ export class Profile {
     if (!next) return '';
     return this.i18n.lang() === 'en' ? next.titleEn : next.titleIt;
   }
+
+  /** Punteggio composito: corrette + bestStreak * 10. Stesso che usa la
+   *  classifica alltime. Esposto qui in profilo come "Punti totali" con il
+   *  breakdown della formula, cosi' l'utente capisce a colpo d'occhio cosa
+   *  contribuisce al suo posizionamento. */
+  protected readonly scoreBreakdown = computed(() => {
+    const s = this.state();
+    const fromCorrect = s.correctAnswers;
+    const fromStreak = s.bestStreak * 10;
+    return {
+      total: fromCorrect + fromStreak,
+      correct: fromCorrect,
+      bestStreak: s.bestStreak,
+      streakBonus: fromStreak,
+    };
+  });
 
   /** Storico daily (max 14 piu' recenti, in ordine cronologico inverso). */
   protected readonly dailyHistory = computed(() => {
@@ -220,6 +249,13 @@ export class Profile {
     this.router.navigate(['/u', nick]);
   }
 
+  protected openScoreInfo(): void {
+    this.scoreInfoOpen.set(true);
+  }
+  protected closeScoreInfo(): void {
+    this.scoreInfoOpen.set(false);
+  }
+
   protected askSignOut(): void {
     this.signOutDialog.set(true);
   }
@@ -249,5 +285,6 @@ export class Profile {
     if (this.editingNick()) this.cancelEditNick();
     else if (this.pickingAvatar()) this.closeAvatarPicker();
     else if (this.signOutDialog()) this.cancelSignOut();
+    else if (this.scoreInfoOpen()) this.closeScoreInfo();
   }
 }

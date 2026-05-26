@@ -152,6 +152,41 @@
   border-color: var(--accent);
 }
 
+/* Campo password con bottone occhio in overlay a destra. L'input riserva
+   padding-right sufficiente perche' la password digitata non vada sotto al
+   bottone. Il bottone non altera il flow del form, e' position-absolute. */
+.login-pass-wrap {
+  position: relative;
+}
+.login-pass-input {
+  padding-right: 44px;
+}
+.login-pass-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--text-mute);
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background var(--hover-dur) ease, color var(--hover-dur) ease;
+}
+.login-pass-toggle:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.login-pass-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 .login-error {
   margin: 0;
   padding: 10px 12px;
