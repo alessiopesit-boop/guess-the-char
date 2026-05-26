@@ -75,7 +75,7 @@ export class Login {
     this.resetError.set(null);
     const email = this.resetEmail().trim();
     try {
-      await this.auth.sendPasswordReset(email);
+      await this.auth.sendPasswordReset(email, this.i18n.lang());
       this.resetDone.set(true);
     } catch (e: unknown) {
       const code = (e as { code?: string })?.code ?? '';
