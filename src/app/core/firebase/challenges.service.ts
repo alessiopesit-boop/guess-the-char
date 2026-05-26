@@ -3,6 +3,7 @@ import {
   Firestore,
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -231,6 +232,20 @@ export class ChallengesService {
       else draw++;
     }
     return { won, lost, draw, total: won + lost + draw };
+  }
+
+  /**
+   * Revoca una sfida pending che il challenger ha inviato. Cancella il doc
+   * Firestore. Le rules consentono delete solo se `auth.uid === from` E
+   * `status === 'pending'`: una sfida gia' giocata dal destinatario non
+   * puo' piu' essere annullata. Idempotente lato client: se il doc non
+   * esiste piu' (es. l'altro l'ha gia' completata nel frattempo), la
+   * delete fallisce silently e l'UI ricarica lo stato fresco.
+   */
+  async cancelOutgoing(id: string): Promise<void> {
+    if (!this.db) throw new Error('Firebase not configured');
+    const ref = doc(this.db, 'challenges', id);
+    await deleteDoc(ref);
   }
 
   /** Risposta del destinatario alla sfida: setta toScore e segna completed. */

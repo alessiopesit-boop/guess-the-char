@@ -141,3 +141,38 @@
   border-color: var(--border);
   background: var(--surface-2);
 }
+
+/* Bottone "Annulla" sulla riga delle sfide inviate pending. Stile sobrio (no
+   primary), color text-dim per non rubare attenzione alla riga stessa. Hover
+   passa al rosso per segnalare la natura distruttiva dell'azione. */
+.cl-revoke {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    color var(--hover-dur) ease,
+    border-color var(--hover-dur) ease,
+    background var(--hover-dur) ease;
+}
+.cl-revoke:hover:not(:disabled) {
+  color: var(--bad);
+  border-color: var(--bad);
+  background: rgba(239, 68, 68, 0.06);
+}
+.cl-revoke:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Adatta la riga statica delle sfide inviate al nuovo terzo elemento (bottone
+   Annulla a destra): tre colonne invece di due. */
+.cl-row-static {
+  grid-template-columns: 40px 1fr auto;
+}

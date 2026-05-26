@@ -108,6 +108,15 @@
                         <strong>{{ c.fromScore }}/5</strong>
                       </span>
                     </span>
+                    <button class="cl-revoke"
+                            type="button"
+                            [disabled]="cancelling().has(c.id)"
+                            (click)="revokeOutgoing(c, $event)"
+                            [attr.aria-label]="i18n.lang() === 'it' ? 'Annulla sfida' : 'Cancel challenge'">
+                      {{ cancelling().has(c.id)
+                          ? (i18n.lang() === 'it' ? 'Annullo…' : 'Cancelling…')
+                          : (i18n.lang() === 'it' ? 'Annulla' : 'Cancel') }}
+                    </button>
                   </div>
                 </li>
               }
