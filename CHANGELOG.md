@@ -5,6 +5,13 @@ Tutte le modifiche rilevanti a questo progetto sono documentate qui.
 Il formato si basa su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/),
 e il progetto segue il [Semantic Versioning](https://semver.org/lang/it/).
 
+## [1.6.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.5.0...v1.6.0) (2026-05-26)
+
+
+### Features
+
+* **login:** flow 'Password dimenticata?' con email di reset ([#73](https://github.com/alessiopesit-boop/guess-the-char/issues/73)) ([60ffe44](https://github.com/alessiopesit-boop/guess-the-char/commit/60ffe44e387e651a69d3a15e0539b8efbc258c3b))
+
 ## [1.5.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.4.0...v1.5.0) (2026-05-26)
 
 
