@@ -437,3 +437,40 @@
   margin-top: 4px;
   line-height: 1.4;
 }
+
+/* Card "Sfide tra amici" cliccabile sotto le stats principali. Tre numeri
+   (vinte/perse/pari) con accenti di colore distinti. */
+.profile-challenge-card {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease;
+}
+.profile-challenge-card:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.profile-challenge-eyebrow {
+  margin: 0;
+}
+.profile-challenge-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.profile-challenge-stats .v[data-tone='win'] { color: var(--ok); }
+.profile-challenge-stats .v[data-tone='lose'] { color: var(--bad); }
+.profile-challenge-stats .v[data-tone='draw'] { color: var(--text-dim); }

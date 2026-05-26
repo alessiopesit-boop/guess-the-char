@@ -23,7 +23,7 @@ Aggiornare significa: modificare la sezione gia' esistente che descrive l'area t
 
 Quiz interattivo single-page per imparare a riconoscere a colpo d'occhio i sistemi di scrittura del mondo: appare un glifo (hiragana, devanagari, arabo, greco, ecc.) e l'utente sceglie tra quattro opzioni. Quattro modalita': Allenamento libero, Sfida a tempo, Survival, Sfida giornaliera deterministica con griglia emoji condivisibile. Tono estetico: gioco-quiz, dark, palette ambra di default.
 
-Persistenza dei progressi via `localStorage` per stato di gioco, lingua UI e preferenze visive. Login via Firebase Auth (Email/Password + Google) gia' attivo: l'utente puo' creare un account o continuare in modo anonimo. La sincronizzazione dei progressi nel cloud, profilo pubblico, classifica e sfide tra amici sono ancora stub "In arrivo".
+Persistenza dei progressi via `localStorage` per stato di gioco, lingua UI e preferenze visive. Login via Firebase Auth (Email/Password + Google) attivo: l'utente puo' creare un account o continuare in modo anonimo. Per gli utenti loggati i progressi vengono sincronizzati su Firestore, e sono attivi profilo pubblico (`/u/:nickname`), ricerca utenti (`/search`), classifica daily + all-time (`/leaderboard`), amicizie mutuali (`/friends`) e sfide custom 1-vs-1 tra amici (`/sfide`).
 
 ## Stack
 
@@ -292,7 +292,7 @@ L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del p
 2. **Aggiungi web app** (icona `</>`): nickname libero, **non** abilitare Hosting (siamo su Pages). Ti restituisce un config object con 6 stringhe (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId).
 3. **Incolla il config** in `src/app/core/firebase/firebase.config.ts` al posto dei placeholder. E aggiorna `.firebaserc` mettendo il `projectId` reale al posto di `PLACEHOLDER_PROJECT_ID`.
 4. **Restringi la apiKey** (importante per non farsi rubare quota): su [console.cloud.google.com](https://console.cloud.google.com) -> APIs & Services -> Credentials -> click sulla "Browser key (auto created by Firebase)" -> Application restrictions = "HTTP referrers", aggiungi `localhost:4200/*` e `alessiopesit-boop.github.io/*`.
-5. **Auth providers**: Firebase Console -> Authentication -> Sign-in method, abilita Email/Password e Google (per Apple serve un Apple Developer a $99/anno, salta finche' non serve davvero).
+5. **Auth providers**: Firebase Console -> Authentication -> Sign-in method, abilita Email/Password e Google.
 6. **Firestore**: Firebase Console -> Firestore Database -> Create database -> **Production mode** (non test, le test rules scadono). Regione: `eur3` per latenze migliori da IT.
 7. **Deploy delle rules**: dalla root del repo, `npx firebase login` (una sola volta), poi `npm run deploy:rules`. Pubblica `firestore.rules` sul tuo progetto. Da ripetere ogni volta che le rules cambiano.
 
@@ -331,7 +331,7 @@ Al login iniziale, `UserDocService` legge il doc cloud e fa **max-merge** per i 
 
 Le scritture successive durante la sessione fanno **full overwrite** del documento (con `setDoc({merge: true})` ma a livello field-shallow), perche' dopo il merge iniziale lo stato locale e' la fonte di verita' fino al prossimo login.
 
-### Cosa NON e' ancora collegato
+### Pagine connesse al cloud
 
 - `/leaderboard` reale: due tab Daily / Alltime. Daily sort per `dailyScore`, filtra solo chi ha completato la sfida di oggi. Alltime sort per `correctAnswers`. Top 3 con medaglie 🥇🥈🥉, evidenza ambra sulla propria riga, click su un'altra riga porta a `/u/:nickname`. Paginazione "Mostra altri" 30 alla volta. Weekly/Monthly non implementati: per averli onestamente servirebbe tracciare contatori a finestra temporale (incremento per ogni partita + reset al cambio settimana/mese). Per ora fuori scope.
 - `/profile` reale: hero con avatar editabile in modale (12 glifi predefiniti in `AVATARS`), nickname inline edit (Enter salva, Esc annulla, errore "gia' preso" via transazione `NicknameService.change`), stats 2x2, lista per-scrittura con barre colorate (verde >=75%, ambra >=40%, rosso <40%), badges teaser, storico daily.
@@ -342,8 +342,8 @@ Le scritture successive durante la sessione fanno **full overwrite** del documen
 
 ### Convenzioni
 
-- **Niente segreti committati**: il config Firebase NON e' un segreto, vive in chiaro. Le credenziali Apple Sign-In (quando arriveranno) e qualunque service account JSON vanno in `.gitignore`.
-- **Provider IDs Firebase**: `password` / `google.com` / `apple.com`. Mappati 1:1 nel campo `AccountInfo.provider`. `'demo'` resta come back-compat per chi aveva il vecchio mock; verra' rimosso quando la 1.3.x avra' circolato.
+- **Niente segreti committati**: il config Firebase NON e' un segreto, vive in chiaro. Qualunque service account JSON va in `.gitignore`.
+- **Provider IDs Firebase**: `password` / `google.com`. Mappati 1:1 nel campo `AccountInfo.provider`. `'demo'` resta come back-compat per chi aveva il vecchio mock; verra' rimosso quando la 1.3.x avra' circolato.
 - **localhost vs prod**: lo stesso progetto Firebase serve dev e prod. Va bene per la nostra scala. Se in futuro vuoi separare, crea un secondo progetto e fai fileReplacement su `firebase.config.ts` come gia' facciamo con `build-info.ts`.
 
 ## Vincoli e cose da non fare

@@ -130,6 +130,42 @@
         </div>
       </div>
 
+      <!-- Daily oggi: visibile solo se l'utente visualizzato ha completato la
+           sfida del giorno corrente. Se anche io l'ho fatta, mostro il
+           confronto a due. Se sono io stesso (isSelf), niente: il mio daily lo
+           vedo gia' su /daily-result. -->
+      @if (!isSelf() && p.dailyToday; as theirDaily) {
+        <div class="pub-daily-card">
+          <span class="eyebrow pub-daily-eyebrow">
+            {{ i18n.lang() === 'it' ? 'SFIDA GIORNALIERA · OGGI' : 'DAILY · TODAY' }}
+          </span>
+          @if (myDailyToday(); as mine) {
+            <div class="pub-daily-vs">
+              <div class="pub-daily-side"
+                   [class.pub-daily-winner]="mine.score > theirDaily.score">
+                <span class="pub-daily-name">{{ i18n.lang() === 'it' ? 'Tu' : 'You' }}</span>
+                <span class="pub-daily-score tabnum">{{ mine.score }}/5</span>
+              </div>
+              <span class="pub-daily-vs-sep">vs</span>
+              <div class="pub-daily-side"
+                   [class.pub-daily-winner]="theirDaily.score > mine.score">
+                <span class="pub-daily-name">{{ p.nickname }}</span>
+                <span class="pub-daily-score tabnum">{{ theirDaily.score }}/5</span>
+              </div>
+            </div>
+          } @else {
+            <p class="pub-daily-solo">
+              {{ p.nickname }}
+              {{ i18n.lang() === 'it' ? 'ha fatto' : 'scored' }}
+              <strong class="tabnum">{{ theirDaily.score }}/5</strong>.
+              {{ i18n.lang() === 'it'
+                ? 'Vediamo come te la cavi.'
+                : "Let's see how you do." }}
+            </p>
+          }
+        </div>
+      }
+
       <div class="divider"></div>
 
       <h3 class="h3 pub-section-h">
