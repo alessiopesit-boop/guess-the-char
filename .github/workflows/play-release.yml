@@ -46,6 +46,23 @@ jobs:
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli@latest
 
+      - name: Pre-configura Bubblewrap (skip prompt JDK/SDK)
+        run: |
+          # Al primo avvio, Bubblewrap chiede interattivamente se vuoi che si
+          # installi un proprio JDK + SDK. In CI non lo vogliamo: usiamo quelli
+          # gia' messi sul runner dai due step precedenti. Pre-popoliamo il
+          # config file in $HOME/.bubblewrap/config.json cosi' il prompt salta
+          # e l'update parte dritto.
+          mkdir -p "$HOME/.bubblewrap"
+          cat > "$HOME/.bubblewrap/config.json" <<EOF
+          {
+            "jdkPath": "${JAVA_HOME}",
+            "androidSdkPath": "${ANDROID_SDK_ROOT}"
+          }
+          EOF
+          echo "Config Bubblewrap:"
+          cat "$HOME/.bubblewrap/config.json"
+
       - name: Decode keystore from secret
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
