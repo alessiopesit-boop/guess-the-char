@@ -65,6 +65,7 @@ src/
       leaderboard/
       login/
       onboarding/
+      privacy/
       profile/
       public-profile/
       script-detail/

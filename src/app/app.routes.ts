@@ -76,6 +76,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/login/login').then((m) => m.Login),
   },
 
+  // Privacy policy: pagina pubblica, accessibile da chiunque (anche pre-
+  // onboarding). Serve sia all'utente in app sia come URL canonico per la
+  // scheda Play Store (campo "Privacy policy URL" obbligatorio in submission).
+  {
+    path: 'privacy',
+    loadComponent: () => import('./features/privacy/privacy').then((m) => m.Privacy),
+  },
+
   {
     path: 'profile',
     canActivate: [onboardedGuard],

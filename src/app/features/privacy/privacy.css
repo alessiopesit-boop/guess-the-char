@@ -1,0 +1,44 @@
+.privacy-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-bottom: 4rem;
+}
+
+.privacy-page h1 {
+  margin-top: 1.5rem;
+}
+
+.privacy-page h2 {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.privacy-page p,
+.privacy-page ul {
+  line-height: 1.55;
+}
+
+.privacy-page ul {
+  padding-left: 1.5rem;
+}
+
+.privacy-page ul li {
+  margin-bottom: 0.35rem;
+}
+
+.privacy-page code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.92em;
+}
+
+.privacy-page a {
+  color: var(--accent, #ffb347);
+  text-decoration: underline;
+}
+
+.privacy-meta {
+  margin-top: 2.5rem;
+  font-size: 0.9rem;
+}
