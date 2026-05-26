@@ -80,7 +80,12 @@ service cloud.firestore {
                     && request.resource.data.to == resource.data.to
                     && request.resource.data.fromScore == resource.data.fromScore
                     && request.resource.data.questions == resource.data.questions;
-      allow delete: if false;
+      // Solo il challenger (from) puo' revocare una sfida ancora pending.
+      // Una sfida gia' completata dal destinatario non si tocca, resta nello
+      // storico di entrambi.
+      allow delete: if request.auth != null
+                    && request.auth.uid == resource.data.from
+                    && resource.data.status == 'pending';
     }
 
     // /feedback/{auto-id}

@@ -40,6 +40,10 @@ export class ChallengesList {
   protected readonly outgoing = signal<ChallengeDoc[]>([]);
   protected readonly loading = signal(true);
 
+  /** Set di id sfida in fase di revoca: usato per disabilitare il bottone
+   *  "Annulla" durante la delete e per nascondere ottimisticamente la riga. */
+  protected readonly cancelling = signal<Set<string>>(new Set());
+
   protected readonly pendingIncoming = computed(() =>
     this.incoming().filter((c) => c.status === 'pending'),
   );
@@ -101,6 +105,37 @@ export class ChallengesList {
 
   protected openChallenge(id: string): void {
     this.router.navigate(['/sfida', id]);
+  }
+
+  /** Revoca una sfida pending inviata dall'utente. Chiede conferma via
+   *  window.confirm (semplice, niente dialog dedicato per uno scope cosi'
+   *  ristretto). Dopo la delete, rimuove ottimisticamente la riga dalla
+   *  lista; se la delete fallisce, la lista viene comunque ricaricata. */
+  protected async revokeOutgoing(c: ChallengeDoc, event: Event): Promise<void> {
+    event.stopPropagation();
+    const isIt = this.i18n.lang() === 'it';
+    const msg = isIt
+      ? `Annullare la sfida a ${c.toNickname}? Il tuo punteggio (${c.fromScore}/5) andra' perso.`
+      : `Cancel the challenge to ${c.toNickname}? Your score (${c.fromScore}/5) will be discarded.`;
+    if (typeof window !== 'undefined' && !window.confirm(msg)) return;
+    if (this.cancelling().has(c.id)) return;
+    this.cancelling.update((s) => new Set(s).add(c.id));
+    try {
+      await this.challenges.cancelOutgoing(c.id);
+      // Rimuovi ottimisticamente dalla lista locale, evita re-fetch costoso.
+      this.outgoing.update((list) => list.filter((x) => x.id !== c.id));
+    } catch (e) {
+      console.warn('[challenges-list] revoke error:', e);
+      // Refresh per allineare lo stato in caso la delete sia comunque andata
+      // a buon fine, o la sfida sia stata gia' completata nel frattempo.
+      void this.refresh();
+    } finally {
+      this.cancelling.update((s) => {
+        const next = new Set(s);
+        next.delete(c.id);
+        return next;
+      });
+    }
   }
 
   protected openFriend(nickname: string): void {
