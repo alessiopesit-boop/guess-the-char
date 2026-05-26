@@ -1,0 +1,163 @@
+.fr-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 32px;
+}
+
+.fr-anon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  padding: 60px 16px 24px;
+}
+.fr-anon p {
+  max-width: 320px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Tabs Amici/Richieste: riusa .seg globale, ma il tab Richieste puo' avere
+   una pillola col conteggio (badge ambra). */
+.fr-tabs {
+  margin-top: 4px;
+}
+.fr-tab-with-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.fr-tab-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fr-loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}
+.fr-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--surface-2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: fr-spin 0.7s linear infinite;
+}
+@keyframes fr-spin {
+  to { transform: rotate(360deg); }
+}
+[data-motion="minimal"] .fr-spinner { animation: none; }
+
+.fr-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 40px 16px 24px;
+}
+.fr-empty-glyph {
+  font-family: var(--font-glyph);
+  font-size: 56px;
+  color: var(--accent);
+  opacity: 0.5;
+  line-height: 1;
+}
+.fr-empty p {
+  max-width: 320px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.fr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Riga di una persona: parte cliccabile (avatar + nick) a sinistra che porta
+   al profilo pubblico, azioni (Rimuovi / Accetta / Rifiuta) a destra. */
+.fr-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: background var(--hover-dur) ease;
+}
+.fr-row-main {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background var(--hover-dur) ease;
+}
+.fr-row-main:hover {
+  background: var(--surface-2);
+}
+.fr-avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+}
+.fr-nick {
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fr-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.fr-action-btn {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 12px;
+}
+.fr-row-action {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 12px;
+}

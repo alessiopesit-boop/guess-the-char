@@ -26,6 +26,13 @@
                     (click)="closeAccountMenu(); goProfile()">
               {{ i18n.t('profile') }}
             </button>
+            <button type="button" class="account-menu-item account-menu-friends" role="menuitem"
+                    (click)="closeAccountMenu(); goFriends()">
+              <span>{{ i18n.lang() === 'it' ? 'Amici' : 'Friends' }}</span>
+              @if (pendingFriendRequests() > 0) {
+                <span class="account-menu-badge">{{ pendingFriendRequests() }}</span>
+              }
+            </button>
             <button type="button" class="account-menu-item" role="menuitem"
                     (click)="closeAccountMenu(); goSearch()">
               {{ i18n.lang() === 'it' ? 'Cerca utenti' : 'Find users' }}

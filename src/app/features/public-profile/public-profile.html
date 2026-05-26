@@ -46,6 +46,48 @@
         }
       </div>
 
+      <!-- Bottone amicizia: stati distinti in base alla relazione corrente.
+           Visibile solo se sto guardando il profilo di qualcun altro (non il
+           mio) e sono loggato. -->
+      @if (!isSelf() && appState.state().account) {
+        <div class="pub-friend-bar">
+          @switch (friendStatus()) {
+            @case ('accepted') {
+              <button class="nav-btn pub-friend-btn"
+                      type="button"
+                      [disabled]="friendBusy()"
+                      (click)="removeFriend()">
+                ✓ {{ i18n.lang() === 'it' ? 'Siete amici' : 'Friends' }}
+              </button>
+            }
+            @case ('pending-sent') {
+              <button class="nav-btn pub-friend-btn"
+                      type="button"
+                      [disabled]="friendBusy()"
+                      (click)="cancelRequest()">
+                {{ i18n.lang() === 'it' ? 'Richiesta inviata · Annulla' : 'Request sent · Cancel' }}
+              </button>
+            }
+            @case ('pending-received') {
+              <button class="btn btn-primary pub-friend-btn"
+                      type="button"
+                      [disabled]="friendBusy()"
+                      (click)="acceptRequest()">
+                {{ i18n.lang() === 'it' ? 'Accetta richiesta' : 'Accept request' }}
+              </button>
+            }
+            @default {
+              <button class="btn btn-primary pub-friend-btn"
+                      type="button"
+                      [disabled]="friendBusy()"
+                      (click)="addFriend()">
+                + {{ i18n.lang() === 'it' ? 'Aggiungi amico' : 'Add friend' }}
+              </button>
+            }
+          }
+        </div>
+      }
+
       <!-- Card punteggio cliccabile: tap apre la modale che spiega la formula. -->
       <button class="card pub-score-card" type="button" (click)="openScoreInfo()"
               [attr.aria-label]="i18n.lang() === 'it' ? 'Come si calcolano i punti' : 'How points work'">
