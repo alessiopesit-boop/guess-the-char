@@ -5,6 +5,22 @@ Tutte le modifiche rilevanti a questo progetto sono documentate qui.
 Il formato si basa su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/),
 e il progetto segue il [Semantic Versioning](https://semver.org/lang/it/).
 
+## [1.7.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.6.0...v1.7.0) (2026-05-26)
+
+
+### Features
+
+* **android:** scaffolding completo per pubblicare l'app su Google Play ([#76](https://github.com/alessiopesit-boop/guess-the-char/issues/76)) ([2b370c6](https://github.com/alessiopesit-boop/guess-the-char/commit/2b370c60b829ed190b3f8c3318be2c753366f91b))
+* **i18n:** inglese come lingua di default con auto-detect ([#77](https://github.com/alessiopesit-boop/guess-the-char/issues/77)) ([f87d6e5](https://github.com/alessiopesit-boop/guess-the-char/commit/f87d6e5ae640151ce56b44137020b48fe9a5bec2))
+* **privacy:** aggiungi pagina /privacy bilingue ([#79](https://github.com/alessiopesit-boop/guess-the-char/issues/79)) ([522971d](https://github.com/alessiopesit-boop/guess-the-char/commit/522971dad575a55e76b6c316c30a2c32752450a4))
+* **pwa:** rendi l'app installabile come PWA ([#75](https://github.com/alessiopesit-boop/guess-the-char/issues/75)) ([c31b343](https://github.com/alessiopesit-boop/guess-the-char/commit/c31b343a69b2773ec064f5136eef983b02fe4724))
+
+
+### Bug Fixes
+
+* **android:** porta minSdkVersion da 19 a 21 ([#82](https://github.com/alessiopesit-boop/guess-the-char/issues/82)) ([3cba51f](https://github.com/alessiopesit-boop/guess-the-char/commit/3cba51fe9e39af97b430e86efecd4d02a79800a0))
+* **ci:** pre-configura Bubblewrap per saltare il prompt JDK/SDK interattivo ([#81](https://github.com/alessiopesit-boop/guess-the-char/issues/81)) ([d46949b](https://github.com/alessiopesit-boop/guess-the-char/commit/d46949b2e513c33e79f52d4bab967bb5e7e28bc3))
+
 ## [1.6.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.5.0...v1.6.0) (2026-05-26)
 
 
