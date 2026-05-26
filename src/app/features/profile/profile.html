@@ -106,15 +106,35 @@
       </div>
     }
 
-    <!-- Stats 2x2 -->
+    <!-- Card punteggio cliccabile: tap apre la modale che spiega la formula. -->
+    <button class="card profile-score-card" type="button" (click)="openScoreInfo()"
+            [attr.aria-label]="i18n.lang() === 'it' ? 'Come si calcolano i punti' : 'How points work'">
+      <span class="eyebrow">{{ i18n.lang() === 'it' ? 'PUNTI TOTALI' : 'TOTAL POINTS' }}</span>
+      <div class="profile-score-total tabnum">{{ scoreBreakdown().total }}</div>
+    </button>
+
+    <!-- Cards contributore: i due fattori che alimentano il punteggio.
+         Numero grande + label + "+N pt" come terza riga, tutto in flow,
+         niente absolute. -->
+    <div class="profile-score-contrib">
+      <div class="stat profile-contrib-card">
+        <span class="v">{{ scoreBreakdown().correct }}</span>
+        <span class="l">{{ i18n.lang() === 'it' ? 'Corrette' : 'Correct' }}</span>
+        <span class="profile-contrib-bonus mono">+{{ scoreBreakdown().correct }} pt</span>
+      </div>
+      <div class="stat profile-contrib-card">
+        <span class="v">{{ scoreBreakdown().bestStreak }}</span>
+        <span class="l">{{ i18n.t('bestStreak') }}</span>
+        <span class="profile-contrib-bonus mono">+{{ scoreBreakdown().streakBonus }} pt</span>
+      </div>
+    </div>
+
+    <!-- Stats contestuali (NON contribuiscono al punteggio: streak corrente,
+         precisione, partite giocate). bestStreak vive sopra nei contributor. -->
     <div class="profile-stats">
       <div class="stat">
         <span class="v">{{ state().streak }}</span>
         <span class="l">{{ i18n.t('streak') }}</span>
-      </div>
-      <div class="stat">
-        <span class="v">{{ state().bestStreak }}</span>
-        <span class="l">{{ i18n.t('bestStreak') }}</span>
       </div>
       <div class="stat">
         <span class="v">{{ state().accuracy }}%</span>
@@ -248,6 +268,14 @@
         </button>
       </div>
     </div>
+  }
+
+  @if (scoreInfoOpen()) {
+    <app-info-sheet
+      [title]="scoreInfoTitle()"
+      [body]="scoreInfoBody()"
+      (close)="closeScoreInfo()"
+    />
   }
 
   @if (signOutDialog()) {

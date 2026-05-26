@@ -236,6 +236,10 @@ interface CloudUserDoc {
   played: number;
   correctAnswers: number;
   accuracy: number;
+  /** Score composito per la classifica alltime: correctAnswers + bestStreak*10.
+   *  Premia sia il volume sia il picco di bravura. Calcolato lato client e
+   *  scritto qui per poterci fare orderBy() direttamente. */
+  score: number;
   perScript: Record<string, PerScriptStat>;
   dailyDone: boolean;
   dailyDoneStamp: string | null;
@@ -257,6 +261,9 @@ function toCloudShape(s: AppState, user: User | null): Omit<CloudUserDoc, 'joine
     played: s.played,
     correctAnswers: s.correctAnswers,
     accuracy: s.accuracy,
+    // Score composito per leaderboard alltime: 1 punto per ogni corretta, 10
+    // punti bonus per ogni step del miglior streak personale.
+    score: s.correctAnswers + s.bestStreak * 10,
     perScript: s.perScript,
     dailyDone: s.dailyDone,
     dailyDoneStamp: s.dailyDoneStamp,
