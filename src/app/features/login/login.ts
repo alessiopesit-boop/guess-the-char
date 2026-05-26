@@ -24,8 +24,13 @@ export class Login {
 
   protected readonly email = signal('');
   protected readonly password = signal('');
+  protected readonly showPassword = signal(false);
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
+
+  protected toggleShowPassword(): void {
+    this.showPassword.update((v) => !v);
+  }
 
   /** Se siamo gia' autenticati: tornare al rendering qui dentro significa che
    *  ci siamo arrivati dal redirect Google (o che eravamo gia' loggati e
@@ -111,9 +116,14 @@ export class Login {
           await this.auth.signUpEmail(email, password);
         } catch (signUpErr: unknown) {
           // Se signUp fallisce con "email in uso", l'account esiste e la
-          // password e' sbagliata: rilanciamo come "credenziali errate".
+          // password e' sbagliata. Lanciamo un codice custom cosi' il
+          // messaggio user-facing dice "account gia' esistente" invece
+          // del generico "credenziali errate" che confonde chi pensa di
+          // stare creando un nuovo account.
           const upCode = (signUpErr as { code?: string })?.code ?? '';
-          if (upCode === 'auth/email-already-in-use') throw signInErr;
+          if (upCode === 'auth/email-already-in-use') {
+            throw { code: 'gtc/account-exists-wrong-password' };
+          }
           throw signUpErr;
         }
       }
@@ -180,6 +190,10 @@ export class Login {
         return isIt
           ? 'Email o password non corrette.'
           : 'Email or password is incorrect.';
+      case 'gtc/account-exists-wrong-password':
+        return isIt
+          ? 'Esiste gia\' un account con questa email, ma la password non corrisponde. Se non ricordi la password, prova con un\'email diversa.'
+          : 'An account with this email already exists, but the password doesn\'t match. If you don\'t remember it, try a different email.';
       case 'auth/too-many-requests':
         return isIt
           ? 'Troppi tentativi in poco tempo: riprova fra qualche minuto.'
