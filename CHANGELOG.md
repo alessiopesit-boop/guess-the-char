@@ -5,6 +5,27 @@ Tutte le modifiche rilevanti a questo progetto sono documentate qui.
 Il formato si basa su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/),
 e il progetto segue il [Semantic Versioning](https://semver.org/lang/it/).
 
+## [1.5.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.4.0...v1.5.0) (2026-05-26)
+
+
+### Features
+
+* **daily:** confronto con gli amici sulla daily challenge ([#65](https://github.com/alessiopesit-boop/guess-the-char/issues/65)) ([aa7a201](https://github.com/alessiopesit-boop/guess-the-char/commit/aa7a201e7df7bc2e22dea2d8fbbdd9ad84df50ec))
+* **friends:** amicizie mutuali con richieste e pagina /amici ([#63](https://github.com/alessiopesit-boop/guess-the-char/issues/63)) ([0e20a8a](https://github.com/alessiopesit-boop/guess-the-char/commit/0e20a8a47c8f125ec13b865ff83f57ee5df0751e))
+* **leaderboard,home:** metrica composita per la classifica + card classifica in home ([#61](https://github.com/alessiopesit-boop/guess-the-char/issues/61)) ([ac24732](https://github.com/alessiopesit-boop/guess-the-char/commit/ac24732cd35a4c0d8f16750f16d7d69544b41bf2))
+* **profile:** mostra punti totali in profilo personale (col calcolo) e pubblico ([#62](https://github.com/alessiopesit-boop/guess-the-char/issues/62)) ([a498afc](https://github.com/alessiopesit-boop/guess-the-char/commit/a498afcd7f620df8f1ca82fba7929be8a076c284))
+* **profile:** record sfide tra amici nel profilo ([#69](https://github.com/alessiopesit-boop/guess-the-char/issues/69)) ([01f4627](https://github.com/alessiopesit-boop/guess-the-char/commit/01f4627d1b2c8840a47e5784b857120c60c8d68e))
+* **public-profile:** daily di oggi + confronto col tuo ([#70](https://github.com/alessiopesit-boop/guess-the-char/issues/70)) ([a46f017](https://github.com/alessiopesit-boop/guess-the-char/commit/a46f017856b867179733420525a400155ab05a92))
+* **sfide:** revoca sfide pending inviate ([#72](https://github.com/alessiopesit-boop/guess-the-char/issues/72)) ([1000c70](https://github.com/alessiopesit-boop/guess-the-char/commit/1000c70fdca608d4e212213ddfe49864432911e3))
+* **sfide:** sfide custom 1-vs-1 tra amici ([#66](https://github.com/alessiopesit-boop/guess-the-char/issues/66)) ([d60504d](https://github.com/alessiopesit-boop/guess-the-char/commit/d60504d98e122e4d75f6a7d523f72a3ac99f3078))
+
+
+### Bug Fixes
+
+* **login:** toggle occhio per mostrare la password + messaggio chiaro per email gia' registrata ([#64](https://github.com/alessiopesit-boop/guess-the-char/issues/64)) ([36d12e6](https://github.com/alessiopesit-boop/guess-the-char/commit/36d12e68eca339228c5f8376071f10805720df1a))
+* **public-profile:** impedisci sfide duplicate verso lo stesso amico ([#71](https://github.com/alessiopesit-boop/guess-the-char/issues/71)) ([cba9490](https://github.com/alessiopesit-boop/guess-the-char/commit/cba949029880e5e23436ce943ef53315d53c20ec))
+* **settings:** footer mostra solo la versione, niente 'static · offline-ready' ([#60](https://github.com/alessiopesit-boop/guess-the-char/issues/60)) ([48b48a2](https://github.com/alessiopesit-boop/guess-the-char/commit/48b48a2aa211704e876d0e2a173659943f854f79))
+
 ## [1.4.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.3.0...v1.4.0) (2026-05-25)
 
 
