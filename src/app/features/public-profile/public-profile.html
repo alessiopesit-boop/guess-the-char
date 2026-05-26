@@ -59,6 +59,11 @@
                       (click)="removeFriend()">
                 ✓ {{ i18n.lang() === 'it' ? 'Siete amici' : 'Friends' }}
               </button>
+              <button class="btn btn-primary pub-friend-btn"
+                      type="button"
+                      (click)="challengeFriend()">
+                {{ i18n.lang() === 'it' ? 'Sfida' : 'Challenge' }}
+              </button>
             }
             @case ('pending-sent') {
               <button class="nav-btn pub-friend-btn"

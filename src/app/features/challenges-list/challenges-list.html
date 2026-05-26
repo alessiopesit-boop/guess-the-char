@@ -1,0 +1,155 @@
+<div class="app-shell">
+  <app-bar [canBack]="true" leftMode="nav" (back)="goBack()" />
+
+  <div class="page">
+    <h2 class="h2 cl-title">
+      {{ i18n.lang() === 'it' ? 'Sfide' : 'Challenges' }}
+    </h2>
+
+    @if (!appState.state().account) {
+      <p class="muted cl-empty">
+        {{
+          i18n.lang() === 'it'
+            ? 'Accedi per ricevere e inviare sfide ai tuoi amici.'
+            : 'Sign in to send and receive challenges with friends.'
+        }}
+      </p>
+    } @else {
+      <!-- Tabs -->
+      <div class="cl-tabs" role="tablist">
+        <button
+          class="cl-tab"
+          role="tab"
+          [class.is-active]="tab() === 'incoming'"
+          (click)="setTab('incoming')"
+        >
+          {{ i18n.lang() === 'it' ? 'In arrivo' : 'Incoming' }}
+          @if (pendingIncoming().length > 0) {
+            <span class="cl-badge">{{ pendingIncoming().length }}</span>
+          }
+        </button>
+        <button
+          class="cl-tab"
+          role="tab"
+          [class.is-active]="tab() === 'outgoing'"
+          (click)="setTab('outgoing')"
+        >
+          {{ i18n.lang() === 'it' ? 'Inviate' : 'Sent' }}
+          @if (pendingOutgoing().length > 0) {
+            <span class="cl-badge">{{ pendingOutgoing().length }}</span>
+          }
+        </button>
+        <button
+          class="cl-tab"
+          role="tab"
+          [class.is-active]="tab() === 'history'"
+          (click)="setTab('history')"
+        >
+          {{ i18n.lang() === 'it' ? 'Storico' : 'History' }}
+        </button>
+      </div>
+
+      @if (loading()) {
+        <p class="muted cl-empty">{{ i18n.lang() === 'it' ? 'Carico…' : 'Loading…' }}</p>
+      } @else {
+        <!-- Incoming -->
+        @if (tab() === 'incoming') {
+          @if (pendingIncoming().length === 0) {
+            <p class="muted cl-empty">
+              {{
+                i18n.lang() === 'it'
+                  ? 'Nessuna sfida in arrivo. Quando un amico ti sfida, la trovi qui.'
+                  : "No incoming challenges. They'll appear here when a friend sends one."
+              }}
+            </p>
+          } @else {
+            <ul class="cl-list">
+              @for (c of pendingIncoming(); track c.id) {
+                <li>
+                  <button class="cl-row" type="button" (click)="openChallenge(c.id)">
+                    <span class="cl-row-avatar">{{ (c.fromNickname || '?').charAt(0).toUpperCase() }}</span>
+                    <span class="cl-row-main">
+                      <span class="cl-row-title">{{ c.fromNickname }}</span>
+                      <span class="cl-row-sub">
+                        {{ i18n.lang() === 'it' ? 'ti sfida con' : 'challenges you with' }}
+                        <strong>{{ c.fromScore }}/5</strong>
+                      </span>
+                    </span>
+                    <span class="cl-row-cta">
+                      {{ i18n.lang() === 'it' ? 'Gioca' : 'Play' }}
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        }
+
+        <!-- Outgoing -->
+        @if (tab() === 'outgoing') {
+          @if (pendingOutgoing().length === 0) {
+            <p class="muted cl-empty">
+              {{
+                i18n.lang() === 'it'
+                  ? 'Nessuna sfida inviata in attesa.'
+                  : 'No pending challenges sent.'
+              }}
+            </p>
+          } @else {
+            <ul class="cl-list">
+              @for (c of pendingOutgoing(); track c.id) {
+                <li>
+                  <div class="cl-row cl-row-static">
+                    <span class="cl-row-avatar">{{ (c.toNickname || '?').charAt(0).toUpperCase() }}</span>
+                    <span class="cl-row-main">
+                      <span class="cl-row-title">{{ c.toNickname }}</span>
+                      <span class="cl-row-sub">
+                        {{ i18n.lang() === 'it' ? 'In attesa. Tuo punteggio:' : 'Waiting. Your score:' }}
+                        <strong>{{ c.fromScore }}/5</strong>
+                      </span>
+                    </span>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        }
+
+        <!-- History -->
+        @if (tab() === 'history') {
+          @if (history().length === 0) {
+            <p class="muted cl-empty">
+              {{
+                i18n.lang() === 'it'
+                  ? 'Nessuna sfida completata. Inizia da un amico.'
+                  : 'No completed challenges yet.'
+              }}
+            </p>
+          } @else {
+            <ul class="cl-list">
+              @for (c of history(); track c.id) {
+                @let v = verdictFor(c);
+                <li>
+                  <button class="cl-row" type="button" (click)="openChallenge(c.id)">
+                    <span class="cl-row-avatar">{{ (opponentOf(c) || '?').charAt(0).toUpperCase() }}</span>
+                    <span class="cl-row-main">
+                      <span class="cl-row-title">{{ opponentOf(c) }}</span>
+                      <span class="cl-row-sub">
+                        {{ myUid() === c.to ? c.toScore : c.fromScore }}/5
+                        {{ i18n.lang() === 'it' ? 'vs' : 'vs' }}
+                        {{ myUid() === c.to ? c.fromScore : c.toScore }}/5
+                      </span>
+                    </span>
+                    @if (v) {
+                      <span class="cl-pill" [attr.data-tone]="v.tone">{{ v.label }}</span>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        }
+      }
+    }
+  </div>
+</div>

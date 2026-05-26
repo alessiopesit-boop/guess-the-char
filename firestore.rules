@@ -47,6 +47,42 @@ service cloud.firestore {
                     && resource.data.uid == request.auth.uid;
     }
 
+    // /challenges/{auto-id}
+    // Sfida tra due utenti (friend challenge). Doc creato dal challenger (from)
+    // che gioca per primo e setta fromScore al momento della creazione. Il
+    // destinatario (to) puo' aggiornare il doc per settare toScore + status
+    // 'completed' quando gioca la sua run. Lettura riservata alle due parti.
+    match /challenges/{id} {
+      allow read: if request.auth != null
+                  && (request.auth.uid == resource.data.from
+                      || request.auth.uid == resource.data.to);
+      allow create: if request.auth != null
+                    && request.resource.data.from == request.auth.uid
+                    && request.resource.data.to is string
+                    && request.resource.data.to != request.auth.uid
+                    && request.resource.data.fromScore is int
+                    && request.resource.data.fromScore >= 0
+                    && request.resource.data.fromScore <= 5
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.toScore == null
+                    && request.resource.data.questions is list
+                    && request.resource.data.questions.size() == 5;
+      // Solo il destinatario puo' completare la sfida settando toScore. Niente
+      // possibilita' di alterare from, to, fromScore o questions dopo create.
+      allow update: if request.auth != null
+                    && request.auth.uid == resource.data.to
+                    && resource.data.status == 'pending'
+                    && request.resource.data.status == 'completed'
+                    && request.resource.data.toScore is int
+                    && request.resource.data.toScore >= 0
+                    && request.resource.data.toScore <= 5
+                    && request.resource.data.from == resource.data.from
+                    && request.resource.data.to == resource.data.to
+                    && request.resource.data.fromScore == resource.data.fromScore
+                    && request.resource.data.questions == resource.data.questions;
+      allow delete: if false;
+    }
+
     // /feedback/{auto-id}
     // Write-only collection: chiunque (anche anonimo) puo' creare un
     // documento di feedback, ma solo il proprietario del progetto puo'

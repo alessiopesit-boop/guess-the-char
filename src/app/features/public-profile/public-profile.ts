@@ -239,6 +239,13 @@ export class PublicProfile {
     }
   }
 
+  /** Apre il flow di creazione sfida verso questo amico. */
+  protected challengeFriend(): void {
+    const p = this.profile();
+    if (!p) return;
+    this.router.navigate(['/sfida/nuova', p.nickname]);
+  }
+
   /** Rimuove l'amicizia (gia' accettata). */
   protected async removeFriend(): Promise<void> {
     const p = this.profile();
