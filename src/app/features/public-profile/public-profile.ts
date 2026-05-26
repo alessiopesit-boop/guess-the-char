@@ -7,6 +7,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
 import { NicknameService } from '../../core/firebase/nickname.service';
 import { FriendStatus, FriendsService } from '../../core/firebase/friends.service';
+import { ChallengesService } from '../../core/firebase/challenges.service';
 import { avatarById } from '../../core/data/avatars';
 import { BadgeWithProgress, computeBadges } from '../../core/data/badges';
 import { ScriptInfo, scriptById } from '../../core/data/scripts';
@@ -35,6 +36,7 @@ export class PublicProfile {
   protected readonly appState = inject(AppStateService);
   private readonly nicknames = inject(NicknameService);
   private readonly friends = inject(FriendsService);
+  private readonly challenges = inject(ChallengesService);
 
   /** Param `:nickname` dalla rotta, in formato URL-encoded come arriva. */
   protected readonly nickname = toSignal(
@@ -51,6 +53,12 @@ export class PublicProfile {
   protected readonly friendStatus = signal<FriendStatus | null>(null);
   /** Lock per evitare doppi-click sui bottoni amicizia. */
   protected readonly friendBusy = signal(false);
+
+  /** Esiste gia' una sfida pending con questo utente (in qualunque direzione)?
+   *  Caricato lazy dopo il fetch del profilo. Mentre e' `null` = "non lo so
+   *  ancora"; il bottone "Sfida" resta normale. Quando passa a `true` lo
+   *  disabilitiamo per evitare sfide duplicate. */
+  protected readonly pendingChallenge = signal<boolean | null>(null);
 
   /** Modale "come si calcolano i punti": tap sulla card Punti la apre. */
   protected readonly scoreInfoOpen = signal(false);
@@ -111,6 +119,7 @@ export class PublicProfile {
       this.notFound.set(false);
       this.profile.set(null);
       this.friendStatus.set(null);
+      this.pendingChallenge.set(null);
       void this.fetch(n);
     });
   }
@@ -180,6 +189,18 @@ export class PublicProfile {
         try {
           const status = await this.friends.statusWith(doc.uid);
           this.friendStatus.set(status);
+          // Se siamo amici, verifico anche se c'e' gia' una sfida pending fra
+          // di noi (in qualunque direzione), per disabilitare il bottone
+          // "Sfida" ed evitare di crearne una seconda.
+          if (status === 'accepted') {
+            try {
+              const exists = await this.challenges.existsPendingWith(doc.uid);
+              this.pendingChallenge.set(exists);
+            } catch (e) {
+              console.warn('[public-profile] pending challenge check error:', e);
+              this.pendingChallenge.set(false);
+            }
+          }
         } catch (e) {
           console.warn('[public-profile] friend status error:', e);
         }
@@ -244,6 +265,12 @@ export class PublicProfile {
     const p = this.profile();
     if (!p) return;
     this.router.navigate(['/sfida/nuova', p.nickname]);
+  }
+
+  /** Navigazione alla lista sfide, usata dal bottone disabilitato "Sfida in
+   *  corso" come hint per dove ritrovare la pending. */
+  protected goChallenges(): void {
+    this.router.navigate(['/sfide']);
   }
 
   /** Rimuove l'amicizia (gia' accettata). */
