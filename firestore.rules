@@ -20,6 +20,19 @@ service cloud.firestore {
                     && request.resource.data.nickname.size() <= 24;
       allow update: if request.auth != null && request.auth.uid == uid;
       allow delete: if false;
+
+      // /users/{uid}/friends/{friendUid}
+      // Subcollezione amici. Una relazione di amicizia consiste in DUE doc
+      // speculari: /users/A/friends/B e /users/B/friends/A. Entrambe le parti
+      // possono scrivere su entrambi i lati (necessario per il pattern
+      // simmetrico via writeBatch). Lettura riservata al proprietario della
+      // subcollezione: il tuo elenco amici e' privato.
+      match /friends/{friendUid} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create, update, delete:
+          if request.auth != null
+             && (request.auth.uid == uid || request.auth.uid == friendUid);
+      }
     }
 
     // /nicknames/{nicknameLowercased}

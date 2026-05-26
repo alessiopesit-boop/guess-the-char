@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
 import { AuthService } from '../../core/firebase/auth.service';
+import { FriendsService } from '../../core/firebase/friends.service';
 import { ALL_SCRIPT_IDS } from '../../core/data/scripts';
 import { buildQuestion, mulberry32, seedFromDate } from '../../core/data/quiz';
 import { computeBadges } from '../../core/data/badges';
@@ -27,8 +28,23 @@ export class Home {
   protected readonly i18n = inject(I18nService);
   protected readonly appState = inject(AppStateService);
   private readonly authSvc = inject(AuthService);
+  private readonly friendsSvc = inject(FriendsService);
 
   protected readonly state = this.appState.state;
+
+  /** Numero di richieste amicizia in arrivo, mostrato come pillino nel menu
+   *  account. Refetchato lazy: ogni volta che la home si carica (componente
+   *  ricreato dal router) e ad ogni cambio di uid dell'account loggato. */
+  protected readonly pendingFriendRequests = signal(0);
+
+  private readonly _refreshFriendsOnAuth = effect(() => {
+    const uid = this.state().account?.uid ?? null;
+    if (uid) {
+      void this.refreshFriendRequests();
+    } else {
+      this.pendingFriendRequests.set(0);
+    }
+  });
 
   /** Apertura del menu account (popover sotto l'icona in alto a destra). */
   protected readonly accountMenuOpen = signal(false);
@@ -177,6 +193,26 @@ export class Home {
 
   protected goSearch(): void {
     this.router.navigate(['/search']);
+  }
+
+  protected goFriends(): void {
+    this.router.navigate(['/friends']);
+  }
+
+  /** Rileggi il conteggio richieste in arrivo. Chiamata all'apertura della
+   *  home (via effect) e quando si torna sulla home (la component si ricrea
+   *  con router OnPush). */
+  protected async refreshFriendRequests(): Promise<void> {
+    if (!this.state().account) {
+      this.pendingFriendRequests.set(0);
+      return;
+    }
+    try {
+      const list = await this.friendsSvc.listIncomingRequests();
+      this.pendingFriendRequests.set(list.length);
+    } catch {
+      // ignore: il badge resta com'era
+    }
   }
 
   /** Toggle del popover account; chiude se aperto, apre se chiuso. Lo

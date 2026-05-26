@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
 import { NicknameService } from '../../core/firebase/nickname.service';
+import { FriendStatus, FriendsService } from '../../core/firebase/friends.service';
 import { avatarById } from '../../core/data/avatars';
 import { BadgeWithProgress, computeBadges } from '../../core/data/badges';
 import { ScriptInfo, scriptById } from '../../core/data/scripts';
@@ -32,6 +33,7 @@ export class PublicProfile {
   protected readonly i18n = inject(I18nService);
   protected readonly appState = inject(AppStateService);
   private readonly nicknames = inject(NicknameService);
+  private readonly friends = inject(FriendsService);
 
   /** Param `:nickname` dalla rotta, in formato URL-encoded come arriva. */
   protected readonly nickname = toSignal(
@@ -43,6 +45,11 @@ export class PublicProfile {
   protected readonly notFound = signal(false);
   protected readonly profile = signal<PublicProfileData | null>(null);
   protected readonly copyFlash = signal(false);
+
+  /** Stato amicizia con l'utente visualizzato. null = nessuna relazione. */
+  protected readonly friendStatus = signal<FriendStatus | null>(null);
+  /** Lock per evitare doppi-click sui bottoni amicizia. */
+  protected readonly friendBusy = signal(false);
 
   protected readonly isSelf = computed(() => {
     const p = this.profile();
@@ -84,6 +91,7 @@ export class PublicProfile {
       this.loading.set(true);
       this.notFound.set(false);
       this.profile.set(null);
+      this.friendStatus.set(null);
       void this.fetch(n);
     });
   }
@@ -139,11 +147,89 @@ export class PublicProfile {
         totalBadges: allBadges.length,
         scriptStats,
       });
+      // Stato amicizia: read separata (non bloccante per il render).
+      if (this.appState.state().account && doc.uid !== this.appState.state().account?.uid) {
+        try {
+          const status = await this.friends.statusWith(doc.uid);
+          this.friendStatus.set(status);
+        } catch (e) {
+          console.warn('[public-profile] friend status error:', e);
+        }
+      }
     } catch (e) {
       console.warn('[public-profile] fetch error:', e);
       this.notFound.set(true);
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  /** Azione "Aggiungi amico": manda richiesta. Aggiorna lo stato locale a
+   *  'pending-sent' senza ricaricare l'intera pagina. */
+  protected async addFriend(): Promise<void> {
+    const p = this.profile();
+    const myNick = this.appState.state().account?.nickname;
+    if (!p || !myNick || this.friendBusy()) return;
+    this.friendBusy.set(true);
+    try {
+      const r = await this.friends.sendRequest(p.uid, p.nickname, myNick);
+      if (r === 'sent') this.friendStatus.set('pending-sent');
+    } catch (e) {
+      console.warn('[public-profile] addFriend error:', e);
+    } finally {
+      this.friendBusy.set(false);
+    }
+  }
+
+  /** Annulla richiesta inviata (rimuove la pending). */
+  protected async cancelRequest(): Promise<void> {
+    const p = this.profile();
+    if (!p || this.friendBusy()) return;
+    this.friendBusy.set(true);
+    try {
+      await this.friends.remove(p.uid);
+      this.friendStatus.set(null);
+    } catch (e) {
+      console.warn('[public-profile] cancelRequest error:', e);
+    } finally {
+      this.friendBusy.set(false);
+    }
+  }
+
+  /** Accetta richiesta in arrivo (l'altro mi ha invitato, sono sul suo profilo). */
+  protected async acceptRequest(): Promise<void> {
+    const p = this.profile();
+    if (!p || this.friendBusy()) return;
+    this.friendBusy.set(true);
+    try {
+      await this.friends.accept(p.uid);
+      this.friendStatus.set('accepted');
+    } catch (e) {
+      console.warn('[public-profile] acceptRequest error:', e);
+    } finally {
+      this.friendBusy.set(false);
+    }
+  }
+
+  /** Rimuove l'amicizia (gia' accettata). */
+  protected async removeFriend(): Promise<void> {
+    const p = this.profile();
+    if (!p || this.friendBusy()) return;
+    if (typeof window !== 'undefined') {
+      const msg =
+        this.i18n.lang() === 'it'
+          ? 'Vuoi rimuovere ' + p.nickname + ' dagli amici?'
+          : 'Remove ' + p.nickname + ' from friends?';
+      if (!window.confirm(msg)) return;
+    }
+    this.friendBusy.set(true);
+    try {
+      await this.friends.remove(p.uid);
+      this.friendStatus.set(null);
+    } catch (e) {
+      console.warn('[public-profile] removeFriend error:', e);
+    } finally {
+      this.friendBusy.set(false);
     }
   }
 

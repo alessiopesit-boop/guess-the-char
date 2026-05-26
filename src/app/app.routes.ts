@@ -87,6 +87,11 @@ export const routes: Routes = [
     canActivate: [onboardedGuard],
     loadComponent: () => import('./features/search/search').then((m) => m.Search),
   },
+  {
+    path: 'friends',
+    canActivate: [onboardedGuard],
+    loadComponent: () => import('./features/friends/friends').then((m) => m.Friends),
+  },
 
   {
     path: 'leaderboard',

@@ -258,3 +258,27 @@
 .account-menu-item.is-danger:hover {
   background: rgba(251, 113, 133, 0.08);
 }
+
+/* Voce "Amici" con pillino contatore richieste in arrivo. Layout: label
+   a destra (gia' per text-align: right), badge accent a sinistra (flex
+   row-reverse via gap su justify-end). */
+.account-menu-friends {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.account-menu-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}

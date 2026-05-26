@@ -58,6 +58,7 @@ src/
       badges/
       daily-result/
       feedback/
+      friends/
       game/
       glyph-detail/
       home/
@@ -305,6 +306,7 @@ L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del p
 - `src/app/core/firebase/user-search.service.ts`: `UserSearchService` cerca utenti per nickname con tolleranza fuzzy (Levenshtein <=2). Carica la collezione `/nicknames` intera in cache (TTL 5 min) e fa filtering/ranking client-side: match esatto > prefisso > sottostringa > distanza 1 > distanza 2. Strategia OK fino a ~2000 utenti; oltre, conviene un indice esterno tipo Algolia.
 - `src/app/core/firebase/leaderboard.service.ts`: `LeaderboardService` legge la classifica da `/users`. Due viste: `daily` (filtra per `dailyDoneStamp == today`, sort `dailyScore` desc) e `alltime` (sort `correctAnswers` desc). Paginazione cursor-based via `startAfter`, page size 30. Niente cache: ogni cambio tab e ogni "Mostra altri" e' una fetch fresca.
 - `src/app/core/firebase/feedback.service.ts`: `FeedbackService` scrive nella collezione `/feedback`. Rate limit lato client via localStorage (`gtc.feedback.history`), massimo 3 submission nelle ultime 24h. Le regole Firestore impongono shape e lunghezza dei campi (titolo 3-80, corpo 8-600, kind in bug/idea). Le submission sono read-only dal client: le leggi tu dalla Firebase Console.
+- `src/app/core/firebase/friends.service.ts`: `FriendsService` gestisce amicizie mutuali via subcollezione `/users/{uid}/friends/{friendUid}`. Schema speculare: una relazione = due doc, uno per lato, status `pending-sent` | `pending-received` | `accepted`. Scritture atomiche via `writeBatch` (sendRequest/accept/decline/remove). Le regole Firestore consentono a entrambe le parti di scrivere su entrambi i lati (necessario per il batch simmetrico). Lettura riservata al proprietario della subcollezione: la tua lista amici e' privata.
 - `AppStateService` si abbona al signal `auth.user` via `effect`: a ogni cambio di stato Auth, riflette in `state.account` (uid, email, nickname seedato da `displayName` per Google, avatar 0 di default).
 - `firestore.rules`, `firebase.json`, `.firebaserc` alla root: config per `firebase deploy`. Schema corrente: `/users/{uid}` (stato gioco + anagrafica), `/nicknames/{nick}` (indice unicita'), `/feedback/{auto-id}` (write-only feedback dei giocatori).
 

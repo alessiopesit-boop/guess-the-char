@@ -1,0 +1,111 @@
+<div class="app-shell">
+  <app-bar [canBack]="true"
+           [title]="i18n.lang() === 'it' ? 'Amici' : 'Friends'"
+           (back)="goBack()"
+           (goHome)="goHome()" />
+
+  <div class="page fr-page">
+    @if (notLogged()) {
+      <div class="fr-anon">
+        <p class="muted">
+          {{ i18n.lang() === 'it'
+            ? 'Accedi al tuo profilo per aggiungere amici e ricevere richieste.'
+            : 'Sign in to add friends and receive requests.' }}
+        </p>
+        <button class="btn btn-primary" type="button" (click)="goLogin()">
+          {{ i18n.t('login') }}
+        </button>
+      </div>
+    } @else {
+      <!-- Switch tab Amici / Richieste con badge sul numero richieste. -->
+      <div class="seg fr-tabs">
+        <button type="button" class="seg-btn"
+                [class.is-active]="tab() === 'friends'"
+                (click)="setTab('friends')">
+          {{ i18n.lang() === 'it' ? 'Amici' : 'Friends' }}
+        </button>
+        <button type="button" class="seg-btn fr-tab-with-badge"
+                [class.is-active]="tab() === 'requests'"
+                (click)="setTab('requests')">
+          {{ i18n.lang() === 'it' ? 'Richieste' : 'Requests' }}
+          @if (requests().length > 0) {
+            <span class="fr-tab-badge">{{ requests().length }}</span>
+          }
+        </button>
+      </div>
+
+      @if (loading()) {
+        <div class="fr-loading">
+          <span class="fr-spinner" aria-label="loading"></span>
+        </div>
+      } @else if (tab() === 'friends') {
+        @if (friends().length === 0) {
+          <div class="fr-empty">
+            <span class="fr-empty-glyph" aria-hidden="true">友</span>
+            <p class="muted">
+              {{ i18n.lang() === 'it'
+                ? 'Niente amici per ora. Cerca qualcuno per inviare la prima richiesta.'
+                : 'No friends yet. Search for someone to send your first request.' }}
+            </p>
+            <button class="btn btn-ghost" type="button" (click)="goSearch()">
+              {{ i18n.lang() === 'it' ? 'Cerca utenti' : 'Find users' }}
+            </button>
+          </div>
+        } @else {
+          <div class="fr-list">
+            @for (f of friends(); track f.uid) {
+              <div class="fr-row">
+                <button class="fr-row-main" type="button" (click)="openProfile(f.nickname)">
+                  <span class="fr-avatar">{{ (f.nickname || '?').charAt(0).toUpperCase() }}</span>
+                  <span class="fr-nick">{{ f.nickname }}</span>
+                </button>
+                <button class="nav-btn fr-row-action"
+                        type="button"
+                        [disabled]="pendingAction() === f.uid"
+                        (click)="remove(f.uid)">
+                  {{ i18n.lang() === 'it' ? 'Rimuovi' : 'Remove' }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        @if (requests().length === 0) {
+          <div class="fr-empty">
+            <span class="fr-empty-glyph" aria-hidden="true">∅</span>
+            <p class="muted">
+              {{ i18n.lang() === 'it'
+                ? 'Nessuna richiesta in attesa.'
+                : 'No pending requests.' }}
+            </p>
+          </div>
+        } @else {
+          <div class="fr-list">
+            @for (r of requests(); track r.uid) {
+              <div class="fr-row">
+                <button class="fr-row-main" type="button" (click)="openProfile(r.nickname)">
+                  <span class="fr-avatar">{{ (r.nickname || '?').charAt(0).toUpperCase() }}</span>
+                  <span class="fr-nick">{{ r.nickname }}</span>
+                </button>
+                <div class="fr-row-actions">
+                  <button class="btn btn-primary fr-action-btn"
+                          type="button"
+                          [disabled]="pendingAction() === r.uid"
+                          (click)="accept(r.uid)">
+                    {{ i18n.lang() === 'it' ? 'Accetta' : 'Accept' }}
+                  </button>
+                  <button class="nav-btn fr-action-btn"
+                          type="button"
+                          [disabled]="pendingAction() === r.uid"
+                          (click)="decline(r.uid)">
+                    {{ i18n.lang() === 'it' ? 'Rifiuta' : 'Decline' }}
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+  </div>
+</div>
