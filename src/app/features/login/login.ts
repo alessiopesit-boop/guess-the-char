@@ -28,8 +28,68 @@ export class Login {
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
 
+  /** Modal "Password dimenticata?": stato proprio, indipendente dal form
+   *  principale. Email precompilata con quella del form se l'utente l'ha
+   *  gia' inserita, altrimenti vuota. */
+  protected readonly resetOpen = signal(false);
+  protected readonly resetEmail = signal('');
+  protected readonly resetBusy = signal(false);
+  protected readonly resetDone = signal(false);
+  protected readonly resetError = signal<string | null>(null);
+
   protected toggleShowPassword(): void {
     this.showPassword.update((v) => !v);
+  }
+
+  protected openReset(): void {
+    this.resetEmail.set(this.email() || '');
+    this.resetError.set(null);
+    this.resetDone.set(false);
+    this.resetOpen.set(true);
+  }
+
+  protected closeReset(): void {
+    this.resetOpen.set(false);
+  }
+
+  protected setResetEmail(v: string): void {
+    this.resetEmail.set(v);
+    if (this.resetError()) this.resetError.set(null);
+  }
+
+  protected readonly resetEmailValid = computed(() =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.resetEmail()),
+  );
+
+  /**
+   * Manda l'email di reset. Firebase non fa enumeration leak: la stessa risposta
+   * (success) torna sia se l'email esiste sia se no. Quindi mostriamo sempre
+   * "controlla la mail" indipendentemente dal vero risultato lato Firebase.
+   * Eccezione: errori reali come formato invalido / rate limit / network li
+   * mostriamo all'utente cosi' sa che il bottone non e' stato silenziosamente
+   * ignorato.
+   */
+  protected async submitReset(): Promise<void> {
+    if (!this.resetEmailValid() || this.resetBusy()) return;
+    this.resetBusy.set(true);
+    this.resetError.set(null);
+    const email = this.resetEmail().trim();
+    try {
+      await this.auth.sendPasswordReset(email);
+      this.resetDone.set(true);
+    } catch (e: unknown) {
+      const code = (e as { code?: string })?.code ?? '';
+      // auth/user-not-found NON arriva in pratica con sendPasswordResetEmail
+      // su Firebase moderno (privacy), ma lo trattiamo come "fingiamo
+      // success" se mai dovesse arrivare, cosi' resta coerente con il resto.
+      if (code === 'auth/user-not-found' || code === 'auth/invalid-credential') {
+        this.resetDone.set(true);
+      } else {
+        this.resetError.set(this.translateError(e));
+      }
+    } finally {
+      this.resetBusy.set(false);
+    }
   }
 
   /** Se siamo gia' autenticati: tornare al rendering qui dentro significa che

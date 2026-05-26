@@ -228,3 +228,57 @@
   color: var(--text);
   background: var(--surface-2);
 }
+
+/* Link "Password dimenticata?" sotto il campo password: piccolo, sobrio,
+   allineato a destra. Non un link <a> (rimane nel form), e' un button con
+   look da link. */
+.login-forgot {
+  align-self: flex-end;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 4px 0;
+  margin-top: -4px;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+  transition: color var(--hover-dur) ease;
+}
+.login-forgot:hover {
+  color: var(--accent);
+}
+
+/* Modale reset password: stessa estetica di InfoSheet, ma piu' grande per
+   ospitare il form. */
+.reset-backdrop {
+  align-items: center;
+  z-index: 90;
+}
+.reset-sheet {
+  max-width: 380px;
+  border-radius: 20px;
+  padding: 22px;
+  animation: pop 0.18s ease;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.reset-title {
+  margin: 0;
+}
+.reset-sub {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.reset-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}

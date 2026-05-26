@@ -131,6 +131,12 @@
           </div>
         </label>
 
+        <!-- Link "Password dimenticata?" piccolino, allineato a destra sotto il
+             campo password. Apre la modale di reset. -->
+        <button type="button" class="login-forgot" (click)="openReset()">
+          {{ i18n.lang() === 'it' ? 'Password dimenticata?' : 'Forgot password?' }}
+        </button>
+
         @if (error(); as e) {
           <p class="login-error" role="alert">{{ e }}</p>
         }
@@ -160,4 +166,67 @@
       }
     </div>
   </div>
+
+  <!-- Modale "Password dimenticata?". Riusa le classi .sheet-backdrop / .sheet
+       gia' definite nello stile globale, stessa estetica di InfoSheet ecc. -->
+  @if (resetOpen()) {
+    <div class="sheet-backdrop reset-backdrop" (click)="closeReset()">
+      <div class="sheet reset-sheet" (click)="$event.stopPropagation()">
+        <h2 class="h2 reset-title">
+          {{ i18n.lang() === 'it' ? 'Reimposta la password' : 'Reset your password' }}
+        </h2>
+
+        @if (resetDone()) {
+          <p class="muted reset-sub">
+            {{ i18n.lang() === 'it'
+              ? 'Se esiste un account con questa email, ti abbiamo mandato un link per scegliere una nuova password. Controlla anche lo spam.'
+              : 'If an account exists for this email, we sent a link to set a new password. Check your spam folder too.' }}
+          </p>
+          <button type="button" class="btn btn-primary btn-block" (click)="closeReset()">
+            {{ i18n.lang() === 'it' ? 'Chiudi' : 'Close' }}
+          </button>
+        } @else {
+          <p class="muted reset-sub">
+            {{ i18n.lang() === 'it'
+              ? 'Inserisci la tua email: ti mandiamo un link per impostare una nuova password.'
+              : 'Enter your email: we will send a link to set a new password.' }}
+          </p>
+
+          <form (ngSubmit)="submitReset()">
+            <label class="login-field">
+              <span class="login-field-label">Email</span>
+              <input
+                type="email"
+                autocomplete="email"
+                class="input-field"
+                placeholder="tu@esempio.it"
+                [ngModel]="resetEmail()"
+                (ngModelChange)="setResetEmail($event)"
+                name="resetEmail"
+                required
+                autofocus
+              />
+            </label>
+
+            @if (resetError(); as e) {
+              <p class="login-error" role="alert">{{ e }}</p>
+            }
+
+            <div class="reset-actions">
+              <button type="button" class="btn btn-ghost" (click)="closeReset()" [disabled]="resetBusy()">
+                {{ i18n.lang() === 'it' ? 'Annulla' : 'Cancel' }}
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="!resetEmailValid() || resetBusy()">
+                @if (resetBusy()) {
+                  {{ i18n.lang() === 'it' ? 'Invio…' : 'Sending…' }}
+                } @else {
+                  {{ i18n.lang() === 'it' ? 'Invia link' : 'Send link' }}
+                }
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  }
 </div>
