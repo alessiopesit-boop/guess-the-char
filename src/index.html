@@ -74,6 +74,22 @@
         // sessionStorage non disponibile, accettiamo il path attuale.
       }
     })();
+
+    // Registrazione del service worker: serve a Chrome per considerare l'app
+    // "installable" (requisito anche del wrapping TWA per Google Play). Saltiamo
+    // localhost in dev cosi' il live reload di ng serve non viene intercettato
+    // da una cache stantia.
+    (function () {
+      if (!('serviceWorker' in navigator)) return;
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return;
+      window.addEventListener('load', function () {
+        var swUrl = new URL('sw.js', document.baseURI).href;
+        navigator.serviceWorker.register(swUrl).catch(function () {
+          // Registrazione fallita (es. file 404 su deploy parziale): ignoriamo,
+          // l'app funziona comunque senza SW.
+        });
+      });
+    })();
   </script>
 </head>
 <body>
