@@ -54,3 +54,74 @@
   text-align: center;
   margin-top: 4px;
 }
+
+/* Sezione "Amici oggi" sotto le stat: lista compatta con avatar iniziale,
+   nickname e score. Riga evidenziata in ambra se l'amico ha fatto piu' di te. */
+.dr-friends-title {
+  margin: 0 0 10px;
+}
+.dr-friends-empty {
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.5;
+}
+.dr-friends-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dr-friend-row {
+  appearance: none;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  transition:
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease;
+}
+.dr-friend-row:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.dr-friend-row.is-better {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.35);
+}
+.dr-friend-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+}
+.dr-friend-nick {
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dr-friend-score {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.dr-friend-row.is-better .dr-friend-score {
+  color: var(--warm);
+}

@@ -215,4 +215,48 @@ export class FriendsService {
     if (!userDoc) return 'not-found';
     return await this.sendRequest(userDoc.uid, friendNickname, myNickname);
   }
+
+  /**
+   * Per ogni amico accettato, legge il suo doc /users/{uid} e restituisce
+   * dailyScore + dailyDoneStamp. Filtra solo chi ha completato la sfida di
+   * oggi (stamp == new Date().toDateString()).
+   *
+   * Costo: N read Firestore dove N = numero amici. Per <20 amici trascurabile.
+   * Se un utente accumula centinaia di amici, batchare con where('__name__',
+   * 'in', [...]) in chunk da 30.
+   */
+  async getFriendsDailyToday(): Promise<FriendDaily[]> {
+    if (!this.db) return [];
+    const accepted = await this.listFriends();
+    if (accepted.length === 0) return [];
+    const today = new Date().toDateString();
+    const out: FriendDaily[] = [];
+    await Promise.all(
+      accepted.map(async (f) => {
+        try {
+          const userRef = doc(this.db!, 'users', f.uid);
+          const userSnap = await getDoc(userRef);
+          if (!userSnap.exists()) return;
+          const data = userSnap.data();
+          const stamp = data?.['dailyDoneStamp'];
+          if (stamp !== today) return;
+          out.push({
+            uid: f.uid,
+            nickname: f.nickname,
+            dailyScore:
+              typeof data?.['dailyScore'] === 'number' ? (data['dailyScore'] as number) : 0,
+          });
+        } catch (e) {
+          console.warn('[friends] getFriendsDailyToday error:', e);
+        }
+      }),
+    );
+    return out.sort((a, b) => b.dailyScore - a.dailyScore);
+  }
+}
+
+export interface FriendDaily {
+  uid: string;
+  nickname: string;
+  dailyScore: number;
 }
