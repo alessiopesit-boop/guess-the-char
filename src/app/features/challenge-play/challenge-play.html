@@ -1,0 +1,189 @@
+<div class="app-shell">
+  <app-bar [canBack]="true" leftMode="nav" (back)="goBack()" (goHome)="goHome()" />
+
+  <div class="page">
+    @if (loading()) {
+      <p class="muted cp-empty">{{ i18n.lang() === 'it' ? 'Carico…' : 'Loading…' }}</p>
+    } @else if (errorMsg(); as err) {
+      <div class="cp-error">
+        <p class="muted">{{ err }}</p>
+        <button class="btn btn-ghost btn-block" type="button" (click)="goBack()">
+          {{ i18n.lang() === 'it' ? 'Torna alle sfide' : 'Back to challenges' }}
+        </button>
+      </div>
+    } @else {
+      <!-- ===== INTRO ===== -->
+      @if (phase() === 'intro') {
+        <div class="cp-hero">
+          <span class="eyebrow warm-text">
+            {{ i18n.lang() === 'it' ? 'SFIDA TRA AMICI' : 'FRIEND CHALLENGE' }}
+          </span>
+          @if (mode() === 'create') {
+            <h2 class="h2 cp-title">
+              {{ i18n.lang() === 'it' ? 'Sfida' : 'Challenge' }} {{ toNickname() }}
+            </h2>
+            <p class="muted cp-desc">
+              {{
+                i18n.lang() === 'it'
+                  ? 'Cinque caratteri a caso da scritture diverse. Gioca prima tu, poi invii la sfida.'
+                  : 'Five random characters from various scripts. Play first, then send the challenge.'
+              }}
+            </p>
+          } @else if (challenge(); as c) {
+            <h2 class="h2 cp-title">
+              {{ c.fromNickname }}
+              {{ i18n.lang() === 'it' ? 'ti ha sfidato' : 'challenged you' }}
+            </h2>
+            <p class="muted cp-desc">
+              {{ i18n.lang() === 'it' ? 'Punteggio da battere:' : 'Score to beat:' }}
+              <strong>{{ c.fromScore }}/{{ totalQ() }}</strong>
+            </p>
+          }
+          <button class="btn btn-primary btn-block cp-start" type="button" (click)="startGame()">
+            {{ i18n.lang() === 'it' ? 'Inizia' : 'Start' }}
+          </button>
+        </div>
+      }
+
+      <!-- ===== PLAYING ===== -->
+      @if (phase() === 'playing' || phase() === 'feedback') {
+        <div class="game-meta">
+          <span class="eyebrow">
+            {{ i18n.lang() === 'it' ? 'Sfida' : 'Challenge' }} ·
+            {{ idx() + 1 }}/{{ totalQ() }}
+          </span>
+        </div>
+
+        @if (questions()[idx()]; as q) {
+          <div class="glyph-stage">
+            <div class="glyph">{{ q.glyph }}</div>
+          </div>
+
+          <div class="opt-list">
+            @for (opt of q.options; track opt; let i = $index) {
+              <button
+                class="opt"
+                type="button"
+                [attr.data-state]="optState(opt)"
+                [disabled]="phase() === 'feedback'"
+                (click)="pick(opt)"
+              >
+                <span class="opt-key">{{ i + 1 }}</span>
+                <span>{{ nameOf(opt) }}</span>
+              </button>
+            }
+          </div>
+
+          @if (chosen(); as c) {
+            <div [class]="'fb-bar ' + (c.correct ? 'correct' : 'wrong')">
+              <div class="fb-title">
+                @if (c.correct) {
+                  <span>✓ {{ i18n.t('correct') }}</span>
+                } @else {
+                  <span>✗ {{ i18n.t('wrong') }} {{ i18n.lang() === 'it' ? 'era' : 'it was' }} {{ nameOf(q.correctId) }}</span>
+                }
+              </div>
+            </div>
+          }
+        }
+      }
+
+      <!-- ===== FINISHED ===== -->
+      @if (phase() === 'finished') {
+        <div class="cp-hero">
+          <span class="eyebrow warm-text">
+            {{ i18n.lang() === 'it' ? 'RISULTATO' : 'RESULT' }}
+          </span>
+
+          <!-- Verdict in caso di confronto completo -->
+          @if (verdict(); as v) {
+            <h2 class="h2 cp-verdict" [attr.data-v]="v">{{ verdictLabel() }}</h2>
+          }
+
+          <!-- Confronto due score: tu vs avversario -->
+          @if (displayTheirScore() !== null) {
+            <div class="cp-scores">
+              <div class="cp-score-block">
+                <span class="cp-score-label">
+                  {{ i18n.lang() === 'it' ? 'Tu' : 'You' }}
+                </span>
+                <span class="cp-score-val tabnum">
+                  {{ displayMyScore() }}<span class="cp-score-sm">/{{ totalQ() }}</span>
+                </span>
+              </div>
+              <div class="cp-score-vs">vs</div>
+              <div class="cp-score-block">
+                <span class="cp-score-label">{{ theirNickname() }}</span>
+                <span class="cp-score-val tabnum">
+                  {{ displayTheirScore() }}<span class="cp-score-sm">/{{ totalQ() }}</span>
+                </span>
+              </div>
+            </div>
+          } @else {
+            <!-- Mode create appena finito di giocare, oppure mode reply ma
+                 challenger torna a vedere e l'altro non ha ancora giocato. -->
+            <div class="big tabnum cp-bigscore">
+              <span>{{ myScore() }}</span><span class="result-total">/{{ totalQ() }}</span>
+            </div>
+            @if (mode() === 'create') {
+              <p class="muted cp-desc">
+                {{
+                  i18n.lang() === 'it'
+                    ? 'Ora puoi inviare la sfida.'
+                    : 'Now you can send the challenge.'
+                }}
+              </p>
+            } @else if (readOnly() && challenge()) {
+              <p class="muted cp-desc">
+                {{
+                  i18n.lang() === 'it'
+                    ? 'In attesa che ' + theirNickname() + ' giochi la sfida.'
+                    : 'Waiting for ' + theirNickname() + ' to play.'
+                }}
+              </p>
+            }
+          }
+
+          <!-- Bottoni -->
+          <div class="cp-actions">
+            @if (mode() === 'create' && !readOnly()) {
+              <button
+                class="btn btn-primary btn-block"
+                type="button"
+                [disabled]="submitting()"
+                (click)="sendChallenge()"
+              >
+                {{
+                  submitting()
+                    ? (i18n.lang() === 'it' ? 'Invio…' : 'Sending…')
+                    : (i18n.lang() === 'it'
+                        ? 'Invia la sfida a ' + toNickname()
+                        : 'Send the challenge to ' + toNickname())
+                }}
+              </button>
+            } @else if (mode() === 'reply' && !readOnly() && answers().length === totalQ()) {
+              <button
+                class="btn btn-primary btn-block"
+                type="button"
+                [disabled]="submitting()"
+                (click)="submitReply()"
+              >
+                {{ submitting()
+                    ? (i18n.lang() === 'it' ? 'Salvo…' : 'Saving…')
+                    : (i18n.lang() === 'it' ? 'Conferma risultato' : 'Confirm result') }}
+              </button>
+            }
+            <button class="btn btn-ghost btn-block" type="button" (click)="goBack()">
+              {{ i18n.lang() === 'it' ? 'Vai alle sfide' : 'Go to challenges' }}
+            </button>
+            @if (theirNickname()) {
+              <button class="btn btn-ghost btn-block" type="button" (click)="viewFriendProfile()">
+                {{ i18n.lang() === 'it' ? 'Profilo di ' + theirNickname() : 'View ' + theirNickname() + "'s profile" }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

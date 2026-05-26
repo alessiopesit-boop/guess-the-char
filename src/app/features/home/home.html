@@ -33,6 +33,13 @@
                 <span class="account-menu-badge">{{ pendingFriendRequests() }}</span>
               }
             </button>
+            <button type="button" class="account-menu-item account-menu-friends" role="menuitem"
+                    (click)="closeAccountMenu(); goChallenges()">
+              <span>{{ i18n.lang() === 'it' ? 'Sfide' : 'Challenges' }}</span>
+              @if (pendingChallenges() > 0) {
+                <span class="account-menu-badge">{{ pendingChallenges() }}</span>
+              }
+            </button>
             <button type="button" class="account-menu-item" role="menuitem"
                     (click)="closeAccountMenu(); goSearch()">
               {{ i18n.lang() === 'it' ? 'Cerca utenti' : 'Find users' }}

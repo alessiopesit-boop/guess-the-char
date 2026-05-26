@@ -4,6 +4,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
 import { AuthService } from '../../core/firebase/auth.service';
 import { FriendsService } from '../../core/firebase/friends.service';
+import { ChallengesService } from '../../core/firebase/challenges.service';
 import { ALL_SCRIPT_IDS } from '../../core/data/scripts';
 import { buildQuestion, mulberry32, seedFromDate } from '../../core/data/quiz';
 import { computeBadges } from '../../core/data/badges';
@@ -29,6 +30,7 @@ export class Home {
   protected readonly appState = inject(AppStateService);
   private readonly authSvc = inject(AuthService);
   private readonly friendsSvc = inject(FriendsService);
+  private readonly challengesSvc = inject(ChallengesService);
 
   protected readonly state = this.appState.state;
 
@@ -37,12 +39,17 @@ export class Home {
    *  ricreato dal router) e ad ogni cambio di uid dell'account loggato. */
   protected readonly pendingFriendRequests = signal(0);
 
+  /** Numero di sfide in arrivo pending, badge nel menu account. */
+  protected readonly pendingChallenges = signal(0);
+
   private readonly _refreshFriendsOnAuth = effect(() => {
     const uid = this.state().account?.uid ?? null;
     if (uid) {
       void this.refreshFriendRequests();
+      void this.refreshPendingChallenges();
     } else {
       this.pendingFriendRequests.set(0);
+      this.pendingChallenges.set(0);
     }
   });
 
@@ -197,6 +204,24 @@ export class Home {
 
   protected goFriends(): void {
     this.router.navigate(['/friends']);
+  }
+
+  protected goChallenges(): void {
+    this.router.navigate(['/sfide']);
+  }
+
+  /** Conteggio sfide pending in arrivo. Letto lazy, come pendingFriendRequests. */
+  protected async refreshPendingChallenges(): Promise<void> {
+    if (!this.state().account) {
+      this.pendingChallenges.set(0);
+      return;
+    }
+    try {
+      const n = await this.challengesSvc.countPendingIncoming();
+      this.pendingChallenges.set(n);
+    } catch {
+      // ignore
+    }
   }
 
   /** Rileggi il conteggio richieste in arrivo. Chiamata all'apertura della

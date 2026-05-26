@@ -93,6 +93,27 @@ export const routes: Routes = [
     loadComponent: () => import('./features/friends/friends').then((m) => m.Friends),
   },
 
+  // Sfide tra amici. L'ordine conta: /sfida/nuova/:toNickname deve venire
+  // prima di /sfida/:id, altrimenti 'nuova' verrebbe interpretato come :id.
+  {
+    path: 'sfide',
+    canActivate: [onboardedGuard],
+    loadComponent: () =>
+      import('./features/challenges-list/challenges-list').then((m) => m.ChallengesList),
+  },
+  {
+    path: 'sfida/nuova/:toNickname',
+    canActivate: [onboardedGuard],
+    loadComponent: () =>
+      import('./features/challenge-play/challenge-play').then((m) => m.ChallengePlay),
+  },
+  {
+    path: 'sfida/:id',
+    canActivate: [onboardedGuard],
+    loadComponent: () =>
+      import('./features/challenge-play/challenge-play').then((m) => m.ChallengePlay),
+  },
+
   {
     path: 'leaderboard',
     canActivate: [onboardedGuard],
