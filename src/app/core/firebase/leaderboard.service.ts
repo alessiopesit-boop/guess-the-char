@@ -19,15 +19,16 @@ export interface LeaderboardRow {
   uid: string;
   nickname: string;
   avatar: number;
-  /** Score visualizzato sulla destra. Su Daily = dailyScore (0-5), su Alltime
-   *  = correctAnswers (intero non negativo). */
+  /** Score visualizzato sulla destra. Su Daily = dailyScore (0-5). Su Alltime
+   *  e' uno score composito (correctAnswers + bestStreak*10) gia' salvato come
+   *  campo "score" in /users per supportare orderBy senza compute lato server. */
   score: number;
 }
 
 /**
  * Classifica letta dalla collezione `/users`. Due viste:
  *  - daily: filtra per dailyDoneStamp == oggi, sort per dailyScore desc
- *  - alltime: sort per correctAnswers desc
+ *  - alltime: sort per score desc (composito: corretti + bestStreak * 10)
  *
  * Paginazione cursor-based via `startAfter`: la prima fetch carica i primi N
  * documenti, le successive partono dall'ultimo doc della pagina precedente.
@@ -56,7 +57,7 @@ export class LeaderboardService {
             where('dailyDoneStamp', '==', new Date().toDateString()),
             orderBy('dailyScore', 'desc'),
           ]
-        : [orderBy('correctAnswers', 'desc')];
+        : [orderBy('score', 'desc')];
     const q = after
       ? query(usersRef, ...constraints, startAfter(after), limit(pageSize))
       : query(usersRef, ...constraints, limit(pageSize));
@@ -73,9 +74,13 @@ export class LeaderboardService {
             ? typeof data['dailyScore'] === 'number'
               ? (data['dailyScore'] as number)
               : 0
-            : typeof data['correctAnswers'] === 'number'
-              ? (data['correctAnswers'] as number)
-              : 0,
+            : typeof data['score'] === 'number'
+              ? (data['score'] as number)
+              : // Fallback per utenti legacy senza campo score: calcolo qui
+                // cosi' non spariscono dalla classifica al primo deploy. Al
+                // loro prossimo login il campo viene scritto.
+                (typeof data['correctAnswers'] === 'number' ? (data['correctAnswers'] as number) : 0) +
+                (typeof data['bestStreak'] === 'number' ? (data['bestStreak'] as number) : 0) * 10,
       });
     });
     const lastDoc = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
