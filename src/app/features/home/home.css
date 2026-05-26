@@ -134,6 +134,54 @@
   line-height: 1.4;
 }
 
+/* Card classifica: emoji trofeo a sinistra, titolo + subtitle al centro,
+   chevron a destra. Stessa estetica delle mode-card del menu modalita'. */
+.lb-teaser {
+  appearance: none;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  transition:
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease,
+    transform var(--hover-dur) ease;
+}
+.lb-teaser:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+.lb-teaser-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+.lb-teaser-text {
+  min-width: 0;
+}
+.lb-teaser-title {
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.2;
+}
+.lb-teaser-sub {
+  font-size: 12px;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.lb-teaser app-icon {
+  color: var(--text-mute);
+}
+
 /* Le icone di modalita' (emoji ∞ / ⏱ / ♥) restano centrate nel quadratino
    38x38: passiamo al font di display + line-height 1 per evitare la baseline
    del mono che le fa scendere fuori asse. */
