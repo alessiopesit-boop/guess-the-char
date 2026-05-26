@@ -190,6 +190,20 @@ export class ChallengesService {
   }
 
   /**
+   * True se esiste una sfida pending tra l'utente loggato e `friendUid`,
+   * in qualunque direzione. Usato dal profilo pubblico per impedire di
+   * mandare una seconda sfida quando una e' gia' in corso.
+   */
+  async existsPendingWith(friendUid: string): Promise<boolean> {
+    const me = this.appState.state().account?.uid;
+    if (!me) return false;
+    const [inc, out] = await Promise.all([this.listIncoming(), this.listOutgoing()]);
+    const fromHim = inc.some((c) => c.status === 'pending' && c.from === friendUid);
+    const fromMe = out.some((c) => c.status === 'pending' && c.to === friendUid);
+    return fromHim || fromMe;
+  }
+
+  /**
    * Aggregato di tutte le sfide completate dell'utente loggato: quante ha
    * vinto, perso, pareggiato. Usato in /profile per mostrare un record
    * sintetico delle sfide tra amici. Conta come "vittoria" se il mio score

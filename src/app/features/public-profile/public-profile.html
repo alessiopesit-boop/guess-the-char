@@ -59,11 +59,21 @@
                       (click)="removeFriend()">
                 ✓ {{ i18n.lang() === 'it' ? 'Siete amici' : 'Friends' }}
               </button>
-              <button class="btn btn-primary pub-friend-btn"
-                      type="button"
-                      (click)="challengeFriend()">
-                {{ i18n.lang() === 'it' ? 'Sfida' : 'Challenge' }}
-              </button>
+              @if (pendingChallenge() === true) {
+                <button class="nav-btn pub-friend-btn"
+                        type="button"
+                        disabled
+                        (click)="goChallenges()"
+                        [attr.aria-label]="i18n.lang() === 'it' ? 'Sfida gia\' in corso' : 'Challenge already pending'">
+                  {{ i18n.lang() === 'it' ? 'Sfida in corso' : 'Pending' }}
+                </button>
+              } @else {
+                <button class="btn btn-primary pub-friend-btn"
+                        type="button"
+                        (click)="challengeFriend()">
+                  {{ i18n.lang() === 'it' ? 'Sfida' : 'Challenge' }}
+                </button>
+              }
             }
             @case ('pending-sent') {
               <button class="nav-btn pub-friend-btn"
