@@ -1,22 +1,22 @@
-# Release to Google Play (TWA)
+# Release su Google Play (TWA)
 
-Operational guide to ship "Guess the Char" to Google Play as an Android app. The work in the code is already done: PWA manifest, service worker, Bubblewrap config (`twa-manifest.json`), Digital Asset Links scaffolding (`public/.well-known/assetlinks.json`), CI workflow (`.github/workflows/play-release.yml`). What follows are the **manual actions** that require accounts and credentials only you have, so they cannot be delegated to a commit.
+Guida operativa per portare "Guess the Char" su Google Play come app Android. Il lavoro nel codice e' fatto: manifest PWA, service worker, config Bubblewrap (`twa-manifest.json`), Digital Asset Links scaffolding (`public/.well-known/assetlinks.json`), workflow CI (`.github/workflows/play-release.yml`). Quello che segue sono le **azioni manuali** che richiedono account/credenziali tuoi, non delegabili a un commit.
 
-First-time estimate: **2-3 hours** (of which ~1h is waiting for Google review).
+Tempo stimato la prima volta: **2-3 ore** (di cui ~1h di attesa per la review Google).
 
 ---
 
-## 1. Google Play Developer account ($25 one-time)
+## 1. Google Play Developer account ($25 una tantum)
 
-1. Go to https://play.google.com/console/signup with a personal Google account (not a corporate one, if the idea is that this is your app).
-2. "Developer" profile (not "Organization"): identity verified by ID document (requires a photo-ID from a smartphone, ~10 minutes).
-3. Pay the $25. This is the standard one-time fee.
+1. Vai su https://play.google.com/console/signup con un account Google personale (non aziendale, se l'idea e' che sia una tua app).
+2. Profilo "Developer" (non "Organization"): identita' verificata via documento ID (richiede una foto-id da smartphone, ~10 minuti).
+3. Paga i $25. E' la fee una-tantum standard.
 
-From this moment you have access to the Play Console.
+Da questo momento hai accesso alla Play Console.
 
-## 2. Generate the production keystore (once in the lifetime of the app)
+## 2. Genera la keystore di produzione (una sola volta nella vita dell'app)
 
-From a terminal, in the repo root (the keystore will **not** be committed, it is covered by `.gitignore`):
+Da terminale, nella root del repo (la keystore **non** verra' committata, e' coperta da `.gitignore`):
 
 ```bash
 keytool -genkey -v \
@@ -24,143 +24,141 @@ keytool -genkey -v \
   -alias android \
   -keyalg RSA -keysize 2048 -validity 36500 \
   -storepass "$(read -s -p 'Keystore password: ' p && echo $p)" \
-  -keypass "$(read -s -p 'Key password (you can use the same): ' p && echo $p)"
+  -keypass "$(read -s -p 'Key password (puoi usare la stessa): ' p && echo $p)"
 ```
 
-`keytool` will ask for some info (name, OU, etc.): values can be whatever you want, what matters is internal consistency. **Write the two passwords down somewhere safe**: you will put them as GitHub Secrets, and you will not be able to recover them later.
+`keytool` ti chiedera' alcuni dati (nome, OU, ecc.): possono essere quelli che vuoi, l'importante e' coerenza interna. **Annota da qualche parte le due password**, le rimetterai sui Secrets di GitHub e non le potrai piu' recuperare.
 
-Validity 36500 = 100 years: the keystore must survive every app update, because Play refuses an AAB signed with a keystore different from the one of the initial upload.
+Validity 36500 = 100 anni: la keystore deve sopravvivere a tutti gli update dell'app, perche' Play rifiuta un AAB firmato con una keystore diversa da quella dell'upload iniziale.
 
-> **KEEP `android-release.keystore` IN A SAFE PLACE** (password manager with a file vault, encrypted NAS, etc.). Losing it = losing the ability to ever update the app again.
+> **CONSERVA `android-release.keystore` IN UN POSTO SICURO** (password manager con file vault, NAS criptato, ecc.). Perderla = perdere la possibilita' di aggiornare l'app per sempre.
 
-## 3. Extract the SHA-256 fingerprint of the keystore
+## 3. Estrai il fingerprint SHA-256 della keystore
 
 ```bash
 keytool -list -v -keystore android-release.keystore -alias android \
   | grep -E "SHA-256|SHA256"
 ```
 
-Output looks like:
+Output simile a:
 
 ```
    SHA-256: 1A:2B:3C:4D:5E:6F:...:99
 ```
 
-**Copy the entire string** (colons included). Update `public/.well-known/assetlinks.json` replacing `PLACEHOLDER_REPLACE_WITH_SHA256_FROM_YOUR_RELEASE_KEYSTORE` with the real value, then commit it as a PR `chore(android): add keystore SHA-256 fingerprint`.
+**Copia tutta la stringa** (i due punti inclusi). Aggiorna `public/.well-known/assetlinks.json` sostituendo `PLACEHOLDER_REPLACE_WITH_SHA256_FROM_YOUR_RELEASE_KEYSTORE` con il valore reale, poi committa in una PR `chore(android): aggiungi fingerprint SHA-256 della keystore`.
 
-## 4. Google service account for upload via API
+## 4. Service account Google per l'upload via API
 
-Needed so the CI workflow can push the AAB to Play Console without a human click.
+Serve perche' il workflow CI carichi l'AAB sulla Play Console senza un click umano.
 
-1. Go to https://console.cloud.google.com/iam-admin/serviceaccounts.
-2. **Select the project linked to your Play Console** (if it does not exist, create one; it is an "empty" project that only exists to host the service account).
-3. "Create service account": any name (e.g. `play-store-uploader`), role "Service Account User" (enough).
-4. Open the new service account > "Keys" > "Add key" > "Create new key" > "JSON". A `*.json` file is downloaded. **Keep it as a secret** (do not commit it).
-5. Go to https://play.google.com/console > Setup > API access > **Link** the Cloud project from the previous step.
-6. Find the service account in the list and click "Grant access" > minimum permissions: "Release manager" on your specific app (after you create it, see step 5).
+1. Vai su https://console.cloud.google.com/iam-admin/serviceaccounts.
+2. **Seleziona il progetto associato alla tua Play Console** (se non c'e', creane uno; e' un progetto "vuoto" che serve solo per il service account).
+3. "Crea service account": nome libero (es. `play-store-uploader`), ruolo "Service Account User" (basta).
+4. Apri il service account creato > "Chiavi" > "Aggiungi chiave" > "Crea nuova chiave" > "JSON". Si scarica un file `*.json`. **Conservalo come un segreto** (non committarlo).
+5. Vai su https://play.google.com/console > Setup > API access > **Link** il progetto Cloud del passo precedente.
+6. Trova il service account nella lista e clicca "Grant access" > permessi minimi: "Release manager" sulla tua app specifica (dopo averla creata, vedi passo 5).
 
-## 5. Create the app in Play Console
+## 5. Crea l'app sulla Play Console
 
 1. Play Console > "Create app".
-2. Name: "Guess the Char".
-3. Default language: English (United States).
-4. Type: "App" (not "Game"; simpler as an initial category).
+2. Nome: "Guess the Char".
+3. Lingua predefinita: **English (United States)**. Sotto "Store listing > Manage translations" aggiungi poi Italiano: gli utenti con device italiano vedranno la scheda IT, tutti gli altri quella EN. (Coerente con il default linguistico dell'app web.)
+4. Tipo: "App" (non "Game"; piu' semplice come categoria iniziale).
 5. Free.
-6. Accept the standard declarations.
+6. Accetta le dichiarazioni standard.
 
-You must fill in before the first upload (Play blocks you otherwise):
+Devi compilare prima del primo upload (Play te lo blocca):
 
-- **Privacy policy** (URL, see below)
-- **App access**: if login features require credentials for testers, provide a test account
-- **Ads**: no, the app contains no advertising
-- **Content rating**: questionnaire (~5 minutes)
-- **Target audience**: 13+ likely
+- **Privacy policy** (URL, vedi sotto)
+- **App access**: se le funzioni di login richiedono credenziali per i tester, fornisci un account di test
+- **Ads**: no, l'app non contiene pubblicita'
+- **Content rating**: questionario (~5 minuti)
+- **Target audience**: 13+ verosimilmente
 - **News app**: no
-- **Data safety form**: declare collection of email + nickname + game progress via Firebase Auth + Firestore
+- **Data safety form**: dichiara raccolta email + nickname + progressi di gioco via Firebase Auth + Firestore
 
-Add Italian as a translation under "Store listing > Manage translations" so users with an Italian device see the Italian title/description while the rest of the world sees the English ones.
+### Privacy policy (URL pubblico richiesto)
 
-### Privacy policy (public URL required)
+Opzioni dal piu' veloce al piu' professionale:
+- **Privacy Policy Generator** (https://www.termsfeed.com/privacy-policy-generator/): 10 minuti, output gratuito. Adatto per app non-commerciali.
+- Ospitala su una sotto-pagina del sito: aggiungi `public/privacy.html` (o una route Angular `/privacy`), committa, viene servita su `alessiopesit-boop.github.io/guess-the-char/privacy.html`.
 
-Options from fastest to most professional:
-- **Privacy Policy Generator** (https://www.termsfeed.com/privacy-policy-generator/): 10 minutes, free output. Suitable for non-commercial apps.
-- Host it on a sub-page of the site: add `public/privacy.html` (or an Angular route `/privacy`), commit, it is served at `alessiopesit-boop.github.io/guess-the-char/privacy.html`.
+## 6. Carica i Secrets su GitHub
 
-## 6. Upload the Secrets to GitHub
+Repo > Settings > Secrets and variables > Actions > "New repository secret". Crea questi quattro:
 
-Repo > Settings > Secrets and variables > Actions > "New repository secret". Create these four:
-
-| Secret | Value |
+| Secret | Valore |
 |---|---|
-| `ANDROID_KEYSTORE_BASE64` | output of `base64 -w0 android-release.keystore` (only the base64, one single line) |
-| `ANDROID_KEYSTORE_PASSWORD` | the first password from step 2 (storepass) |
-| `ANDROID_KEY_PASSWORD` | the second password from step 2 (keypass) |
-| `PLAY_STORE_SERVICE_ACCOUNT_JSON` | the **full** contents of the JSON downloaded at step 4 |
+| `ANDROID_KEYSTORE_BASE64` | output di `base64 -w0 android-release.keystore` (solo la base64, una riga unica) |
+| `ANDROID_KEYSTORE_PASSWORD` | la prima password del passo 2 (storepass) |
+| `ANDROID_KEY_PASSWORD` | la seconda password del passo 2 (keypass) |
+| `PLAY_STORE_SERVICE_ACCOUNT_JSON` | il contenuto **completo** del JSON scaricato al passo 4 |
 
-Practical commands for base64:
+Comandi pratici per la base64:
 
 ```bash
 base64 -w0 android-release.keystore | xclip -selection clipboard   # Linux
 base64 android-release.keystore | pbcopy                            # macOS
 ```
 
-Then paste into the secret box.
+Poi incolla nella casella del secret.
 
-## 7. First manual upload (one time only)
+## 7. Primo upload manuale (una sola volta)
 
-The automatic workflow only works after Play Console knows **at least one** version of the app on the "Internal testing" track. The first upload must be done by hand.
+Il workflow automatico funziona solo dopo che la Play Console conosce **almeno una** versione dell'app sulla track "Internal testing". Il primo upload va fatto a mano.
 
-1. Trigger the workflow manually: go to GitHub > Actions > "Release to Google Play" > "Run workflow" > track: `internal`. It will still build an AAB and attempt to upload. If Play Console rejects it because of "no existing release", download the AAB from the workflow artifact ("app-release-bundle") and upload it manually via Play Console > Internal testing > "Create new release".
-2. Fill in release notes in English + Italian (max 500 characters per language).
-3. Submit for review. Internal testing activates almost immediately (~minutes). To leave Internal and reach Production takes days and a formal review.
+1. Lancia il workflow manualmente: vai su GitHub > Actions > "Release to Google Play" > "Run workflow" > track: `internal`. Genera comunque un AAB e prova a uploadare. Se la Play Console rifiuta perche' "no existing release", scarica l'AAB dall'artifact del workflow ("app-release-bundle") e uploadlo manualmente in Play Console > Internal testing > "Create new release".
+2. Compila note di rilascio in italiano + inglese (massimo 500 caratteri per lingua).
+3. Submit per review. Internal testing si attiva quasi subito (~minuti). Per uscire da Internal e passare a Production servono giorni e una review formale.
 
-After this time, every `release.published` event on GitHub will automatically trigger a new build + upload, and the AAB will show up on Internal testing without manual steps.
+Dopo questa volta, ogni `release.published` su GitHub triggera automaticamente un nuovo build + upload, e l'AAB compare in Internal testing senza interventi.
 
-## 8. Asset Links: verify they work
+## 8. Asset Links: verifica che funzionino
 
-After `public/.well-known/assetlinks.json` is updated with the real fingerprint and deployed to Pages, check:
-
-```
-https://alessiopesit-boop.github.io/.well-known/assetlinks.json
-```
-
-**Warning**: GitHub Pages serves the assets of a repo under `/<repo-name>/`, but Asset Links MUST live at the **domain root**. So the canonical URL for the Chrome browser / Play Store is:
+Dopo che `public/.well-known/assetlinks.json` e' aggiornato con il fingerprint reale e deployato su Pages, verifica:
 
 ```
 https://alessiopesit-boop.github.io/.well-known/assetlinks.json
 ```
 
-This requires the file to be served from the **GitHub profile Pages** (the `alessiopesit-boop.github.io` repo), not from the `guess-the-char` repo. You have two options:
+**Attenzione**: GitHub Pages serve gli asset di un repo sotto `/<repo-name>/`, ma Asset Links DEVE essere alla **root del dominio**. Quindi la URL canonica per il browser Chrome / Play Store e':
 
-- **Option A** (recommended): create a `alessiopesit-boop.github.io` repo (or, if it exists, add `.well-known/assetlinks.json` inside it). It is the profile repo, served at the root of the domain.
-- **Option B**: use a custom domain for `guess-the-char` (e.g. `guessthechar.com`) and there `/.well-known/assetlinks.json` is served by this repo. Adds a cost (~10 EUR/year for the domain) and extra DNS setup.
+```
+https://alessiopesit-boop.github.io/.well-known/assetlinks.json
+```
 
-Verify with Google's official validator:
+Questo richiede che il file vada servito dal **profilo GitHub Pages** (`alessiopesit-boop.github.io` repo), non dal repo `guess-the-char`. Hai due opzioni:
+
+- **Opzione A** (consigliata): crea un repo `alessiopesit-boop.github.io` (o se esiste, aggiungi `.well-known/assetlinks.json` li' dentro). E' il repo profilo, viene servito a root del dominio.
+- **Opzione B**: usa un dominio custom per `guess-the-char` (es. `indovinailcarattere.it`) e li' il file `/.well-known/assetlinks.json` lo serviamo gia' noi tramite questo repo. Aggiungere costo (~10 EUR/anno per il dominio) e setup DNS extra.
+
+Verifica con il validator ufficiale Google:
 ```
 https://developers.google.com/digital-asset-links/tools/generator
 ```
 
-If the file is in the right place and contains the right fingerprint, the tool will say "Statement is valid".
+Se il file e' al posto giusto e contiene il fingerprint corretto, lo strumento ti dara' "Statement is valid".
 
-Without valid Asset Links, the TWA app still opens on Android **but** displays the browser bar ("App opens alessiopesit-boop.github.io"), revealing that it is a wrapper. With valid Asset Links the app opens full-screen as a native app.
+Senza Asset Links validi, l'app TWA si apre comunque su Android **ma** mostra la barra del browser ("App apre alessiopesit-boop.github.io"), tradendo che e' un wrapper. Con Asset Links validi, l'app si apre full-screen come un'app nativa.
 
-## 9. Future updates: fully automatic
+## 9. Update successivi: tutto automatico
 
-From here on:
+Da qui in avanti:
 
-1. Merge feature/fix PRs into `main` as usual.
-2. Merge release-please's Release PR whenever you want to ship.
-3. The `vX.Y.Z` tag is created, then in parallel:
-   - `deploy.yml`: publishes the site to GitHub Pages (pre-prod)
-   - `play-release.yml`: builds the AAB and uploads it to Play Store track `internal`
-4. Open Play Console and "Promote release" from Internal to Production when you want the new version to reach everyone.
+1. Mergi feature/fix su `main` come al solito.
+2. Mergi la Release PR di release-please quando vuoi rilasciare.
+3. Si tagga `vX.Y.Z`, parte:
+   - `deploy.yml`: pubblica il sito su GitHub Pages (pre-prod)
+   - `play-release.yml`: builda l'AAB e lo carica su Play Store track `internal`
+4. Apri la Play Console e fai "Promote release" da Internal a Production quando vuoi che la nuova versione raggiunga tutti.
 
-`appVersionCode` is computed from the tag with the formula `MAJOR*10000 + MINOR*100 + PATCH` (e.g. 1.6.0 becomes 10600). Works as long as no component exceeds 99: at that point it will need to be updated.
+`appVersionCode` viene calcolato dal tag con la formula `MAJOR*10000 + MINOR*100 + PATCH` (es. 1.6.0 -> 10600). Funziona finche' nessuna componente supera 99: a quel punto andra' aggiornata.
 
 ## Troubleshooting
 
-- **`Keystore was tampered with, or password was incorrect`**: `ANDROID_KEYSTORE_PASSWORD` or `ANDROID_KEY_PASSWORD` on Secrets does not match the real ones. Redo from step 2 generating a **new** keystore only if this is the very first publication; otherwise recover the passwords from your password manager.
-- **`Package not found` on upload**: the app does not yet exist in Play Console (see step 5).
-- **`No existing release` on first dispatch**: the first Play upload must be manual (see step 7). After that, automatic.
-- **Asset Links validator says "Statement not found"**: the `assetlinks.json` file is not at the domain root. See step 8 (Option A or B).
-- **The TWA app on Android shows the browser bar at the top**: Asset Links is invalid, or an old cache on the phone. Uninstall the app, reboot, reinstall from Play Console.
+- **`Keystore was tampered with, or password was incorrect`**: la `ANDROID_KEYSTORE_PASSWORD` o `ANDROID_KEY_PASSWORD` su Secrets non combaciano con quelle reali. Rifai dal passo 2 generando una **nuova** keystore solo se sei alla primissima pubblicazione; altrimenti recupera le password dal tuo password manager.
+- **`Package not found` su upload**: l'app non esiste ancora sulla Play Console (vedi passo 5).
+- **`No existing release` al primo dispatch**: il primo upload Play va fatto manualmente (vedi passo 7). Dopo, automatico.
+- **Asset Links validator dice "Statement not found"**: il file `assetlinks.json` non e' alla root del dominio. Vedi passo 8 (Opzione A o B).
+- **L'app TWA su Android mostra la barra del browser sopra**: Asset Links non valido, oppure cache vecchia sul telefono. Disinstalla l'app, riavvia, reinstalla dalla Play Console.
