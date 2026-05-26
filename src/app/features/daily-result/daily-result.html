@@ -25,6 +25,40 @@
       </div>
     </div>
 
+    <!-- Amici oggi: visibile solo se loggato. Mostra chi tra i tuoi amici
+         ha completato la sfida di oggi, con il loro punteggio a destra
+         e un'evidenza ambra sulla riga che ti ha battuto. -->
+    @if (state().account) {
+      <div class="divider"></div>
+      <h3 class="h3 dr-friends-title">
+        {{ i18n.lang() === 'it' ? 'Amici oggi' : 'Friends today' }}
+      </h3>
+      @if (friendsLoading()) {
+        <p class="muted dr-friends-empty">
+          {{ i18n.lang() === 'it' ? 'Carico…' : 'Loading…' }}
+        </p>
+      } @else if (friendsToday().length === 0) {
+        <p class="muted dr-friends-empty">
+          {{ i18n.lang() === 'it'
+            ? 'Nessun amico ha completato la sfida di oggi. Per primo!'
+            : 'No friends finished today\'s challenge yet. You\'re first!' }}
+        </p>
+      } @else {
+        <div class="dr-friends-list">
+          @for (f of friendsToday(); track f.uid) {
+            <button class="dr-friend-row"
+                    type="button"
+                    [class.is-better]="f.dailyScore > myScore()"
+                    (click)="openFriend(f.nickname)">
+              <span class="dr-friend-avatar">{{ (f.nickname || '?').charAt(0).toUpperCase() }}</span>
+              <span class="dr-friend-nick">{{ f.nickname }}</span>
+              <span class="dr-friend-score mono tabnum">{{ f.dailyScore }}/5</span>
+            </button>
+          }
+        </div>
+      }
+    }
+
     <div class="divider"></div>
 
     <div class="result-actions">

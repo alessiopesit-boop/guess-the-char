@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
+import { FriendDaily, FriendsService } from '../../core/firebase/friends.service';
 import { AppBar } from '../../shared/app-bar';
 import { Icon } from '../../shared/icon';
 
@@ -21,8 +22,44 @@ export class DailyResult {
   protected readonly i18n = inject(I18nService);
   protected readonly appState = inject(AppStateService);
 
+  private readonly friendsSvc = inject(FriendsService);
+
   protected readonly state = this.appState.state;
   protected readonly copied = signal(false);
+
+  /** Lista amici che hanno completato la daily oggi, ordinati per punteggio
+   *  desc. Caricata in modo lazy quando la pagina si apre. */
+  protected readonly friendsToday = signal<FriendDaily[]>([]);
+  protected readonly friendsLoading = signal(false);
+
+  /** Mio score di oggi (per il confronto con gli amici nelle righe). */
+  protected readonly myScore = computed(() => this.score());
+
+  private readonly _loadFriendsOnAuth = effect(() => {
+    const account = this.state().account;
+    if (!account) {
+      this.friendsToday.set([]);
+      return;
+    }
+    void this.loadFriendsToday();
+  });
+
+  private async loadFriendsToday(): Promise<void> {
+    this.friendsLoading.set(true);
+    try {
+      const list = await this.friendsSvc.getFriendsDailyToday();
+      this.friendsToday.set(list);
+    } catch (e) {
+      console.warn('[daily-result] friendsToday error:', e);
+    } finally {
+      this.friendsLoading.set(false);
+    }
+  }
+
+  protected openFriend(nickname: string): void {
+    if (!nickname) return;
+    this.router.navigate(['/u', nickname]);
+  }
 
   protected readonly lastEntry = computed(() => {
     const h = this.state().dailyHistory ?? [];
