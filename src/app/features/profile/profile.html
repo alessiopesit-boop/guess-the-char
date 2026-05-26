@@ -146,6 +146,35 @@
       </div>
     </div>
 
+    <!-- Record sfide tra amici: visibile solo se loggato e con almeno una sfida
+         completata. Tap apre /sfide. -->
+    @if (challengeStats(); as cs) {
+      @if (cs.total > 0) {
+        <button type="button"
+                class="profile-challenge-card"
+                (click)="goChallenges()"
+                [attr.aria-label]="i18n.lang() === 'it' ? 'Vai alle sfide' : 'Go to challenges'">
+          <span class="eyebrow profile-challenge-eyebrow">
+            {{ i18n.lang() === 'it' ? 'SFIDE TRA AMICI' : 'FRIEND CHALLENGES' }}
+          </span>
+          <div class="profile-challenge-stats">
+            <div class="stat">
+              <span class="v" data-tone="win">{{ cs.won }}</span>
+              <span class="l">{{ i18n.lang() === 'it' ? 'Vinte' : 'Won' }}</span>
+            </div>
+            <div class="stat">
+              <span class="v" data-tone="lose">{{ cs.lost }}</span>
+              <span class="l">{{ i18n.lang() === 'it' ? 'Perse' : 'Lost' }}</span>
+            </div>
+            <div class="stat">
+              <span class="v" data-tone="draw">{{ cs.draw }}</span>
+              <span class="l">{{ i18n.lang() === 'it' ? 'Pari' : 'Tied' }}</span>
+            </div>
+          </div>
+        </button>
+      }
+    }
+
     <div class="divider"></div>
 
     <h3 class="h3 section-h">

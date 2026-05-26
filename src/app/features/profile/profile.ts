@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { AppStateService } from '../../core/state/app-state.service';
 import { AuthService } from '../../core/firebase/auth.service';
 import { NicknameService } from '../../core/firebase/nickname.service';
+import { ChallengeStats, ChallengesService } from '../../core/firebase/challenges.service';
 import { AVATARS, avatarById } from '../../core/data/avatars';
 import { scriptById } from '../../core/data/scripts';
 import { computeBadges } from '../../core/data/badges';
@@ -28,9 +29,36 @@ export class Profile {
   protected readonly appState = inject(AppStateService);
   private readonly authSvc = inject(AuthService);
   private readonly nicknames = inject(NicknameService);
+  private readonly challengesSvc = inject(ChallengesService);
 
   protected readonly state = this.appState.state;
   protected readonly avatars = AVATARS;
+
+  /** Record sfide tra amici (vinte/perse/pari), caricato lazy quando si apre
+   *  la pagina e l'utente e' loggato. Resta `null` finche' non e' pronto. */
+  protected readonly challengeStats = signal<ChallengeStats | null>(null);
+
+  private readonly _loadChallengeStats = effect(() => {
+    const uid = this.state().account?.uid ?? null;
+    if (!uid) {
+      this.challengeStats.set(null);
+      return;
+    }
+    void this.refreshChallengeStats();
+  });
+
+  private async refreshChallengeStats(): Promise<void> {
+    try {
+      const s = await this.challengesSvc.getChallengeStats();
+      this.challengeStats.set(s);
+    } catch (e) {
+      console.warn('[profile] challenge stats error:', e);
+    }
+  }
+
+  protected goChallenges(): void {
+    this.router.navigate(['/sfide']);
+  }
 
   protected readonly account = computed(() => this.state().account);
   protected readonly currentAvatar = computed(() => avatarById(this.account()?.avatar));

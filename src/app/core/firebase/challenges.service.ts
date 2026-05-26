@@ -47,6 +47,13 @@ export interface ChallengeDoc {
   completedAt: unknown;
 }
 
+export interface ChallengeStats {
+  won: number;
+  lost: number;
+  draw: number;
+  total: number;
+}
+
 const TOTAL_Q = 5;
 
 /**
@@ -180,6 +187,36 @@ export class ChallengesService {
   async countPendingIncoming(): Promise<number> {
     const all = await this.listIncoming();
     return all.filter((c) => c.status === 'pending').length;
+  }
+
+  /**
+   * Aggregato di tutte le sfide completate dell'utente loggato: quante ha
+   * vinto, perso, pareggiato. Usato in /profile per mostrare un record
+   * sintetico delle sfide tra amici. Conta come "vittoria" se il mio score
+   * supera quello dell'avversario, "sconfitta" se inferiore, "pareggio" se
+   * uguali (incluse le 5-5 e le 0-0).
+   *
+   * Costo: 2 query Firestore (incoming + outgoing). Aggregato lato client.
+   */
+  async getChallengeStats(): Promise<ChallengeStats> {
+    if (!this.db) return { won: 0, lost: 0, draw: 0, total: 0 };
+    const me = this.appState.state().account?.uid;
+    if (!me) return { won: 0, lost: 0, draw: 0, total: 0 };
+    const [inc, out] = await Promise.all([this.listIncoming(), this.listOutgoing()]);
+    let won = 0;
+    let lost = 0;
+    let draw = 0;
+    const completed = [...inc, ...out].filter(
+      (c) => c.status === 'completed' && typeof c.toScore === 'number',
+    );
+    for (const c of completed) {
+      const meScore = me === c.to ? (c.toScore ?? 0) : c.fromScore;
+      const them = me === c.to ? c.fromScore : (c.toScore ?? 0);
+      if (meScore > them) won++;
+      else if (meScore < them) lost++;
+      else draw++;
+    }
+    return { won, lost, draw, total: won + lost + draw };
   }
 
   /** Risposta del destinatario alla sfida: setta toScore e segna completed. */
