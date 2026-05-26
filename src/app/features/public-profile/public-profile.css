@@ -237,3 +237,67 @@
   font-size: 12px;
   padding: 0 12px;
 }
+
+/* Card "Daily oggi" sotto le stats: visibile solo sui profili altrui quando
+   l'utente ha completato la daily del giorno. Confronto a due se anche io
+   l'ho fatta, "ha fatto X/5" altrimenti. */
+.pub-daily-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pub-daily-eyebrow {
+  color: var(--warm);
+}
+.pub-daily-solo {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.pub-daily-solo strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+.pub-daily-vs {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+.pub-daily-side {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+}
+.pub-daily-name {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 500;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pub-daily-score {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text);
+}
+.pub-daily-winner .pub-daily-score {
+  color: var(--accent);
+}
+.pub-daily-vs-sep {
+  font-size: 11px;
+  color: var(--text-mute);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}

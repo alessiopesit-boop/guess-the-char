@@ -70,6 +70,15 @@ export class PublicProfile {
     this.scoreInfoOpen.set(false);
   }
 
+  /** Il MIO score della daily di oggi, se l'ho completata, dal mio AppState.
+   *  Serve a fare il confronto a fianco al daily dell'utente visualizzato. */
+  protected readonly myDailyToday = computed<{ score: number } | null>(() => {
+    const s = this.appState.state();
+    const today = new Date().toDateString();
+    if (s.dailyDoneStamp !== today) return null;
+    return { score: s.dailyScore };
+  });
+
   protected readonly isSelf = computed(() => {
     const p = this.profile();
     const me = this.appState.state().account?.uid;
@@ -161,6 +170,13 @@ export class PublicProfile {
         stateForBadges.correctAnswers + stateForBadges.bestStreak * 10;
       const score = typeof persistedScore === 'number' ? persistedScore : computedScore;
 
+      // Daily oggi: e' considerata "fatta" se lo stamp persistito su cloud
+      // corrisponde alla stringa di oggi (new Date().toDateString()). Cosi'
+      // un giorno dopo la conferma, il campo torna implicitamente a false e
+      // non mostriamo piu' un risultato stantio.
+      const todayStamp = new Date().toDateString();
+      const dailyDoneToday = stateForBadges.dailyDoneStamp === todayStamp;
+
       this.profile.set({
         uid: doc.uid,
         nickname: (doc as Record<string, string>)['nickname'] ?? nick,
@@ -171,6 +187,9 @@ export class PublicProfile {
         accuracy: stateForBadges.accuracy,
         played: stateForBadges.played,
         dailyStreak: stateForBadges.dailyStreak,
+        dailyToday: dailyDoneToday
+          ? { score: stateForBadges.dailyScore }
+          : null,
         unlockedBadges,
         totalBadges: allBadges.length,
         scriptStats,
@@ -325,6 +344,10 @@ interface PublicProfileData {
   accuracy: number;
   played: number;
   dailyStreak: number;
+  /** Risultato della sfida giornaliera di OGGI dell'utente visualizzato, se
+   *  l'ha completata. Null se non l'ha ancora giocata oggi (o se il campo
+   *  stale di un giorno precedente). */
+  dailyToday: { score: number } | null;
   unlockedBadges: BadgeWithProgress[];
   totalBadges: number;
   scriptStats: Array<{
