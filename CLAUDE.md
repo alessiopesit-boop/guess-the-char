@@ -284,7 +284,7 @@ Cose da sapere se lo modifichi:
 
 ## Android / Google Play (TWA)
 
-L'app e' wrappata come **Trusted Web Activity** per essere pubblicabile su Google Play. La build avviene in CI a ogni release, in parallelo al deploy Pages (pre-prod). Il sito Pages resta la fonte di verita': l'AAB Android contiene solo un Chrome wrapper che apre `https://alessiopesit-boop.github.io/guess-the-char/`.
+L'app e' wrappata come **Trusted Web Activity** per essere pubblicabile su Google Play. La build avviene in CI a ogni release, in parallelo al deploy Pages (pre-prod). Il sito Pages resta la fonte di verita': l'AAB Android contiene solo un Chrome wrapper che apre `https://alessiopesit-boop.github.io/guess-the-char/`. Nome app sotto l'icona: "Guess the Char" / "Guess" (la TWA non localizza facilmente il nome icona, EN come default e' coerente con il default linguistico dell'app).
 
 File coinvolti:
 
