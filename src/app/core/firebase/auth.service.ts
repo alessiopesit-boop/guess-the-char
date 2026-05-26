@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut as fbSignOut,
@@ -74,6 +75,26 @@ export class AuthService {
   async signOut(): Promise<void> {
     if (!this.auth) return;
     await fbSignOut(this.auth);
+  }
+
+  /**
+   * Manda il classico "email di reset password" all'indirizzo dato. Firebase
+   * non ritorna feedback diverso a seconda che l'email esista o no (scelta
+   * voluta per privacy: non vogliamo che un attaccante possa enumerare gli
+   * account registrati). Quindi la UI dice sempre "se l'email esiste, hai
+   * ricevuto un link" indipendentemente dal risultato.
+   *
+   * `languageCode` ('it' / 'en' / ecc.) seleziona la lingua del template
+   * della mail. Firebase ha gia' i template tradotti per ~50 lingue
+   * (incluse IT + EN), quindi non c'e' nulla da configurare lato console.
+   *
+   * Lancia comunque per i casi di errore reale (formato email invalido,
+   * rate limit, network), che la UI mappa a messaggi specifici.
+   */
+  async sendPasswordReset(email: string, languageCode?: string): Promise<void> {
+    const auth = this.requireAuth();
+    if (languageCode) auth.languageCode = languageCode;
+    await sendPasswordResetEmail(auth, email);
   }
 
   private requireAuth(): Auth {
