@@ -88,6 +88,13 @@
         </div>
       }
 
+      <!-- Card punteggio cliccabile: tap apre la modale che spiega la formula. -->
+      <button class="card pub-score-card" type="button" (click)="openScoreInfo()"
+              [attr.aria-label]="i18n.lang() === 'it' ? 'Come si calcolano i punti' : 'How points work'">
+        <span class="eyebrow">{{ i18n.lang() === 'it' ? 'PUNTI' : 'POINTS' }}</span>
+        <div class="pub-score-total tabnum">{{ p.score.toLocaleString() }}</div>
+      </button>
+
       <!-- Stats 2x2 (best, accuracy, played, dailyStreak) -->
       <div class="pub-stats">
         <div class="stat">
@@ -186,4 +193,12 @@
       }
     }
   </div>
+
+  @if (scoreInfoOpen()) {
+    <app-info-sheet
+      [title]="scoreInfoTitle()"
+      [body]="scoreInfoBody()"
+      (close)="closeScoreInfo()"
+    />
+  }
 </div>
