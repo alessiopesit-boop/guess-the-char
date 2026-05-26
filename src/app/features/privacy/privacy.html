@@ -1,0 +1,103 @@
+<div class="app-shell">
+  <app-bar [canBack]="true" (back)="goBack()" (goHome)="goHome()" />
+
+  <div class="page privacy-page">
+    @if (i18n.lang() === 'it') {
+      <h1 class="h1">Informativa sulla privacy</h1>
+      <p class="muted">In sintesi: l'app raccoglie il minimo indispensabile, niente pubblicita', niente tracker, e i dati restano tuoi.</p>
+
+      <h2 class="h2">Chi sono</h2>
+      <p>Alessio Pes, sviluppatore indipendente. Per qualsiasi domanda o richiesta legata ai tuoi dati: <a href="mailto:alessio.pes.it&#64;gmail.com">alessio.pes.it&#64;gmail.com</a>.</p>
+
+      <h2 class="h2">Cosa raccolgo se accedi con un account</h2>
+      <p>Quando crei un account (con email + password oppure con Google), l'app salva su Firebase questi dati:</p>
+      <ul>
+        <li>l'email che hai usato per accedere, gestita da Firebase Authentication</li>
+        <li>un nickname pubblico (che ti chiediamo di scegliere) e un avatar</li>
+        <li>i tuoi progressi di gioco: streak, percentuale di accuratezza, statistiche per ogni alfabeto, storico delle sfide giornaliere</li>
+        <li>la lista degli amici e le sfide 1-vs-1 che scambi con loro</li>
+      </ul>
+      <p>I dati di profilo (nickname, avatar, statistiche, badge sbloccati) sono <strong>visibili pubblicamente</strong> sull'URL <code>/u/:nickname</code> dell'app e nella classifica. Email e elenco amici restano privati: solo tu li vedi.</p>
+
+      <h2 class="h2">Cosa raccolgo se NON accedi</h2>
+      <p>Se usi l'app come ospite, niente lascia il tuo dispositivo. Le preferenze (lingua, tema, suoni) e i progressi di gioco vengono salvati solo nel <code>localStorage</code> del tuo browser. Niente viene inviato a un server.</p>
+
+      <h2 class="h2">Dove finiscono questi dati</h2>
+      <p>L'app usa due servizi Google:</p>
+      <ul>
+        <li><strong>Firebase Authentication</strong>: gestisce login con email/password o con Google. Email e provider OAuth vivono qui.</li>
+        <li><strong>Cloud Firestore</strong>: database delle tue statistiche, amici e sfide. Regione di archiviazione: <code>eur3</code> (Europa).</li>
+      </ul>
+      <p>Google e' titolare del trattamento per la parte di infrastruttura. La sua privacy policy: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.</p>
+
+      <h2 class="h2">Cosa NON raccolgo</h2>
+      <p>Nessuna pubblicita'. Nessun tracker di terze parti (no Google Analytics, no Facebook Pixel, niente). Nessun profilo di marketing.</p>
+
+      <h2 class="h2">Per quanto tempo</h2>
+      <p>Finche' tieni il tuo account, i dati restano. Se cancelli l'account o me lo chiedi, vengono eliminati entro 30 giorni.</p>
+
+      <h2 class="h2">I tuoi diritti</h2>
+      <p>In base al GDPR puoi sempre:</p>
+      <ul>
+        <li>accedere ai tuoi dati (te li mando io in un file JSON, scrivimi)</li>
+        <li>correggerli (nickname e avatar li cambi direttamente da Impostazioni)</li>
+        <li>cancellarli (mandami una mail: rimuovo account, statistiche, amicizie e sfide)</li>
+        <li>portarli altrove (export JSON su richiesta)</li>
+      </ul>
+      <p>Indirizzo per esercitare questi diritti: <a href="mailto:alessio.pes.it&#64;gmail.com">alessio.pes.it&#64;gmail.com</a>. Rispondo entro 30 giorni.</p>
+
+      <h2 class="h2">Modifiche a questa informativa</h2>
+      <p>Se cambio qualcosa di sostanziale, aggiorno la data in fondo e te lo segnalo nell'app al prossimo accesso.</p>
+
+      <p class="muted privacy-meta">Ultimo aggiornamento: <strong>{{ lastUpdated }}</strong></p>
+    } @else {
+      <h1 class="h1">Privacy Policy</h1>
+      <p class="muted">Short version: this app collects the bare minimum, no ads, no trackers, your data stays yours.</p>
+
+      <h2 class="h2">Who I am</h2>
+      <p>Alessio Pes, indie developer. For any question or request about your data, write to: <a href="mailto:alessio.pes.it&#64;gmail.com">alessio.pes.it&#64;gmail.com</a>.</p>
+
+      <h2 class="h2">What I collect if you sign in</h2>
+      <p>When you create an account (with email + password or Google), the app stores on Firebase:</p>
+      <ul>
+        <li>the email you used to sign in, managed by Firebase Authentication</li>
+        <li>a public nickname (you choose it) and an avatar</li>
+        <li>your game progress: streaks, accuracy percentage, per-script statistics, daily challenge history</li>
+        <li>your friend list and the 1-vs-1 challenges you exchange with them</li>
+      </ul>
+      <p>Profile data (nickname, avatar, statistics, unlocked badges) is <strong>publicly visible</strong> on the app's <code>/u/:nickname</code> page and on the leaderboard. Email and friend list stay private: only you can see them.</p>
+
+      <h2 class="h2">What I collect if you don't sign in</h2>
+      <p>If you use the app as a guest, nothing leaves your device. Preferences (language, theme, sounds) and game progress are saved only in your browser's <code>localStorage</code>. Nothing is sent to any server.</p>
+
+      <h2 class="h2">Where this data lives</h2>
+      <p>The app uses two Google services:</p>
+      <ul>
+        <li><strong>Firebase Authentication</strong>: handles login with email/password or Google. Email and OAuth provider live here.</li>
+        <li><strong>Cloud Firestore</strong>: database of your statistics, friends and challenges. Storage region: <code>eur3</code> (Europe).</li>
+      </ul>
+      <p>Google is the controller for the infrastructure portion. Their privacy policy: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.</p>
+
+      <h2 class="h2">What I do NOT collect</h2>
+      <p>No advertising. No third-party trackers (no Google Analytics, no Facebook Pixel, nothing). No marketing profile.</p>
+
+      <h2 class="h2">For how long</h2>
+      <p>As long as you keep your account, the data stays. If you delete your account or ask me to, it is removed within 30 days.</p>
+
+      <h2 class="h2">Your rights</h2>
+      <p>Under GDPR you can always:</p>
+      <ul>
+        <li>access your data (I send it to you as a JSON file, just email me)</li>
+        <li>correct it (nickname and avatar are editable directly from Settings)</li>
+        <li>delete it (email me: I remove account, statistics, friendships and challenges)</li>
+        <li>port it elsewhere (JSON export on request)</li>
+      </ul>
+      <p>To exercise these rights: <a href="mailto:alessio.pes.it&#64;gmail.com">alessio.pes.it&#64;gmail.com</a>. I respond within 30 days.</p>
+
+      <h2 class="h2">Changes to this policy</h2>
+      <p>If I change something substantial, I update the date below and flag it inside the app on your next access.</p>
+
+      <p class="muted privacy-meta">Last updated: <strong>{{ lastUpdated }}</strong></p>
+    }
+  </div>
+</div>
