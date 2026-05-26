@@ -1,8 +1,8 @@
 {
-  "name": "Indovina il carattere",
-  "short_name": "Indovina",
-  "description": "Quiz interattivo per riconoscere i sistemi di scrittura del mondo.",
-  "lang": "it",
+  "name": "Guess the Char",
+  "short_name": "Guess",
+  "description": "Interactive quiz to learn the writing systems of the world at a glance.",
+  "lang": "en",
   "categories": ["games", "education"],
   "start_url": "/guess-the-char/",
   "scope": "/guess-the-char/",
