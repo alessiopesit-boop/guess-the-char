@@ -76,11 +76,41 @@
   margin: 0;
 }
 
+/* Card "Punti" cliccabile: tap apre modale con la spiegazione formula. */
+.pub-score-card {
+  appearance: none;
+  width: 100%;
+  margin-top: 22px;
+  padding: 18px 18px 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition:
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease;
+}
+.pub-score-card:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.pub-score-total {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--accent);
+  margin-top: 2px;
+}
+
 .pub-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 22px;
+  margin-top: 10px;
 }
 
 .pub-badges-count {

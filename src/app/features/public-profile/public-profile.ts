@@ -10,6 +10,7 @@ import { avatarById } from '../../core/data/avatars';
 import { BadgeWithProgress, computeBadges } from '../../core/data/badges';
 import { ScriptInfo, scriptById } from '../../core/data/scripts';
 import { AppBar } from '../../shared/app-bar';
+import { InfoSheet } from '../../shared/info-sheet';
 import { AppState, DEFAULT_STATE } from '../../core/state/types';
 
 /**
@@ -20,7 +21,7 @@ import { AppState, DEFAULT_STATE } from '../../core/state/types';
  */
 @Component({
   selector: 'app-public-profile',
-  imports: [AppBar],
+  imports: [AppBar, InfoSheet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './public-profile.html',
   styleUrl: './public-profile.css',
@@ -43,6 +44,24 @@ export class PublicProfile {
   protected readonly notFound = signal(false);
   protected readonly profile = signal<PublicProfileData | null>(null);
   protected readonly copyFlash = signal(false);
+
+  /** Modale "come si calcolano i punti": tap sulla card Punti la apre. */
+  protected readonly scoreInfoOpen = signal(false);
+  protected readonly scoreInfoTitle = computed(() =>
+    this.i18n.lang() === 'it' ? 'Come si calcolano i punti' : 'How points work',
+  );
+  protected readonly scoreInfoBody = computed(() =>
+    this.i18n.lang() === 'it'
+      ? 'Il punteggio in classifica si forma da due contributi: 1 punto per ogni risposta corretta data, piu\' 10 punti per ogni passo del migliore streak personale di sempre. Formula: corrette + (migliore streak × 10) = punti totali. Premia sia il volume sia i picchi di precisione.'
+      : 'Leaderboard points come from two contributors: 1 point per correct answer, plus 10 points per step of personal best streak. Formula: correct + (best streak × 10) = total points. Rewards both volume and peak skill.',
+  );
+
+  protected openScoreInfo(): void {
+    this.scoreInfoOpen.set(true);
+  }
+  protected closeScoreInfo(): void {
+    this.scoreInfoOpen.set(false);
+  }
 
   protected readonly isSelf = computed(() => {
     const p = this.profile();
@@ -126,11 +145,20 @@ export class PublicProfile {
           e.tries >= 1 && e.script != null,
         )
         .sort((a, b) => b.acc - a.acc);
+      // Score composito: usa il campo persistito se c'e' (popolato da
+      // UserDocService in #61), altrimenti calcolalo on-the-fly cosi' anche
+      // i profili pre-deploy mostrano un numero coerente.
+      const persistedScore = (doc as Record<string, number>)['score'];
+      const computedScore =
+        stateForBadges.correctAnswers + stateForBadges.bestStreak * 10;
+      const score = typeof persistedScore === 'number' ? persistedScore : computedScore;
+
       this.profile.set({
         uid: doc.uid,
         nickname: (doc as Record<string, string>)['nickname'] ?? nick,
         avatar: (doc as Record<string, number>)['avatar'] ?? 0,
         joinedAt: doc['joinedAt'],
+        score,
         bestStreak: stateForBadges.bestStreak,
         accuracy: stateForBadges.accuracy,
         played: stateForBadges.played,
@@ -197,6 +225,9 @@ interface PublicProfileData {
   nickname: string;
   avatar: number;
   joinedAt: unknown;
+  /** Score composito (correctAnswers + bestStreak*10). Stesso che usa la
+   *  classifica alltime; mostrato qui come "Punti" senza breakdown. */
+  score: number;
   bestStreak: number;
   accuracy: number;
   played: number;

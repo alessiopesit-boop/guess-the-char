@@ -225,12 +225,55 @@
   margin-top: 18px;
 }
 
-/* Stats 2x2 (vs la home che e' 1x3): bestStreak + streak + accuracy + played. */
-.profile-stats {
+/* Card "Punti totali" cliccabile: tap apre modale con la formula. */
+.profile-score-card {
+  appearance: none;
+  width: 100%;
+  margin-top: 22px;
+  padding: 18px 18px 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition:
+    background var(--hover-dur) ease,
+    border-color var(--hover-dur) ease;
+}
+.profile-score-card:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.profile-score-total {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--accent);
+  margin-top: 2px;
+}
+/* Riga dei due tile contributori: stesso .stat globale, la terza riga
+   "+N pt" in accent vive in flow normale come terza linea di testo. */
+.profile-score-contrib {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 22px;
+  margin-top: 10px;
+}
+.profile-contrib-bonus {
+  font-size: 11px;
+  color: var(--accent);
+}
+
+/* Stats contestuali (streak corrente, accuracy, played): tre tile in
+   1x3. bestStreak e' migrato sopra nei contributor del punteggio. */
+.profile-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .section-h {
