@@ -1,0 +1,132 @@
+name: Release to Google Play
+
+# Trigger speculare a deploy.yml: ogni Release pubblicata (creata da
+# release-please al merge della sua PR) builda anche l'AAB Android e lo
+# carica sul track 'internal' di Google Play. Il sito su GitHub Pages
+# continua a fare da pre-prod (vedi deploy.yml).
+on:
+  release:
+    types: [published]
+  # Manuale per test: scegli un tag esistente e parte. Utile per re-uploadare
+  # dopo aver sistemato una rule policy o un secret.
+  workflow_dispatch:
+    inputs:
+      track:
+        description: "Track Play Store (internal/alpha/beta/production)"
+        required: true
+        default: "internal"
+        type: choice
+        options: ["internal", "alpha", "beta", "production"]
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Setup Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli@latest
+
+      - name: Decode keystore from secret
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Manca il secret ANDROID_KEYSTORE_BASE64. Vedi RELEASE-ANDROID.md per generare la keystore e caricarla."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > android.keystore
+          echo "Keystore decodificata, dimensione: $(stat -c%s android.keystore) byte"
+
+      - name: Calcola versionCode e versionName dal tag
+        id: ver
+        run: |
+          # Tag della release: GITHUB_REF e' tipo "refs/tags/v1.6.0".
+          # In workflow_dispatch lo prendiamo dal package.json corrente.
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+          else
+            TAG="v$(node -p "require('./package.json').version")"
+          fi
+          VERSION="${TAG#v}"
+          IFS='.' read -r MAJ MIN PAT <<< "$VERSION"
+          # Formula stabile e monotona: M*10000 + m*100 + p. Funziona finche'
+          # ogni componente resta < 100. Adeguato per noi.
+          CODE=$((10#$MAJ * 10000 + 10#$MIN * 100 + 10#$PAT))
+          echo "version_name=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version_code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "Versione: $VERSION (code $CODE)"
+
+      - name: Patch twa-manifest.json con versione corrente
+        env:
+          VERSION_NAME: ${{ steps.ver.outputs.version_name }}
+          VERSION_CODE: ${{ steps.ver.outputs.version_code }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('twa-manifest.json', 'utf8'));
+            m.appVersionName = process.env.VERSION_NAME;
+            m.appVersionCode = parseInt(process.env.VERSION_CODE, 10);
+            fs.writeFileSync('twa-manifest.json', JSON.stringify(m, null, 2));
+            console.log('twa-manifest.json aggiornato:', m.appVersionName, '(code', m.appVersionCode + ')');
+          "
+
+      - name: Genera progetto Android via Bubblewrap update
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          # 'update' rigenera il progetto Android partendo da twa-manifest.json
+          # senza chiedere interattivamente niente: usa le password dal env.
+          bubblewrap update --skipVersionUpgrade
+
+      - name: Build AAB con Bubblewrap
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          bubblewrap build --skipPwaValidation
+          ls -la *.aab *.apk 2>/dev/null || true
+
+      - name: Upload AAB come artifact del workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-bundle
+          path: |
+            app-release-bundle.aab
+            app-release-signed.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Carica su Google Play
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          packageName: io.github.alessiopesit_boop.guessthechar
+          releaseFiles: app-release-bundle.aab
+          # Default: track 'internal' (testing chiuso). In manual dispatch puoi
+          # scegliere un altro track dall'input del workflow.
+          track: ${{ github.event.inputs.track || 'internal' }}
+          # Le release notes della Play Store si possono customizzare per
+          # locale: per ora prendiamo il body della GitHub Release come-is.
+          status: completed
+          releaseName: ${{ steps.ver.outputs.version_name }}

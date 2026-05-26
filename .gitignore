@@ -52,3 +52,18 @@ src/app/core/build-sha.local.ts
 # Firebase tools cache locale (creata da firebase deploy / login / emulators)
 .firebase/
 firebase-debug.log
+
+# Android / TWA: keystore, output bundle, progetto Android generato al volo
+# da Bubblewrap. Niente di tutto questo deve finire nel repo (la keystore
+# perche' e' un secret, il resto perche' rigenerabile dal workflow CI).
+*.keystore
+*.jks
+android-release.keystore
+play-store-service-account*.json
+app-release-bundle.aab
+app-release-signed.apk
+app-release-unsigned.apk
+/app/
+/twa/
+build/
+.gradle/

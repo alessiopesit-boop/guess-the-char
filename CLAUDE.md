@@ -282,6 +282,25 @@ Cose da sapere se lo modifichi:
 - Prima pubblicazione: in *Settings > Pages* del repo va scelto "Source: GitHub Actions" una volta sola.
 - Anche l'environment `github-pages` (creato in automatico la prima volta che Pages e' attivato) va sbloccato per i tag: di default consente deploy solo dal branch `main`, ma il nostro workflow parte dal tag `vX.Y.Z`. Una sola volta, aggiungere una "deployment branch policy" con `name: v*` e `type: tag` (via *Settings > Environments > github-pages > Deployment branches and tags*, oppure via `gh api -X POST repos/<owner>/<repo>/environments/github-pages/deployment-branch-policies -f name='v*' -f type='tag'`). Senza questo, il job `deploy` fallisce con "Tag X.Y.Z is not allowed to deploy to github-pages due to environment protection rules".
 
+## Android / Google Play (TWA)
+
+L'app e' wrappata come **Trusted Web Activity** per essere pubblicabile su Google Play. La build avviene in CI a ogni release, in parallelo al deploy Pages (pre-prod). Il sito Pages resta la fonte di verita': l'AAB Android contiene solo un Chrome wrapper che apre `https://alessiopesit-boop.github.io/guess-the-char/`.
+
+File coinvolti:
+
+- `twa-manifest.json`: config Bubblewrap (packageId, host, colori, signing key, ecc.). `appVersionName` e `appVersionCode` vengono sovrascritti al volo dal workflow CI a partire dal tag della release (formula `MAJOR*10000 + MINOR*100 + PATCH`).
+- `public/.well-known/assetlinks.json`: Digital Asset Links che dichiarano la corrispondenza fra il dominio e l'app Android. **Va aggiornato manualmente** con il SHA-256 reale della keystore di produzione (al primo setup). Vedi `RELEASE-ANDROID.md`.
+- `.github/workflows/play-release.yml`: triggera su `release.published` (stesso evento di `deploy.yml`). Installa Bubblewrap CLI, decodifica la keystore da `secrets.ANDROID_KEYSTORE_BASE64`, genera il progetto Android via `bubblewrap update`, builda l'AAB con `bubblewrap build`, lo carica su Play Store track `internal` via `r0adkll/upload-google-play@v1.1.3` (service account JSON in `secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON`).
+- `RELEASE-ANDROID.md`: lista step-by-step delle azioni manuali non delegabili al CI (creare keystore, account Play Developer, service account Google, primo upload manuale, privacy policy, ecc.). E' la doc operativa: chi vuole rilasciare segue quella.
+
+Secrets GitHub richiesti dal workflow: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_PASSWORD`, `PLAY_STORE_SERVICE_ACCOUNT_JSON`. Finche' non sono settati, il job fallisce subito con un messaggio esplicito allo step "Decode keystore from secret".
+
+Cose da sapere se lo modifichi:
+
+- Il `packageId` (`io.github.alessiopesit_boop.guessthechar`) e' l'identita' permanente dell'app sullo Store. **Non modificarlo mai** dopo la prima pubblicazione: cambierebbe l'app agli occhi di Play, e gli utenti esistenti non riceverebbero piu' update.
+- Il `host` (`alessiopesit-boop.github.io`) e' la origin che la TWA apre. Se passassimo a un dominio custom, va aggiornato qui + nei valori di `iconUrl`/`webManifestUrl`/`fullScopeUrl`.
+- Asset Links: il file `assetlinks.json` deve essere servito a livello di **dominio root**, non sotto `/guess-the-char/`. Vedi sezione 8 di `RELEASE-ANDROID.md` per le due opzioni (repo profilo `alessiopesit-boop.github.io` oppure dominio custom).
+
 ## Firebase (Auth + Firestore)
 
 L'app si appoggia a Firebase Auth + Firestore per login e sincronizzazione del progresso tra dispositivi. La configurazione lato console e' una-tantum, lato codice tutto e' gia' cablato.
