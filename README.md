@@ -42,4 +42,4 @@ Vedi il [CHANGELOG](CHANGELOG.md) per l'elenco delle modifiche.
 
 ## Licenza
 
-MIT
+Proprietaria, tutti i diritti riservati. Il codice e' pubblicamente visibile ma **non e' open source**: vedi [LICENSE](LICENSE). Nessun uso, copia, modifica, hosting o redistribuzione senza permesso scritto di Alessio Pes.
