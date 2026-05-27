@@ -19,6 +19,17 @@ Se la modifica e' una piccola correzione (typo, refactor locale, rinomina di una
 
 Aggiornare significa: modificare la sezione gia' esistente che descrive l'area toccata. Non aggiungere log di modifiche o changelog qui, il `git log` e' l'unica fonte di verita' per la cronologia.
 
+### Checkpoint obbligatorio prima di ogni PR (per l'assistente AI)
+
+**Prima di aprire una PR (e a fine di ogni task), l'assistente DEVE eseguire questo controllo, non saltarlo:**
+
+1. Rileggi il diff completo della PR (`git diff origin/main`).
+2. Chiediti, voce per voce dei criteri qui sopra: questo diff tocca qualcosa che CLAUDE.md o README descrivono (stack, dipendenze, script npm, route, schermate, servizi core, convenzioni, flusso utente, build, feature visibili, vincoli)?
+3. Se si': aggiorna i file di doc interessati **nella stessa PR** (stesso commit/branch), modificando la sezione esistente che descrive l'area. Non rimandare a una PR separata: la doc viaggia col codice che la rende vera.
+4. Se no (fix banale: typo, refactor locale, CSS puntuale): nessun aggiornamento, e puoi procedere.
+
+Errore tipico da evitare: aprire la PR di codice e "poi aggiorno la doc". Il README in passato e' rimasto indietro (diceva "niente backend" dopo l'arrivo di Firebase) proprio per questo. La doc va nella PR che la causa. In caso di dubbio se una modifica al README sia dovuta, aggiornala: meglio una riga in piu' nella facciata pubblica che un README falso.
+
 ## Cos'e' il progetto
 
 Quiz interattivo single-page per imparare a riconoscere a colpo d'occhio i sistemi di scrittura del mondo: appare un glifo (hiragana, devanagari, arabo, greco, ecc.) e l'utente sceglie tra quattro opzioni. Quattro modalita': Allenamento libero, Sfida a tempo, Survival, Sfida giornaliera deterministica con griglia emoji condivisibile. Tono estetico: gioco-quiz, dark, palette ambra di default.
