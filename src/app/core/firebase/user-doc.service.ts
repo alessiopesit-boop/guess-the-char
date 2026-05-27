@@ -6,6 +6,7 @@ import { User } from 'firebase/auth';
 // lazy (solo al login + debounced writes).
 import {
   Firestore,
+  deleteDoc,
   doc,
   getDoc,
   getFirestore,
@@ -15,6 +16,7 @@ import {
 import { ensureFirebaseApp } from './firebase';
 import { AuthService } from './auth.service';
 import { NicknameService } from './nickname.service';
+import { FriendsService } from './friends.service';
 import { AppStateService } from '../state/app-state.service';
 import { AppState, DailyHistoryEntry, PerScriptStat } from '../state/types';
 
@@ -40,6 +42,7 @@ export class UserDocService {
   private readonly auth = inject(AuthService);
   private readonly appState = inject(AppStateService);
   private readonly nicknames = inject(NicknameService);
+  private readonly friends = inject(FriendsService);
   private readonly db: Firestore | null;
 
   /** Uid della sessione attualmente in sync. Quando cambia (login / logout)
@@ -221,6 +224,96 @@ export class UserDocService {
     } catch (e) {
       console.warn('[firestore] push error:', e);
     }
+  }
+
+  /**
+   * Cancella definitivamente account e dati associati, MENTRE l'utente e'
+   * ancora autenticato. Ordine:
+   *   1. (solo Google) reautenticazione via popup, cosi' deleteUser non viene
+   *      rifiutato per "login non recente".
+   *   2. purge Firestore: amici (entrambi i lati), nickname, doc utente.
+   *   3. deleteUser sull'account Auth.
+   *
+   * Limite noto: NON tocchiamo /challenges. Per design una sfida e' un doc
+   * condiviso fra due parti e resta nello storico dell'altro giocatore anche
+   * dopo che uno dei due ha eliminato l'account.
+   *
+   * Idempotenza: se deleteUser fallisce con 'auth/requires-recent-login'
+   * (tipico per utenti email con sessione vecchia) rilanciamo
+   * RequiresRecentLoginError. A quel punto i dati Firestore sono gia' spariti
+   * ma l'account Auth resta; al secondo tentativo dopo il re-login la purge e'
+   * un no-op sui doc gia' cancellati e deleteUser riesce.
+   */
+  async deleteAccountAndData(): Promise<void> {
+    if (!this.db) throw new Error('Firebase not configured');
+    const u = this.auth.user();
+    if (!u || u === 'loading') throw new Error('Not authenticated');
+    const uid = u.uid;
+
+    // 1. Reautenticazione Google prima di tutto (il popup deve avvenire mentre
+    //    l'account e' ancora pienamente valido).
+    if (this.auth.currentProviderId() === 'google.com') {
+      await this.auth.reauthenticateGoogle();
+    }
+
+    // Annulla eventuali push in volo e dimentica l'uid corrente: non vogliamo
+    // ricreare il doc appena cancellato con una scrittura debounced pendente.
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    this.currentUid = null;
+
+    // 2. Purge Firestore.
+    // Amici: rimuove entrambi i lati di ogni relazione.
+    try {
+      const relations = await this.friends.listAll();
+      for (const entry of relations) {
+        await this.friends.remove(entry.uid);
+      }
+    } catch (e) {
+      console.warn('[firestore] friend purge error:', e);
+    }
+
+    // Nickname: rilascia l'entry in /nicknames. Tollerante: se gia' rilasciata
+    // o assente, non blocca il resto.
+    const nickname = this.appState.state().account?.nickname;
+    if (nickname) {
+      try {
+        await deleteDoc(doc(this.db, 'nicknames', nickname.toLowerCase()));
+      } catch (e) {
+        console.warn('[firestore] nickname release error:', e);
+      }
+    }
+
+    // Documento utente.
+    await deleteDoc(doc(this.db, 'users', uid));
+
+    // 3. Account Auth.
+    try {
+      await this.auth.deleteCurrentUser();
+    } catch (e) {
+      const code = (e as { code?: string } | null)?.code;
+      if (code === 'auth/requires-recent-login') {
+        throw new RequiresRecentLoginError(
+          'Per eliminare l\'account serve un login recente: esci, rientra e riprova.',
+        );
+      }
+      throw e;
+    }
+  }
+}
+
+/**
+ * Lanciato quando Firebase rifiuta la cancellazione dell'account perche' il
+ * login non e' abbastanza recente (tipicamente utenti email). La UI lo
+ * intercetta per invitare a uscire e rientrare. A quel punto i dati Firestore
+ * sono gia' stati cancellati, ma la purge e' idempotente al secondo tentativo.
+ */
+export class RequiresRecentLoginError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'RequiresRecentLoginError';
   }
 }
 
