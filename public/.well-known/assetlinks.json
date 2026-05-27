@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "io.github.alessiopesit_boop.guessthechar",
       "sha256_cert_fingerprints": [
-        "D2:76:57:EB:FD:AC:C6:44:8F:A2:E8:F6:93:1E:E7:19:CA:56:F8:EA:2F:00:E1:E2:4F:B9:A2:37:FD:22:B3:DF"
+        "D2:76:57:EB:FD:AC:C6:44:8F:A2:E8:F6:93:1E:E7:19:CA:56:F8:EA:2F:00:E1:E2:4F:B9:A2:37:FD:22:B3:DF",
+        "2F:57:F3:B2:45:07:6D:20:06:55:DB:2E:C4:30:EF:37:61:39:0E:B7:9B:9F:1B:45:E4:50:E4:CD:62:F2:EC:71"
       ]
     }
   }
