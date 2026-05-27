@@ -4,8 +4,10 @@ import {
   GoogleAuthProvider,
   User,
   createUserWithEmailAndPassword,
+  deleteUser,
   getAuth,
   onAuthStateChanged,
+  reauthenticateWithPopup,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -95,6 +97,44 @@ export class AuthService {
     const auth = this.requireAuth();
     if (languageCode) auth.languageCode = languageCode;
     await sendPasswordResetEmail(auth, email);
+  }
+
+  /**
+   * Provider con cui l'utente corrente ha fatto login ('google.com' /
+   * 'password'), o null se non c'e' utente. Serve alla cancellazione account
+   * per decidere se chiedere una reautenticazione via popup Google.
+   */
+  currentProviderId(): string | null {
+    return this.auth?.currentUser?.providerData[0]?.providerId ?? null;
+  }
+
+  /**
+   * Reautentica l'utente Google via popup. Necessario prima di operazioni
+   * "sensibili" come deleteUser quando il login non e' recente: Firebase
+   * rifiuta queste operazioni con 'auth/requires-recent-login' se la sessione
+   * e' vecchia, e il popup rinfresca le credenziali.
+   */
+  async reauthenticateGoogle(): Promise<void> {
+    const auth = this.requireAuth();
+    const user = auth.currentUser;
+    if (!user) {
+      throw new AuthDisabledError('Nessun utente loggato da reautenticare.');
+    }
+    await reauthenticateWithPopup(user, new GoogleAuthProvider());
+  }
+
+  /**
+   * Cancella definitivamente l'account Auth dell'utente corrente. Va chiamata
+   * solo dopo aver ripulito i dati Firestore (vedi UserDocService). Puo'
+   * lanciare 'auth/requires-recent-login' per utenti email con sessione
+   * vecchia: il chiamante lo intercetta per chiedere un re-login.
+   */
+  async deleteCurrentUser(): Promise<void> {
+    const u = this.auth?.currentUser;
+    if (!u) {
+      throw new AuthDisabledError('Nessun utente loggato da eliminare.');
+    }
+    await deleteUser(u);
   }
 
   private requireAuth(): Auth {

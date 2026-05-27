@@ -174,8 +174,33 @@
       <button class="btn btn-ghost btn-block reset-btn" type="button" (click)="resetProgress()">
         {{ i18n.lang() === 'it' ? 'Azzera progressi' : 'Reset progress' }}
       </button>
+
+      @if (state().account) {
+        <button
+          class="btn btn-ghost btn-block danger-text delete-account-btn"
+          type="button"
+          [disabled]="deleting()"
+          (click)="askDeleteAccount()"
+        >
+          {{ deleting() ? i18n.t('deleting') : i18n.t('deleteAccount') }}
+        </button>
+        @if (deleteError(); as err) {
+          <p class="muted delete-account-error" role="alert">{{ err }}</p>
+        }
+      }
     </div>
 
     <p class="settings-footer mono">{{ buildLabel }}</p>
   </div>
+
+  @if (showDeleteConfirm()) {
+    <app-confirm-dialog
+      [title]="i18n.t('deleteAccountConfirmTitle')"
+      [body]="i18n.t('deleteAccountConfirmBody')"
+      [confirmLabel]="deleting() ? i18n.t('deleting') : i18n.t('deleteAccountConfirmCta')"
+      [cancelLabel]="i18n.t('deleteAccountCancel')"
+      (confirmed)="confirmDeleteAccount()"
+      (cancel)="cancelDeleteAccount()"
+    />
+  }
 </div>

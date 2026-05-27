@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
@@ -13,12 +13,14 @@ import {
 } from '../../core/state/types';
 import { AppBar } from '../../shared/app-bar';
 import { Icon } from '../../shared/icon';
+import { ConfirmDialog } from '../../shared/confirm-dialog';
 import { APP_VERSION, BUILD_CONTEXT, BUILD_SHA } from '../../core/build-info';
 import { AuthService } from '../../core/firebase/auth.service';
+import { RequiresRecentLoginError, UserDocService } from '../../core/firebase/user-doc.service';
 
 @Component({
   selector: 'app-settings',
-  imports: [AppBar, Icon],
+  imports: [AppBar, Icon, ConfirmDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './settings.html',
   styleUrl: './settings.css',
@@ -29,8 +31,16 @@ export class Settings {
   protected readonly i18n = inject(I18nService);
   protected readonly appState = inject(AppStateService);
   private readonly authSvc = inject(AuthService);
+  private readonly userDoc = inject(UserDocService);
 
   protected readonly state = this.appState.state;
+
+  /** Dialog di conferma cancellazione account aperto. */
+  protected readonly showDeleteConfirm = signal(false);
+  /** True mentre la cancellazione e' in corso (disabilita i bottoni). */
+  protected readonly deleting = signal(false);
+  /** Messaggio di errore mostrato dopo un tentativo fallito, o null. */
+  protected readonly deleteError = signal<string | null>(null);
 
   protected readonly accents: ReadonlyArray<AccentPalette> = Object.values(ACCENT_PALETTES);
   protected readonly motions: ReadonlyArray<MotionLevel> = ['minimal', 'playful', 'rich'];
@@ -99,6 +109,41 @@ export class Settings {
     if (typeof window !== 'undefined' && window.confirm(msg)) {
       this.appState.reset();
       this.router.navigate(['/onboarding']);
+    }
+  }
+
+  /** Apre il dialog di conferma per la cancellazione account. */
+  protected askDeleteAccount(): void {
+    this.deleteError.set(null);
+    this.showDeleteConfirm.set(true);
+  }
+
+  /** Chiude il dialog di conferma (annulla). */
+  protected cancelDeleteAccount(): void {
+    this.showDeleteConfirm.set(false);
+  }
+
+  /**
+   * Conferma cancellazione: orchestra la purge dei dati + delete dell'account
+   * Auth via UserDocService. Su successo l'utente e' sloggato e atterra in home
+   * (AppStateService reagisce ad auth.user null azzerando state.account).
+   */
+  protected async confirmDeleteAccount(): Promise<void> {
+    this.deleting.set(true);
+    this.deleteError.set(null);
+    try {
+      await this.userDoc.deleteAccountAndData();
+      this.showDeleteConfirm.set(false);
+      this.router.navigate(['/home']);
+    } catch (e) {
+      this.showDeleteConfirm.set(false);
+      if (e instanceof RequiresRecentLoginError) {
+        this.deleteError.set(this.i18n.t('deleteAccountReloginNeeded'));
+      } else {
+        this.deleteError.set(this.i18n.t('deleteAccountError'));
+      }
+    } finally {
+      this.deleting.set(false);
     }
   }
 

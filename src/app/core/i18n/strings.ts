@@ -53,6 +53,16 @@ const IT = {
     'Questa sezione si attivera’ quando colleghero’ il backend. Per ora resta solo come anteprima.',
   feedback: 'Feedback',
   challenge: 'Sfida un amico',
+  deleteAccount: 'Elimina account',
+  deleteAccountConfirmTitle: 'Eliminare l\'account?',
+  deleteAccountConfirmBody:
+    'Questa operazione elimina per sempre il tuo account, le statistiche, gli amici e il nickname. Non si puo\' annullare.',
+  deleteAccountConfirmCta: 'Elimina per sempre',
+  deleteAccountCancel: 'Annulla',
+  deleteAccountReloginNeeded:
+    'Per sicurezza esci e rientra, poi riprova a eliminare l\'account.',
+  deleteAccountError: 'Non e\' stato possibile eliminare l\'account. Riprova.',
+  deleting: 'Eliminazione...',
 } as const;
 
 export type StringKey = keyof typeof IT;
@@ -110,6 +120,16 @@ const EN: Record<StringKey, string> = {
     'This section will activate once the backend is connected. For now it’s only a preview.',
   feedback: 'Feedback',
   challenge: 'Challenge a friend',
+  deleteAccount: 'Delete account',
+  deleteAccountConfirmTitle: 'Delete your account?',
+  deleteAccountConfirmBody:
+    'This permanently deletes your account, stats, friends and nickname. This cannot be undone.',
+  deleteAccountConfirmCta: 'Delete forever',
+  deleteAccountCancel: 'Cancel',
+  deleteAccountReloginNeeded:
+    'For security, sign out and sign back in, then try deleting again.',
+  deleteAccountError: 'Could not delete the account. Please try again.',
+  deleting: 'Deleting...',
 };
 
 export const STRINGS: Record<Lang, Record<StringKey, string>> = {

@@ -19,7 +19,7 @@ service cloud.firestore {
                     && request.resource.data.nickname.size() >= 2
                     && request.resource.data.nickname.size() <= 24;
       allow update: if request.auth != null && request.auth.uid == uid;
-      allow delete: if false;
+      allow delete: if request.auth != null && request.auth.uid == uid;
 
       // /users/{uid}/friends/{friendUid}
       // Subcollezione amici. Una relazione di amicizia consiste in DUE doc

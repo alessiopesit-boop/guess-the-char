@@ -262,6 +262,26 @@
   background: rgba(251, 113, 133, 0.08);
 }
 
+/* Zona pericolo: cancellazione account, solo per utenti loggati. */
+.delete-account-btn {
+  margin-top: 8px;
+  color: var(--danger);
+  border-color: rgba(251, 113, 133, 0.3);
+}
+.delete-account-btn:hover {
+  background: rgba(251, 113, 133, 0.08);
+}
+.delete-account-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.delete-account-error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--danger);
+}
+
 /* Footer in fondo: versione + "static · offline-ready". In dev include l'hash. */
 .settings-footer {
   margin: 18px 0 calc(env(safe-area-inset-bottom, 0px) + 4px);
