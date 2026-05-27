@@ -5,6 +5,19 @@ Tutte le modifiche rilevanti a questo progetto sono documentate qui.
 Il formato si basa su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/),
 e il progetto segue il [Semantic Versioning](https://semver.org/lang/it/).
 
+## [1.8.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.7.0...v1.8.0) (2026-05-27)
+
+
+### Features
+
+* **account:** permetti di eliminare l'account dall'app ([#88](https://github.com/alessiopesit-boop/guess-the-char/issues/88)) ([fece31d](https://github.com/alessiopesit-boop/guess-the-char/commit/fece31d423993c1a6a586ce13d8f46a9ab4a7159))
+
+
+### Bug Fixes
+
+* **i18n:** traduci stringhe rimaste in italiano in modalita' inglese ([#86](https://github.com/alessiopesit-boop/guess-the-char/issues/86)) ([98b447e](https://github.com/alessiopesit-boop/guess-the-char/commit/98b447e77e10bb8b197aa3970b3ecdb8e99639a2))
+* **privacy:** servi la privacy policy come pagina statica privacy.html ([#83](https://github.com/alessiopesit-boop/guess-the-char/issues/83)) ([1d55506](https://github.com/alessiopesit-boop/guess-the-char/commit/1d5550660274c069b8e02f0692d69cd8fc014ced))
+
 ## [1.7.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.6.0...v1.7.0) (2026-05-26)
 
 
