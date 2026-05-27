@@ -7,7 +7,8 @@ import { LangSwitch } from '../../shared/lang-switch';
 import { Logo } from '../../shared/logo';
 
 interface OnboardingStep {
-  eyebrow: string;
+  eyebrowIt: string;
+  eyebrowEn: string;
   titleIt: string;
   titleEn: string;
   bodyIt: string;
@@ -17,7 +18,8 @@ interface OnboardingStep {
 
 const STEPS: ReadonlyArray<OnboardingStep> = [
   {
-    eyebrow: 'BENVENUTO',
+    eyebrowIt: 'BENVENUTO',
+    eyebrowEn: 'WELCOME',
     titleIt: 'Indovina il carattere.',
     titleEn: 'Guess the character.',
     bodyIt: 'Compare un glifo. Tu riconosci da quale scrittura del mondo proviene. Tutto qui.',
@@ -25,7 +27,8 @@ const STEPS: ReadonlyArray<OnboardingStep> = [
     glyphs: ['字', 'ज', 'ش', 'Ω', 'ก', 'А', 'ㄱ', 'א'],
   },
   {
-    eyebrow: 'COME FUNZIONA',
+    eyebrowIt: 'COME FUNZIONA',
+    eyebrowEn: 'HOW IT WORKS',
     titleIt: 'Quattro opzioni. Tasti 1 a 4.',
     titleEn: 'Four options. Keys 1 to 4.',
     bodyIt: 'Risposta in un tocco o un tasto. Migliora la tua striscia, sblocca nuove scritture.',
@@ -60,6 +63,10 @@ export class Onboarding {
   protected readonly isLast = computed(() => this.step() === STEPS.length - 1);
   /** Chiave usata da @for per forzare il remount del DOM e far ripartire l'animazione di slide ad ogni cambio di step/direzione. */
   protected readonly slideKey = computed(() => `${this.step()}:${this.dir()}`);
+  protected readonly currentEyebrow = computed(() => {
+    const s = this.current();
+    return this.i18n.lang() === 'en' ? s.eyebrowEn : s.eyebrowIt;
+  });
   protected readonly currentTitle = computed(() => {
     const s = this.current();
     return this.i18n.lang() === 'en' ? s.titleEn : s.titleIt;
