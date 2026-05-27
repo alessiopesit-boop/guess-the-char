@@ -8,12 +8,15 @@ Da hiragana a hangul, da devanagari ad arabo: viene mostrato un carattere e devi
 - Quattro modalita' di gioco: Allenamento libero, Sfida a tempo (60s), Survival (3 vite) e Sfida giornaliera deterministica con griglia emoji condivisibile.
 - 17 sistemi di scrittura raggruppati per famiglia (Asia orientale, Sud-est asiatico, indiane, mediorientali, europee).
 - Pagina dei traguardi con dieci obiettivi, statistiche per-scrittura e sezioni di approfondimento.
+- Account opzionale (email/password o Google): senza login giochi subito, con login i progressi si sincronizzano tra dispositivi.
+- Funzioni sociali: profilo pubblico, classifica giornaliera e di sempre, ricerca utenti, amicizie e sfide 1-vs-1 tra amici.
+- Cancellazione account direttamente dall'app, e pagina privacy bilingue.
 - Impostazioni di accent, animazioni, modalita' per daltonici, suoni e vibrazione.
-- Interfaccia disponibile in italiano e inglese, persistenza in `localStorage`.
+- Interfaccia disponibile in italiano e inglese, installabile come app (PWA).
 
 ## Stack
 
-App Angular 21 a single-page application (standalone components, signals, OnPush, zoneless change detection). Niente backend: tutto lato client.
+App Angular 21 a single-page application (standalone components, signals, OnPush, zoneless change detection). Backend opzionale su Firebase (Auth + Firestore) per login e sincronizzazione dei progressi in cloud; senza login l'app funziona interamente lato client, con persistenza in `localStorage`.
 
 ## Come usarla
 
