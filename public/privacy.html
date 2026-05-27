@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy · Guess the Char</title>
+    <meta name="description" content="Privacy policy for Guess the Char: no ads, no trackers, minimal data collection." />
+    <link rel="canonical" href="https://alessiopesit-boop.github.io/guess-the-char/privacy.html" />
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --panel: #121821;
+        --text: #e6edf3;
+        --muted: #9aa7b4;
+        --accent: #f5b14c;
+        --border: #1f2937;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.6;
+        padding: 2rem 1rem 4rem;
+      }
+      .wrap { max-width: 720px; margin: 0 auto; }
+      h1 { font-size: 1.8rem; margin: 0 0 .5rem; }
+      h2 { font-size: 1.15rem; margin: 2rem 0 .5rem; color: var(--accent); }
+      .muted { color: var(--muted); }
+      a { color: var(--accent); }
+      code {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: .1rem .35rem;
+        font-size: .9em;
+      }
+      ul { padding-left: 1.2rem; }
+      li { margin: .25rem 0; }
+      .meta { margin-top: 2.5rem; font-size: .9rem; }
+      .lang-switch {
+        display: flex;
+        gap: .5rem;
+        margin-bottom: 1.5rem;
+      }
+      .lang-switch button {
+        background: var(--panel);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: .35rem 1rem;
+        cursor: pointer;
+        font: inherit;
+      }
+      .lang-switch button.active {
+        background: var(--accent);
+        color: #0b0f14;
+        border-color: var(--accent);
+        font-weight: 600;
+      }
+      .home-link { display: inline-block; margin-bottom: 1rem; color: var(--muted); text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <a class="home-link" href="/guess-the-char/">&larr; Guess the Char</a>
+
+      <div class="lang-switch">
+        <button type="button" data-lang="en">English</button>
+        <button type="button" data-lang="it">Italiano</button>
+      </div>
+
+      <section data-section="it">
+        <h1>Informativa sulla privacy</h1>
+        <p class="muted">In sintesi: l'app raccoglie il minimo indispensabile, niente pubblicita', niente tracker, e i dati restano tuoi.</p>
+
+        <h2>Chi sono</h2>
+        <p>Alessio Pes, sviluppatore indipendente. Per qualsiasi domanda o richiesta legata ai tuoi dati: <a href="mailto:alessio.pes.it@gmail.com">alessio.pes.it@gmail.com</a>.</p>
+
+        <h2>Cosa raccolgo se accedi con un account</h2>
+        <p>Quando crei un account (con email + password oppure con Google), l'app salva su Firebase questi dati:</p>
+        <ul>
+          <li>l'email che hai usato per accedere, gestita da Firebase Authentication</li>
+          <li>un nickname pubblico (che ti chiediamo di scegliere) e un avatar</li>
+          <li>i tuoi progressi di gioco: streak, percentuale di accuratezza, statistiche per ogni alfabeto, storico delle sfide giornaliere</li>
+          <li>la lista degli amici e le sfide 1-vs-1 che scambi con loro</li>
+        </ul>
+        <p>I dati di profilo (nickname, avatar, statistiche, badge sbloccati) sono <strong>visibili pubblicamente</strong> sull'URL <code>/u/:nickname</code> dell'app e nella classifica. Email e elenco amici restano privati: solo tu li vedi.</p>
+
+        <h2>Cosa raccolgo se NON accedi</h2>
+        <p>Se usi l'app come ospite, niente lascia il tuo dispositivo. Le preferenze (lingua, tema, suoni) e i progressi di gioco vengono salvati solo nel <code>localStorage</code> del tuo browser. Niente viene inviato a un server.</p>
+
+        <h2>Dove finiscono questi dati</h2>
+        <p>L'app usa due servizi Google:</p>
+        <ul>
+          <li><strong>Firebase Authentication</strong>: gestisce login con email/password o con Google. Email e provider OAuth vivono qui.</li>
+          <li><strong>Cloud Firestore</strong>: database delle tue statistiche, amici e sfide. Regione di archiviazione: <code>eur3</code> (Europa).</li>
+        </ul>
+        <p>Google e' titolare del trattamento per la parte di infrastruttura. La sua privacy policy: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.</p>
+
+        <h2>Cosa NON raccolgo</h2>
+        <p>Nessuna pubblicita'. Nessun tracker di terze parti (no Google Analytics, no Facebook Pixel, niente). Nessun profilo di marketing.</p>
+
+        <h2>Per quanto tempo</h2>
+        <p>Finche' tieni il tuo account, i dati restano. Se cancelli l'account o me lo chiedi, vengono eliminati entro 30 giorni.</p>
+
+        <h2>I tuoi diritti</h2>
+        <p>In base al GDPR puoi sempre:</p>
+        <ul>
+          <li>accedere ai tuoi dati (te li mando io in un file JSON, scrivimi)</li>
+          <li>correggerli (nickname e avatar li cambi direttamente da Impostazioni)</li>
+          <li>cancellarli (mandami una mail: rimuovo account, statistiche, amicizie e sfide)</li>
+          <li>portarli altrove (export JSON su richiesta)</li>
+        </ul>
+        <p>Indirizzo per esercitare questi diritti: <a href="mailto:alessio.pes.it@gmail.com">alessio.pes.it@gmail.com</a>. Rispondo entro 30 giorni.</p>
+
+        <h2>Modifiche a questa informativa</h2>
+        <p>Se cambio qualcosa di sostanziale, aggiorno la data in fondo e te lo segnalo nell'app al prossimo accesso.</p>
+
+        <p class="muted meta">Ultimo aggiornamento: <strong>2026-05-26</strong></p>
+      </section>
+
+      <section data-section="en">
+        <h1>Privacy Policy</h1>
+        <p class="muted">Short version: this app collects the bare minimum, no ads, no trackers, your data stays yours.</p>
+
+        <h2>Who I am</h2>
+        <p>Alessio Pes, indie developer. For any question or request about your data, write to: <a href="mailto:alessio.pes.it@gmail.com">alessio.pes.it@gmail.com</a>.</p>
+
+        <h2>What I collect if you sign in</h2>
+        <p>When you create an account (with email + password or Google), the app stores on Firebase:</p>
+        <ul>
+          <li>the email you used to sign in, managed by Firebase Authentication</li>
+          <li>a public nickname (you choose it) and an avatar</li>
+          <li>your game progress: streaks, accuracy percentage, per-script statistics, daily challenge history</li>
+          <li>your friend list and the 1-vs-1 challenges you exchange with them</li>
+        </ul>
+        <p>Profile data (nickname, avatar, statistics, unlocked badges) is <strong>publicly visible</strong> on the app's <code>/u/:nickname</code> page and on the leaderboard. Email and friend list stay private: only you can see them.</p>
+
+        <h2>What I collect if you don't sign in</h2>
+        <p>If you use the app as a guest, nothing leaves your device. Preferences (language, theme, sounds) and game progress are saved only in your browser's <code>localStorage</code>. Nothing is sent to any server.</p>
+
+        <h2>Where this data lives</h2>
+        <p>The app uses two Google services:</p>
+        <ul>
+          <li><strong>Firebase Authentication</strong>: handles login with email/password or Google. Email and OAuth provider live here.</li>
+          <li><strong>Cloud Firestore</strong>: database of your statistics, friends and challenges. Storage region: <code>eur3</code> (Europe).</li>
+        </ul>
+        <p>Google is the controller for the infrastructure portion. Their privacy policy: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.</p>
+
+        <h2>What I do NOT collect</h2>
+        <p>No advertising. No third-party trackers (no Google Analytics, no Facebook Pixel, nothing). No marketing profile.</p>
+
+        <h2>For how long</h2>
+        <p>As long as you keep your account, the data stays. If you delete your account or ask me to, it is removed within 30 days.</p>
+
+        <h2>Your rights</h2>
+        <p>Under GDPR you can always:</p>
+        <ul>
+          <li>access your data (I send it to you as a JSON file, just email me)</li>
+          <li>correct it (nickname and avatar are editable directly from Settings)</li>
+          <li>delete it (email me: I remove account, statistics, friendships and challenges)</li>
+          <li>port it elsewhere (JSON export on request)</li>
+        </ul>
+        <p>To exercise these rights: <a href="mailto:alessio.pes.it@gmail.com">alessio.pes.it@gmail.com</a>. I respond within 30 days.</p>
+
+        <h2>Changes to this policy</h2>
+        <p>If I change something substantial, I update the date below and flag it inside the app on your next access.</p>
+
+        <p class="muted meta">Last updated: <strong>2026-05-26</strong></p>
+      </section>
+    </div>
+
+    <script>
+      (function () {
+        var sections = {
+          it: document.querySelector('[data-section="it"]'),
+          en: document.querySelector('[data-section="en"]'),
+        };
+        var buttons = document.querySelectorAll('.lang-switch button');
+        function setLang(lang) {
+          if (lang !== 'it' && lang !== 'en') lang = 'en';
+          sections.it.style.display = lang === 'it' ? '' : 'none';
+          sections.en.style.display = lang === 'en' ? '' : 'none';
+          document.documentElement.lang = lang;
+          buttons.forEach(function (b) {
+            b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+          });
+        }
+        buttons.forEach(function (b) {
+          b.addEventListener('click', function () {
+            setLang(b.getAttribute('data-lang'));
+          });
+        });
+        var nav = (navigator.language || 'en').toLowerCase().split('-')[0];
+        setLang(nav === 'it' ? 'it' : 'en');
+      })();
+    </script>
+  </body>
+</html>
