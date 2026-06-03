@@ -5,6 +5,15 @@ Tutte le modifiche rilevanti a questo progetto sono documentate qui.
 Il formato si basa su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/),
 e il progetto segue il [Semantic Versioning](https://semver.org/lang/it/).
 
+## [1.8.1](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.8.0...v1.8.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* **pwa:** icona app non piu' tagliata sul launcher ([#92](https://github.com/alessiopesit-boop/guess-the-char/issues/92)) ([c1a8f39](https://github.com/alessiopesit-boop/guess-the-char/commit/c1a8f397b8afef47a9a61fa5348f2b8a1a9c1664))
+* **ui:** bottone "Sfida" allineato sul profilo di un amico ([#93](https://github.com/alessiopesit-boop/guess-the-char/issues/93)) ([914fcf7](https://github.com/alessiopesit-boop/guess-the-char/commit/914fcf7f0f207f4d149fe9a520e26afdf4697c55))
+* **ui:** nessun testo selezionabile nell'app ([#94](https://github.com/alessiopesit-boop/guess-the-char/issues/94)) ([f65da5a](https://github.com/alessiopesit-boop/guess-the-char/commit/f65da5a543d06ed679ce79a566c38cca05c80bb9))
+
 ## [1.8.0](https://github.com/alessiopesit-boop/guess-the-char/compare/v1.7.0...v1.8.0) (2026-05-27)
 
 
