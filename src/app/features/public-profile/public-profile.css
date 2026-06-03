@@ -82,10 +82,21 @@
 .pub-friend-bar {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 4px;
 }
+/* Uniformo l'altezza dei due possibili bottoni nella barra ("Siete amici"
+   nav-btn 40px + "Sfida" btn-primary 52px), che altrimenti convivono
+   disallineati nello stato accepted. */
+.pub-friend-bar .nav-btn,
+.pub-friend-bar .btn {
+  height: 46px;
+}
 .pub-friend-btn {
-  min-width: 200px;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 200px;
   justify-content: center;
 }
 
