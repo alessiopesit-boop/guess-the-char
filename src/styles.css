@@ -62,17 +62,16 @@ html, body {
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  /* App-feel: niente selezione del testo accidentale al long-press, niente
-     callout iOS, niente flash celeste al tap su mobile. Eccezioni: testi
-     narrativi (paragrafi) e campi di input restano normalmente selezionabili
-     (vedi regole sotto). */
+  /* App-feel: niente selezione del testo da nessuna parte (rovina
+     l'immersione del gioco-quiz), niente callout iOS, niente flash celeste
+     al tap su mobile. Unica eccezione: i campi editabili (vedi sotto), cosi'
+     ricerca, feedback, login e modifica nickname restano usabili. */
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-p,
 input,
 textarea,
 [contenteditable] {
@@ -664,7 +663,9 @@ button {
   border-radius: 14px;
   padding: 14px;
   white-space: pre;
-  user-select: all;
+  /* La griglia si condivide col bottone (navigator.share / clipboard), non
+     serve renderla selezionabile: niente selezione, coerente col resto. */
+  user-select: none;
   text-align: center;
 }
 
