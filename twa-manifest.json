@@ -14,7 +14,7 @@
   "enableNotifications": false,
   "startUrl": "/guess-the-char/",
   "iconUrl": "https://alessiopesit-boop.github.io/guess-the-char/icon-512.png",
-  "maskableIconUrl": "https://alessiopesit-boop.github.io/guess-the-char/icon-512.png",
+  "maskableIconUrl": "https://alessiopesit-boop.github.io/guess-the-char/icon-512-maskable.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./android.keystore",
